@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:ignore="ContentDescription">
 
-    <com.microsoft.research.karya.ui.views.KaryaToolbar
+    <com.karyaplatform.karya.ui.views.KaryaToolbar
         android:id="@+id/appTb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
         app:layout_constraintRight_toRightOf="@id/accessCodeErrorIv"
         app:layout_constraintTop_toTopOf="@id/accessCodeErrorIv" />
 
-    <com.microsoft.research.karya.ui.views.numpad.NumPad
+    <com.karyaplatform.karya.ui.views.numpad.NumPad
         android:id="@+id/numPad"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

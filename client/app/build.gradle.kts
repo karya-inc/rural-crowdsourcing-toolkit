@@ -14,7 +14,7 @@ plugins {
 android {
   compileSdkVersion(30)
   defaultConfig {
-    applicationId = "com.microsoft.research.karya"
+    applicationId = "com.karyaplatform.karya"
     minSdkVersion(21)
     targetSdkVersion(30)
     multiDexEnabled = true

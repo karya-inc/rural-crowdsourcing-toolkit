@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/splashScreenFragment"
-        android:name="com.microsoft.research.karya.ui.splashScreen.SplashScreenFragment"
+        android:name="com.karyaplatform.karya.ui.splashScreen.SplashScreenFragment"
         android:label="SplashScreenFragment"
         tools:layout="@layout/fragment_splash_screen">
         <action
@@ -32,7 +32,7 @@
         app:startDestination="@id/phoneNumberFragment">
         <fragment
             android:id="@+id/phoneNumberFragment"
-            android:name="com.microsoft.research.karya.ui.onboarding.login.phone.PhoneNumberFragment"
+            android:name="com.karyaplatform.karya.ui.onboarding.login.phone.PhoneNumberFragment"
             android:label="PhoneNumberFragment"
             tools:layout="@layout/fragment_phone_number">
             <action
@@ -41,7 +41,7 @@
         </fragment>
         <fragment
             android:id="@+id/OTPFragment"
-            android:name="com.microsoft.research.karya.ui.onboarding.login.otp.OTPFragment"
+            android:name="com.karyaplatform.karya.ui.onboarding.login.otp.OTPFragment"
             android:label="OTPFragment"
             tools:layout="@layout/fragment_otp">
             <action
@@ -54,7 +54,7 @@
         app:startDestination="@id/accessCodeFragment">
         <fragment
             android:id="@+id/fileDownloadFragment"
-            android:name="com.microsoft.research.karya.ui.onboarding.fileDownload.FileDownloadFragment"
+            android:name="com.karyaplatform.karya.ui.onboarding.fileDownload.FileDownloadFragment"
             android:label="FileDownloadFragment"
             tools:layout="@layout/fragment_file_download">
             <action
@@ -65,7 +65,7 @@
         </fragment>
         <fragment
             android:id="@+id/consentFormFragment"
-            android:name="com.microsoft.research.karya.ui.onboarding.consentForm.ConsentFormFragment"
+            android:name="com.karyaplatform.karya.ui.onboarding.consentForm.ConsentFormFragment"
             android:label="ConsentFormFragment"
             tools:layout="@layout/fragment_consent_form">
             <action
@@ -77,7 +77,7 @@
         </fragment>
         <fragment
             android:id="@+id/accessCodeFragment"
-            android:name="com.microsoft.research.karya.ui.onboarding.accesscode.AccessCodeFragment"
+            android:name="com.karyaplatform.karya.ui.onboarding.accesscode.AccessCodeFragment"
             android:label="AccessCodeFragment"
             tools:layout="@layout/fragment_access_code">
             <action
@@ -90,7 +90,7 @@
     </navigation>
     <fragment
         android:id="@+id/dashboardActivity"
-        android:name="com.microsoft.research.karya.ui.dashboard.DashboardFragment"
+        android:name="com.karyaplatform.karya.ui.dashboard.DashboardFragment"
         android:label="activity_dashboard"
         tools:layout="@layout/fragment_dashboard">
         <action
@@ -151,7 +151,7 @@
         app:destination="@id/loginFlow" />
     <fragment
         android:id="@+id/speechDataMainFragment"
-        android:name="com.microsoft.research.karya.ui.scenarios.speechData.SpeechDataMainFragment"
+        android:name="com.karyaplatform.karya.ui.scenarios.speechData.SpeechDataMainFragment"
         android:label="SpeechDataMainFragment"
         tools:layout="@layout/microtask_speech_data">
         <argument android:name="taskId" app:argType="string" />
@@ -164,7 +164,7 @@
     </fragment>
     <fragment
         android:id="@+id/universalTransliterationMainFragment"
-        android:name="com.microsoft.research.karya.ui.scenarios.transliteration.TransliterationMainFragment"
+        android:name="com.karyaplatform.karya.ui.scenarios.transliteration.TransliterationMainFragment"
         android:label="UniversalTransliterationMainFragment">
         <argument android:name="taskId" app:argType="string" />
         <argument android:name="completed" app:argType="integer" />
@@ -175,7 +175,7 @@
     </fragment>
     <fragment
         android:id="@+id/speechVerificationFragment"
-        android:name="com.microsoft.research.karya.ui.scenarios.speechVerification.SpeechVerificationFragment"
+        android:name="com.karyaplatform.karya.ui.scenarios.speechVerification.SpeechVerificationFragment"
         android:label="SpeechVerificationFragment">
         <argument android:name="taskId" app:argType="string" />
         <argument android:name="completed" app:argType="integer" />
@@ -186,7 +186,7 @@
     </fragment>
     <fragment
         android:id="@+id/imageTranscriptionFragment"
-        android:name="com.microsoft.research.karya.ui.scenarios.imageTranscription.ImageTranscriptionFragment"
+        android:name="com.karyaplatform.karya.ui.scenarios.imageTranscription.ImageTranscriptionFragment"
         android:label="imageTrnascriptionFragment">
         <argument android:name="taskId" app:argType="string" />
         <argument android:name="completed" app:argType="integer" />
@@ -197,7 +197,7 @@
     </fragment>
     <fragment
         android:id="@+id/imageLabellingFragment"
-        android:name="com.microsoft.research.karya.ui.scenarios.imageLabelling.ImageLabellingFragment"
+        android:name="com.karyaplatform.karya.ui.scenarios.imageLabelling.ImageLabellingFragment"
         android:label="imageLabellingFragment">
         <argument android:name="taskId" app:argType="string" />
         <argument android:name="completed" app:argType="integer" />
@@ -208,7 +208,7 @@
     </fragment>
     <fragment
         android:id="@+id/quizFragment"
-        android:name="com.microsoft.research.karya.ui.scenarios.quiz.QuizMainFragment"
+        android:name="com.karyaplatform.karya.ui.scenarios.quiz.QuizMainFragment"
         android:label="quizFragment">
         <argument android:name="taskId" app:argType="string" />
         <argument android:name="completed" app:argType="integer" />
