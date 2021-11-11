@@ -14,5 +14,6 @@
 /captures
 .externalNativeBuild
 .idea
+app/release
 
 google-services.json
