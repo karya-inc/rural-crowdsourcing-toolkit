@@ -18,7 +18,7 @@ android {
     minSdkVersion(21)
     targetSdkVersion(30)
     multiDexEnabled = true
-    versionCode = 26
+    versionCode = 29
     versionName = "1"
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables.useSupportLibrary = true
@@ -61,6 +61,11 @@ android {
     exclude("META-INF/notice.txt")
     exclude("META-INF/ASL2.0")
     exclude("META-INF/*.kotlin_module")
+  }
+  bundle {
+    language {
+      enableSplit = false
+    }
   }
 }
 
