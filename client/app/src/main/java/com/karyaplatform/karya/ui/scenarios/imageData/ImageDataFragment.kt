@@ -1,7 +1,6 @@
 package com.karyaplatform.karya.ui.scenarios.imageData
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,11 +63,11 @@ class ImageDataFragment : BaseMTRendererFragment(R.layout.microtask_image_data) 
 
   private fun setupObservers() {
     viewModel.newImageCount.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { pair ->
-      Log.d("test", pair.toString())
       val count = pair.second
       localImageState.clear()
-      for (i in 1..count) {
-        localImageState.add(false)
+      for (i in 0..count-1) {
+        val outputFilePath = viewModel.outputFilePath(i)
+        localImageState.add(File(outputFilePath).exists())
       }
 
       val instruction = getString(R.string.image_data_collection_instruction).replace("#", (count - 1).toString())
@@ -201,7 +200,7 @@ class ImageDataFragment : BaseMTRendererFragment(R.layout.microtask_image_data) 
     imageDataGridView.invisible()
     fullImageDisplayView.invisible()
     imageDataCaptureView.visible()
-    val label = if (currentImageIndex == 0) "Front Cover" else "Page $currentImageIndex"
+    val label = if (currentImageIndex == 0) "Front Cover" else "Picture $currentImageIndex"
     imageLabelTv.text = label
   }
 
@@ -221,7 +220,7 @@ class ImageDataFragment : BaseMTRendererFragment(R.layout.microtask_image_data) 
       currentImageIndex = 0
       switchToGridView()
     } else {
-      val label = if (currentImageIndex == 0) "Front Cover" else "Page $currentImageIndex"
+      val label = if (currentImageIndex == 0) "Front Cover" else "Picture $currentImageIndex"
       imageLabelTv.text = label
     }
   }
@@ -261,7 +260,7 @@ class ImageDataFragment : BaseMTRendererFragment(R.layout.microtask_image_data) 
 
   private fun updateFullImageView() {
     // Text label
-    val label = if (currentImageIndex == 0) "Front Cover" else "Page $currentImageIndex"
+    val label = if (currentImageIndex == 0) "Front Cover" else "Picture $currentImageIndex"
     fullImageLabelTv.text = label
 
     // Image path
