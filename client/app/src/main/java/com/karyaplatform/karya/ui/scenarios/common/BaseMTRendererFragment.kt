@@ -1,5 +1,6 @@
 package com.karyaplatform.karya.ui.scenarios.common
 
+import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -9,6 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.karyaplatform.karya.ui.base.BaseFragment
 import com.karyaplatform.karya.utils.extensions.observe
+import com.karyaplatform.karya.R
+import com.karyaplatform.karya.utils.DateUtils
 import kotlinx.android.synthetic.main.microtask_common_header.*
 
 abstract class BaseMTRendererFragment(@LayoutRes contentLayoutId: Int) :
@@ -93,6 +96,24 @@ abstract class BaseMTRendererFragment(@LayoutRes contentLayoutId: Int) :
     viewModel.inputFileDoesNotExist.observe(viewLifecycleOwner.lifecycle, lifecycleScope) { notExist ->
       if (notExist) {
         // Toast.makeText(requireContext(), getString(R.string.input_file_does_not_exist), Toast.LENGTH_LONG).show()
+      }
+    }
+
+    viewModel.outsideTimeBound.observe(viewLifecycleOwner.lifecycle, lifecycleScope) { outside ->
+      if (outside.first) {
+        val builder = AlertDialog.Builder(requireContext())
+        val startTime = DateUtils.convert24to12(outside.second)
+        val endTime = DateUtils.convert24to12(outside.third)
+
+        val message = getString(R.string.task_outside_time_bound)
+          .replace("_START_TIME_", startTime)
+          .replace("_END_TIME_", endTime)
+        builder.setMessage(message)
+        builder.setNeutralButton(R.string.okay) { _, _ ->
+          findNavController().popBackStack()
+        }
+        val dialog = builder.create()
+        dialog.show()
       }
     }
   }
