@@ -76,7 +76,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="?taskAvailableColor"
-                    android:textSize="@dimen/_14ssp"
+                    android:textSize="@dimen/_12ssp"
                     tools:text="9" />
 
                 <TextView
@@ -85,7 +85,7 @@
                     android:layout_marginLeft="@dimen/_5sdp"
                     android:text="@string/tasks_available"
                     android:textColor="?taskAvailableColor"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_11ssp" />
             </LinearLayout>
 
             <LinearLayout
@@ -100,7 +100,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="?taskCompletedColor"
-                    android:textSize="@dimen/_14ssp"
+                    android:textSize="@dimen/_12ssp"
                     tools:text="9" />
 
                 <TextView
@@ -109,7 +109,7 @@
                     android:layout_marginLeft="@dimen/_5sdp"
                     android:text="@string/tasks_completed"
                     android:textColor="?taskCompletedColor"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_11ssp" />
             </LinearLayout>
 
             <LinearLayout
@@ -124,8 +124,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="?taskSubmittedColor"
-                    android:textSize="@dimen/_14ssp"
-                    tools:text="9" />
+                    android:textSize="@dimen/_12ssp"
+                    tools:text="1000" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -133,7 +133,7 @@
                     android:layout_marginLeft="@dimen/_5sdp"
                     android:text="@string/tasks_submitted"
                     android:textColor="?taskSubmittedColor"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_11ssp" />
             </LinearLayout>
 
             <LinearLayout
@@ -148,8 +148,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="?taskVerifiedColor"
-                    android:textSize="@dimen/_14ssp"
-                    tools:text="9" />
+                    android:textSize="@dimen/_12ssp"
+                    tools:text="1000" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -157,7 +157,7 @@
                     android:layout_marginLeft="@dimen/_5sdp"
                     android:text="@string/tasks_verified"
                     android:textColor="?taskVerifiedColor"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_11ssp" />
             </LinearLayout>
 
         </GridLayout>

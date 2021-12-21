@@ -89,11 +89,11 @@
 
     <!-- Dashboard -->
     <string name="dashboard_title">டாஷ்போர்டு</string>
-    <string name="sync_prompt">பணிகளைச் சமர்ப்பிக்க / புதிய பணிகளைப் பெற</string>
-    <string name="tasks_available">உள்ளன</string>
-    <string name="tasks_completed">முடிக்கப்பட்டுள்ளன</string>
-    <string name="tasks_submitted">சமர்ப்பிக்கப்பட்டுள்ளன </string>
-    <string name="tasks_verified">சரிபார்க்கப்பட்டுள்ளன</string>
+    <string name="sync_prompt">பணிகள் சமர்ப்பிக்க / புதியவை பெற</string>
+    <string name="tasks_available">உள்ளவை</string>
+    <string name="tasks_completed">முடிந்தவை</string>
+    <string name="tasks_submitted">சமர்ப்பித்தவை</string>
+    <string name="tasks_verified">சரிபார்த்தவை</string>
     <string name="sync_prompt_message">நீங்கள் இப்போது உங்கள் முடிக்கப்பட்ட பணிகளை சர்வரில் சமர்ப்பிக்கலாம். இப்போது பணிகளைச் சமர்ப்பிக்க விரும்புகிறீர்களா?</string>
     <string name="yes">ஆம்</string>
     <string name="no">இல்லை</string>
