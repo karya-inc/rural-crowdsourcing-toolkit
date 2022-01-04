@@ -67,6 +67,16 @@ android {
       enableSplit = false
     }
   }
+  flavorDimensions("size")
+  productFlavors {
+    create("large") {
+      dimension = "size"
+      applicationIdSuffix = "large"
+    }
+    create("standard") {
+      dimension = "size"
+    }
+  }
 }
 
 ktfmt {
