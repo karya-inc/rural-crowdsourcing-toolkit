@@ -17,6 +17,7 @@ import com.karyaplatform.karya.data.model.karya.modelsExtra.TaskInfo
 import com.karyaplatform.karya.databinding.FragmentDashboardBinding
 import com.karyaplatform.karya.ui.base.SessionFragment
 import com.karyaplatform.karya.utils.extensions.*
+import com.karyaplatform.karya.BuildConfig
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -255,11 +256,16 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
     if (!task.isGradeCard && task.taskStatus.assignedMicrotasks > 0) {
       val taskId = task.taskID
       val status = task.taskStatus
-      val completed = status.completedMicrotasks + status.submittedMicrotasks + status.verifiedMicrotasks
+      val completed =
+        status.completedMicrotasks + status.submittedMicrotasks + status.verifiedMicrotasks
       val total = status.assignedMicrotasks + completed
-      val action = with(DashboardFragmentDirections) {
+      var action = with(DashboardFragmentDirections) {
         when (task.scenarioName) {
-          ScenarioType.SPEECH_DATA -> actionDashboardActivityToSpeechDataMainFragment(taskId, completed, total)
+          ScenarioType.SPEECH_DATA -> actionDashboardActivityToSpeechDataMainFragment(
+            taskId,
+            completed,
+            total
+          )
           ScenarioType.XLITERATION_DATA -> actionDashboardActivityToUniversalTransliterationMainFragment(
             taskId,
             completed,
@@ -270,11 +276,33 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
             completed,
             total
           )
-          ScenarioType.IMAGE_TRANSCRIPTION -> actionDashboardActivityToImageTranscription(taskId, completed, total)
-          ScenarioType.IMAGE_LABELLING -> actionDashboardActivityToImageLabelling(taskId, completed, total)
+          ScenarioType.IMAGE_TRANSCRIPTION -> actionDashboardActivityToImageTranscription(
+            taskId,
+            completed,
+            total
+          )
+          ScenarioType.IMAGE_LABELLING -> actionDashboardActivityToImageLabelling(
+            taskId,
+            completed,
+            total
+          )
           ScenarioType.QUIZ -> actionDashboardActivityToQuiz(taskId, completed, total)
           ScenarioType.IMAGE_DATA -> actionDashboardActivityToImageData(taskId, completed, total)
-          ScenarioType.SENTENCE_VALIDATION -> actionDashboardActivityToSentenceValidation(taskId, completed, total)
+          ScenarioType.SENTENCE_VALIDATION -> actionDashboardActivityToSentenceValidation(
+            taskId,
+            completed,
+            total
+          )
+          else -> null
+        }
+      }
+      if (action == null && BuildConfig.FLAVOR == "large") {
+        action = when (task.scenarioName) {
+          ScenarioType.SIGN_LANGUAGE_VIDEO -> DashboardFragmentDirections.actionDashboardActivityToSignVideo(
+            taskId,
+            completed,
+            total
+          )
           else -> null
         }
       }
