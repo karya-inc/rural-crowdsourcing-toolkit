@@ -47,9 +47,10 @@ constructor(
   /**
    * Submit response
    */
-  fun submitResponse(grammar: Boolean, spelling: Boolean) {
+  fun submitResponse(grammar: Boolean, spelling: Boolean, appropriate: Boolean) {
     outputData.addProperty("grammar", grammar)
     outputData.addProperty("spelling", spelling)
+    outputData.addProperty("appropriate", appropriate)
 
     viewModelScope.launch {
       completeAndSaveCurrentMicrotask()

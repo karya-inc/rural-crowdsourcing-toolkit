@@ -22,7 +22,7 @@
         style="@style/MicrotaskInputFrame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.3"
+        app:layout_constraintHeight_percent="0.25"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/instructionTv">
 
@@ -129,6 +129,52 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/appropriateCl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:paddingStart="@dimen/_10sdp"
+        app:layout_constraintTop_toBottomOf="@id/spellingCl">
+
+        <TextView
+            android:id="@+id/appropriateQuestion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="@string/appropriate_question"
+            android:textSize="@dimen/_12ssp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/appropriateGroup"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/appropriateGroup"
+            style="@style/YesNoGroup"
+            android:layout_marginHorizontal="@dimen/_10sdp"
+            android:gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/appropriateQuestion"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/appropriateGoodBtn"
+                style="@style/YesNoToggle"
+                android:minWidth="@dimen/_20sdp"
+                android:text="@string/yes" />
+
+            <Button
+                android:id="@+id/appropriateBadBtn"
+                style="@style/YesNoToggle"
+                android:minWidth="@dimen/_20sdp"
+                android:text="@string/no" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <include
         android:id="@+id/nextBtn"
@@ -138,7 +184,7 @@
         android:layout_margin="@dimen/_20sdp"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/spellingCl"
+        app:layout_constraintTop_toBottomOf="@id/appropriateCl"
         tools:layout_editor_absoluteY="0dp" />
 
 

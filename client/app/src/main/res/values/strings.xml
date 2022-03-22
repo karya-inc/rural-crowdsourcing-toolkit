@@ -244,6 +244,7 @@
     <string name="sentence_validation_instruction">Is the sentence below correct?</string>
     <string name="grammar_question">Is the above sentence grammatically correct?</string>
     <string name="spelling_question">Are all the words spelt correctly in the sentence?</string>
+    <string name="appropriate_question">Is this sentence appropriate for a general audience?</string>
 
     <!-- Sign verification strings -->
     <string name="video_good">Good</string>

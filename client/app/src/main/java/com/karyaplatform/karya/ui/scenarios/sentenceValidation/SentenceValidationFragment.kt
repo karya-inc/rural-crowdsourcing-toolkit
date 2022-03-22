@@ -20,6 +20,7 @@ class SentenceValidationFragment : BaseMTRendererFragment(R.layout.microtask_sen
 
   private var grammarValid: Boolean? = null
   private var spellingValid: Boolean? = null
+  private var appropriateValid: Boolean? = null
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -80,17 +81,30 @@ class SentenceValidationFragment : BaseMTRendererFragment(R.layout.microtask_sen
       }
     }
 
+    appropriateGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+      if (isChecked) {
+        appropriateValid = when (checkedId) {
+          appropriateGoodBtn.id -> true
+          appropriateBadBtn.id -> false
+          else -> false
+        }
+        updateNextButtonStatus()
+      }
+    }
+
     nextBtn.setOnClickListener {
-      viewModel.submitResponse(grammarValid!!, spellingValid!!)
+      viewModel.submitResponse(grammarValid!!, spellingValid!!, appropriateValid!!)
       grammarGroup.clearChecked()
       spellingGroup.clearChecked()
+      appropriateGroup.clearChecked()
       grammarValid = null
       spellingValid = null
+      appropriateValid = null
     }
   }
 
   private fun updateNextButtonStatus() {
-    if (grammarValid != null && spellingValid != null) {
+    if (grammarValid != null && spellingValid != null && appropriateValid != null) {
       enableNextBtn()
     } else {
       disableNextBtn()
