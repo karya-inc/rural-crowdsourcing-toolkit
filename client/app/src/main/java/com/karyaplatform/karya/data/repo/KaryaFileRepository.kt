@@ -10,6 +10,12 @@ class KaryaFileRepository
 @Inject
 constructor(private val karyaFileDao: KaryaFileDao) {
   suspend fun insertKaryaFile(karyaFileRecord: KaryaFileRecord) {
-    withContext(Dispatchers.IO) { karyaFileDao.insert(karyaFileRecord) }
+    withContext(Dispatchers.IO) {
+      try {
+        karyaFileDao.insert(karyaFileRecord)
+      } catch (e: Exception) {
+        karyaFileDao.upsert(karyaFileRecord)
+      }
+    }
   }
 }
