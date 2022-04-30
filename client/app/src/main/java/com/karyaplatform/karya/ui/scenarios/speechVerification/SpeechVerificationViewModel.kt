@@ -258,7 +258,7 @@ constructor(
     if (activityState == ActivityState.PLAYBACK) {
       mediaPlayer!!.stop()
     }
-    mediaPlayer!!.release()
+    mediaPlayer?.release()
     mediaPlayer = null
 
     val accuracy =
