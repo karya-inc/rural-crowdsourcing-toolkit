@@ -293,10 +293,15 @@ constructor(
         if (!File(microtaskTarBallPath).exists()) {
           _inputFileDoesNotExist.value = true
         } else {
-          FileUtils.extractGZippedTarBallIntoDirectory(
-            microtaskTarBallPath,
-            microtaskInputDirectory
-          )
+          try {
+            FileUtils.extractGZippedTarBallIntoDirectory(
+              microtaskTarBallPath,
+              microtaskInputDirectory
+            )
+          } catch(e: Exception) {
+            skipAndSaveCurrentMicrotask()
+            moveToNextMicrotask()
+          }
         }
       }
 
