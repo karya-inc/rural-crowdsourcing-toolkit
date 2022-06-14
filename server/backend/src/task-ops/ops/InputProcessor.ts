@@ -29,9 +29,9 @@ export type TaskInputProcessorObject = {
  */
 export async function processInputFile(
   task: TaskRecordType,
-  jsonFilePath?: string,
-  tgzFilePath?: string,
-  taskFolder?: string
+  jsonFilePath: string | undefined,
+  tgzFilePath: string | undefined,
+  taskFolder: string
 ) {
   // Extract the scenario corresponding to the task
   const scenario_name = task.scenario_name;
@@ -81,7 +81,12 @@ export async function processInputFile(
 
     // extract microtasks and create them
     await BBPromise.mapSeries(microtasks, async (microtask) => {
-      const mtRecord = await BasicModel.insertRecord('microtask', { ...microtask, group_id });
+      const mtRecord = await BasicModel.insertRecord('microtask', {
+        ...microtask,
+        base_credits: task.params.baseCreditsPerMicrotask,
+        deadline: task.params.deadline,
+        group_id,
+      });
 
       // create and upload microtask input files if necessary
       if (mtRecord.input.files) {
@@ -103,4 +108,12 @@ export async function processInputFile(
       }
     });
   });
+
+  // Clean up the input files
+  try {
+    await fsp.rmdir(taskFolder, { recursive: true });
+  } catch (e) {
+    // Something went wrong while cleaning up
+    // Ignore
+  }
 }

@@ -7,6 +7,7 @@ import com.karyaplatform.karya.data.local.daos.TaskDao
 import com.karyaplatform.karya.data.local.daosExtra.MicrotaskAssignmentDaoExtra
 import com.karyaplatform.karya.data.model.karya.MicroTaskAssignmentRecord
 import com.karyaplatform.karya.data.model.karya.MicroTaskRecord
+import com.karyaplatform.karya.data.model.karya.enums.MicrotaskAssignmentStatus
 import com.karyaplatform.karya.data.model.karya.TaskRecord
 import com.karyaplatform.karya.data.service.MicroTaskAssignmentAPI
 import kotlinx.coroutines.Dispatchers
@@ -183,6 +184,10 @@ constructor(
     assignmentDaoExtra.markSkip(id, date)
   }
 
+  suspend fun markExpire(id: String, date: String) {
+    assignmentDaoExtra.markExpire(id, date)
+  }
+
   suspend fun markAssigned(id: String, date: String) {
     assignmentDaoExtra.markAssigned(id, date)
   }
@@ -207,8 +212,14 @@ constructor(
     return assignmentDao.getNewVerifiedAssignmentsFromTime(worker_id) ?: INITIAL_TIME
   }
 
-  suspend fun getTotalCreditsEarned(worker_id: String): Float? {
-    return assignmentDaoExtra.getTotalCreditsEarned(worker_id)
+  suspend fun getTotalCreditsEarned(worker_id: String): Float {
+    val baseCredits = assignmentDaoExtra.getTotalBaseCreditsEarned(worker_id)
+    val bonusCredits = assignmentDaoExtra.getTotalCreditsEarned(worker_id)
+    return (baseCredits ?: 0.0f) + (bonusCredits ?: 0.0f)
+  }
+
+  suspend fun getIDsForTask(task_id: String, statuses: List<MicrotaskAssignmentStatus>): List<String> {
+    return assignmentDaoExtra.getIDsForTask(task_id, statuses)
   }
 
   suspend fun getUnsubmittedIDsForTask(task_id: String, includeCompleted: Boolean): List<String> {

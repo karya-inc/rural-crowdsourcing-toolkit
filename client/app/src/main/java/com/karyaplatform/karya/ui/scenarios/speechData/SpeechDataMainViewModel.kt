@@ -137,6 +137,9 @@ constructor(
   private val _playRecordPromptTrigger: MutableStateFlow<Boolean> = MutableStateFlow(false)
   val playRecordPromptTrigger = _playRecordPromptTrigger.asStateFlow()
 
+  private val _microTaskInstruction: MutableStateFlow<String> = MutableStateFlow("")
+  val microTaskInstruction = _microTaskInstruction.asStateFlow()
+
   private val _sentenceTvText: MutableStateFlow<String> = MutableStateFlow("")
   val sentenceTvText = _sentenceTvText.asStateFlow()
 
@@ -154,6 +157,9 @@ constructor(
 
   /** Recording config and state */
   private val maxPreRecordBytes = timeToSamples(prerecordingTime) * 2
+
+  /** Microtask config */
+  private var skippingAllowed: Boolean = false
 
   private var preRecordBuffer: Array<ByteArray>
   var preRecordBufferConsumed: Array<Int> = Array(2) { 0 }
@@ -255,11 +261,19 @@ constructor(
     // Reset progress bar
     _playbackProgressPbProgress.value = 0
 
+    // Set microtask instruction
+    _microTaskInstruction.value =
+      currentMicroTask.input.asJsonObject.getAsJsonObject("data").get("instruction").toString()
+    totalRecordedBytes = 0
+
     _sentenceTvText.value =
       currentMicroTask.input.asJsonObject.getAsJsonObject("data").get("sentence").toString()
     totalRecordedBytes = 0
 
-    if (firstTimeActivityVisit) {
+    /** Get microtask config */
+    skippingAllowed = currentMicroTask.input.asJsonObject.getAsJsonObject("data").get("skippingAllowed").asBoolean
+
+      if (firstTimeActivityVisit) {
       firstTimeActivityVisit = false
       onAssistantClick()
     } else {
@@ -429,8 +443,14 @@ constructor(
         setButtonStates(DISABLED, DISABLED, DISABLED, DISABLED)
         setActivityState(ActivityState.ENCODING_NEXT)
       }
+      ActivityState.PRERECORDING -> {
+        // User wants to skip the microtask
+        runBlocking {
+          skipAndSaveCurrentMicrotask()
+          setActivityState(ActivityState.SIMPLE_NEXT)
+        }
+      }
       ActivityState.INIT,
-      ActivityState.PRERECORDING,
       ActivityState.RECORDING,
       ActivityState.RECORDED,
       ActivityState.FIRST_PLAYBACK,
@@ -577,6 +597,10 @@ constructor(
 
     if (currentAssignment.status != MicrotaskAssignmentStatus.COMPLETED) {
       setButtonStates(ENABLED, ENABLED, DISABLED, DISABLED)
+      // Enable next button if skipping allowed
+      if (skippingAllowed) {
+        setButtonStates(ENABLED, ENABLED, DISABLED, ENABLED)
+      }
       setActivityState(ActivityState.PRERECORDING)
       resetRecordingLength()
     } else {

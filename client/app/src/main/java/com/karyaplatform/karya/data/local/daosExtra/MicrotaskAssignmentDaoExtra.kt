@@ -37,7 +37,7 @@ interface MicrotaskAssignmentDaoExtra {
   @Query(
     "SELECT count(id) FROM microtask_assignment WHERE " +
       "status=:status AND " +
-      "microtask_id in (SELECT id from microtask WHERE task_id=:taskId)"
+      "task_id=:taskId"
   )
   suspend fun getCountForTask(taskId: String, status: MicrotaskAssignmentStatus): Int
 
@@ -48,7 +48,7 @@ interface MicrotaskAssignmentDaoExtra {
   @Query(
     "SELECT id FROM microtask_assignment WHERE " +
       "status IN (:statuses) AND " +
-      "microtask_id IN (SELECT id FROM microtask WHERE task_id=:taskId) " +
+      "task_id=:taskId " +
       "ORDER BY id"
   )
   suspend fun getIDsForTask(
@@ -111,6 +111,21 @@ interface MicrotaskAssignmentDaoExtra {
   )
 
   /**
+   * Query to mark the microtask assignment with the given [id] as expired
+   */
+  @Query(
+    "UPDATE microtask_assignment SET " +
+      "status=:status, output=:output, last_updated_at=:date " +
+      "WHERE id=:id"
+  )
+  suspend fun markExpire(
+    id: String,
+    date: String,
+    output: JsonElement = JsonNull.INSTANCE,
+    status: MicrotaskAssignmentStatus = MicrotaskAssignmentStatus.EXPIRED,
+  )
+
+  /**
    * Query to mark the microtask assignment with the given [id] as assigned with the given [output].
    */
   @Query(
@@ -147,5 +162,11 @@ interface MicrotaskAssignmentDaoExtra {
   suspend fun getTotalCreditsEarned(
     worker_id: String,
     status: MicrotaskAssignmentStatus = MicrotaskAssignmentStatus.VERIFIED
+  ): Float?
+
+  @Query("SELECT SUM(max_base_credits) FROM microtask_assignment WHERE worker_id=:worker_id AND status IN (:statuses)")
+  suspend fun getTotalBaseCreditsEarned(
+    worker_id: String,
+    statuses: List<MicrotaskAssignmentStatus> = arrayListOf(MicrotaskAssignmentStatus.SUBMITTED, MicrotaskAssignmentStatus.VERIFIED)
   ): Float?
 }
