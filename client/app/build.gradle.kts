@@ -67,14 +67,11 @@ android {
       enableSplit = false
     }
   }
-  flavorDimensions("size", "study")
+  flavorDimensions("size")
   productFlavors {
     create ("mit") {
-      dimension = "study"
+      dimension = "size"
       applicationIdSuffix = "mit2022"
-    }
-    create ("default") {
-      dimension = "study"
     }
     create("large") {
       dimension = "size"
