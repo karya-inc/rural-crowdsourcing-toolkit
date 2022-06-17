@@ -8,6 +8,7 @@ import com.karyaplatform.karya.data.model.karya.modelsExtra.TaskStatus
 import com.karyaplatform.karya.data.repo.AssignmentRepository
 import com.karyaplatform.karya.data.repo.TaskRepository
 import com.karyaplatform.karya.utils.Result
+import com.karyaplatform.karya.data.model.karya.enums.ScenarioType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -42,6 +43,11 @@ constructor(
     val tempList = mutableListOf<TaskInfo>()
     taskInfoList.forEach { taskInfo ->
       val taskStatus = fetchTaskStatus(taskInfo.taskID)
+      val speechReport = if (taskInfo.scenarioName == ScenarioType.SPEECH_DATA) {
+        assignmentRepository.getSpeechReportSummary(worker.id, taskInfo.taskID)
+      } else {
+        null
+      }
       tempList.add(
         TaskInfo(
           taskInfo.taskID,
@@ -49,7 +55,8 @@ constructor(
           taskInfo.taskInstruction,
           taskInfo.scenarioName,
           taskStatus,
-          taskInfo.isGradeCard
+          taskInfo.isGradeCard,
+          speechReport
         )
       )
     }
@@ -81,6 +88,11 @@ constructor(
               null
             }
             val taskStatus = fetchTaskStatus(taskRecord.id)
+            val speechReport = if (taskRecord.scenario_name == ScenarioType.SPEECH_DATA) {
+              assignmentRepository.getSpeechReportSummary(worker.id, taskRecord.id)
+            } else {
+              null
+            }
             tempList.add(
               TaskInfo(
                 taskRecord.id,
@@ -88,7 +100,8 @@ constructor(
                 taskInstruction,
                 taskRecord.scenario_name,
                 taskStatus,
-                false
+                false,
+                speechReport
               )
             )
           }

@@ -5,6 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.karyaplatform.karya.data.model.karya.modelsExtra.TaskInfo
 import com.karyaplatform.karya.databinding.ItemTaskBinding
+import com.karyaplatform.karya.data.model.karya.enums.ScenarioType
+import com.karyaplatform.karya.utils.extensions.gone
+import com.karyaplatform.karya.utils.extensions.visible
 
 class TaskListAdapter(
   private var tasks: List<TaskInfo>,
@@ -52,8 +55,10 @@ class TaskListAdapter(
       val submitted = status.submittedMicrotasks + verified
       val completed = status.completedMicrotasks + submitted
       val assigned = status.assignedMicrotasks
+      val skipped = status.skippedMicrotasks
+      val expired = status.expiredMicrotasks
 
-      val clickable = assigned > 0
+      val clickable = (assigned + skipped) > 0
 
       with(binding) {
         // Set text
@@ -62,10 +67,23 @@ class TaskListAdapter(
         numCompletedTv.text = completed.toString()
         numSubmittedTv.text = submitted.toString()
         numVerifiedTv.text = verified.toString()
+        numSkippedTv.text = skipped.toString()
+        numExpiredTv.text = expired.toString()
 
         // Set views
         completedTasksPb.max = assigned + completed
         completedTasksPb.progress = completed
+
+        // Set speech data report
+        val report = taskInfo.speechDataReport
+        if (taskInfo.scenarioName == ScenarioType.SPEECH_DATA && report != null) {
+          scoreGroup.visible()
+          accuracyScore.rating = report.accuracy
+          volumeScore.rating = report.volume
+          qualityScore.rating = report.quality
+        } else {
+          scoreGroup.gone()
+        }
 
         // Task click listener
         taskLl.setOnClickListener { dashboardItemClick(taskInfo) }
