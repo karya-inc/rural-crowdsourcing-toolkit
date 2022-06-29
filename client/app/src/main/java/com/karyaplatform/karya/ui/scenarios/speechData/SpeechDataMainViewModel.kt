@@ -265,12 +265,17 @@ constructor(
     _playbackProgressPbProgress.value = 0
 
     // Set microtask instruction
-    _microTaskInstruction.value =
-      currentMicroTask.input.asJsonObject.getAsJsonObject("data").get("instruction").toString()
+    val inputData = currentMicroTask.input.asJsonObject.getAsJsonObject("data")
+
+    if (inputData.has("instruction")) {
+      _microTaskInstruction.value = inputData.get("instruction").asString
+    }
+
+    val sentence = if (inputData.has("display_sentence")) inputData.get("display_sentence")  else inputData.get("sentence")
+
+    _sentenceTvText.value = sentence.toString()
     totalRecordedBytes = 0
 
-    _sentenceTvText.value =
-      currentMicroTask.input.asJsonObject.getAsJsonObject("data").get("sentence").toString()
     totalRecordedBytes = 0
 
     /** Get microtask config */
