@@ -43,16 +43,15 @@ class AccessCodeFragment : Fragment(R.layout.fragment_access_code) {
 
       accessCodeEt.doAfterTextChanged {
         if (accessCodeEt.length() > 0) {
-          numPad.enableDoneButton()
+          enableDoneButton()
         } else {
-          numPad.disableDoneButton()
+          disableDoneButton()
         }
-
         hideError()
       }
 
       numPad.setOnDoneListener { handleSubmit() }
-      numPad.disableDoneButton()
+      disableDoneButton()
     }
   }
 
