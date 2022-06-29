@@ -18,7 +18,7 @@ android {
     minSdkVersion(21)
     targetSdkVersion(30)
     multiDexEnabled = true
-    versionCode = 54
+    versionCode = 64
     versionName = "1"
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables.useSupportLibrary = true
@@ -182,4 +182,6 @@ dependencies {
   "largeImplementation" ("com.google.mlkit:face-detection:16.1.2")
   "largeImplementation" ("com.github.fishwjy:VideoCompressor:master-SNAPSHOT")
 
+  // Grid layout for lower APIs
+  implementation ("androidx.gridlayout:gridlayout:1.0.0")
 }
