@@ -225,5 +225,8 @@
     <string name="okay">ठीक</string>
     <string name="grammar_question">क्या इस वाक्य का व्याकरण (ग्रामर) ठीक है?</string>
     <string name="spelling_question">क्या इस वाक्य में सभी शब्दों की वर्तनी (स्पेलिंग) सही है?</string>
+
+    <string name="skip_task_warning">क्या आप वाकई टास्क छोड़ना चाहते हैं?</string>
+
 </resources>
 
