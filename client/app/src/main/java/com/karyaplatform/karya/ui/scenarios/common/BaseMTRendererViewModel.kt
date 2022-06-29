@@ -73,8 +73,9 @@ constructor(
   private val _inputFileDoesNotExist: MutableStateFlow<Boolean> = MutableStateFlow(false)
   val inputFileDoesNotExist = _inputFileDoesNotExist.asSharedFlow()
 
-  private val _outsideTimeBound: MutableStateFlow<Triple<Boolean, String, String>> =
-    MutableStateFlow(Triple(false, "", ""))
+  data class TimeBound(val isValid: Boolean, val now: String, val start: String, val end: String)
+  private val _outsideTimeBound: MutableStateFlow<TimeBound> =
+    MutableStateFlow(TimeBound(false, "", "", ""))
   val outsideTimeBound = _outsideTimeBound.asStateFlow()
 
   protected fun navigateBack() {
@@ -281,8 +282,8 @@ constructor(
       currentMicroTask = microTaskRepository.getById(currentAssignment.microtask_id)
 
       // Check if the current microtask is expired
-      if (!(currentMicroTask.deadline).isNullOrEmpty()
-        && (currentMicroTask.deadline!!) < DateUtils.getCurrentDate()) {
+      if (!(currentAssignment.deadline).isNullOrEmpty()
+        && (currentAssignment.deadline!!) < DateUtils.getCurrentDate()) {
         // Mark the microtask as expired
         expireAndSaveCurrentMicrotask()
         moveToNextMicrotask()
@@ -306,10 +307,10 @@ constructor(
         val currentTime = Calendar.getInstance()
         val hour = currentTime.get(Calendar.HOUR_OF_DAY)
         val minutes = currentTime.get(Calendar.MINUTE)
-        val now = "$hour:$minutes"
+        val now = String.format(Locale.US, "%02d:%02d", hour, minutes)
 
         if (now < taskStartTime || now > taskEndTime) {
-          _outsideTimeBound.emit(Triple(true, taskStartTime, taskEndTime))
+          _outsideTimeBound.emit(TimeBound(true, now, taskStartTime, taskEndTime))
           return@launch
         }
       }

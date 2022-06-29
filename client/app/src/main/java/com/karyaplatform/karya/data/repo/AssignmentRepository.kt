@@ -238,6 +238,8 @@ constructor(
 
   suspend fun updateExpired(worker_id: String) {
     val currentTime = DateUtils.getCurrentDate()
+    assignmentDaoExtra.updateSubmittedButExpired(worker_id)
+    assignmentDaoExtra.updateCompletedButExpired(worker_id)
     assignmentDaoExtra.updateExpired(worker_id, currentTime)
   }
 

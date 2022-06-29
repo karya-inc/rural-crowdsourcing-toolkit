@@ -99,16 +99,18 @@ abstract class BaseMTRendererFragment(@LayoutRes contentLayoutId: Int) :
       }
     }
 
-    viewModel.outsideTimeBound.observe(viewLifecycleOwner.lifecycle, lifecycleScope) { outside ->
-      if (outside.first) {
+    viewModel.outsideTimeBound.observe(viewLifecycleOwner.lifecycle, lifecycleScope) { timeBound ->
+      val (isValid, now, start, end) = timeBound
+      if (isValid) {
         val builder = AlertDialog.Builder(requireContext())
-        val startTime = DateUtils.convert24to12(outside.second)
-        val endTime = DateUtils.convert24to12(outside.third)
+        val currentTime = DateUtils.convert24to12(now)
+        val startTime = DateUtils.convert24to12(start)
+        val endTime = DateUtils.convert24to12(end)
 
         val message = getString(R.string.task_outside_time_bound)
           .replace("_START_TIME_", startTime)
           .replace("_END_TIME_", endTime)
-        builder.setMessage(message)
+        builder.setMessage("[$currentTime] $message")
         builder.setNeutralButton(R.string.okay) { _, _ ->
           findNavController().popBackStack()
         }
