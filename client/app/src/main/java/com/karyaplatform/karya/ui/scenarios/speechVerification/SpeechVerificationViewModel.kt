@@ -77,6 +77,12 @@ constructor(
   private var _fluencyRating: MutableStateFlow<Int> = MutableStateFlow(R.string.rating_undefined)
   val fluencyRating = _fluencyRating.asStateFlow()
 
+  private var _genderRating: MutableStateFlow<Int> = MutableStateFlow(R.string.rating_undefined)
+  val genderRating = _genderRating.asStateFlow()
+
+  private var _childRating: MutableStateFlow<Int> = MutableStateFlow(R.string.rating_undefined)
+  val childRating = _childRating.asStateFlow()
+
   private var reviewCompleted = false
 
   private lateinit var playbackProgressThread: Thread
@@ -114,6 +120,8 @@ constructor(
     _qualityRating.value = R.string.rating_undefined
     _volumeRating.value = R.string.rating_undefined
     _fluencyRating.value = R.string.rating_undefined
+    _genderRating.value = R.string.rating_undefined
+    _childRating.value = R.string.rating_undefined
 
     _reviewEnabled.value = false
     reviewCompleted = false
@@ -289,11 +297,25 @@ constructor(
         else -> 0
       }
 
+    val gender = when (_genderRating.value) {
+      R.string.male -> "m"
+      R.string.female -> "f"
+      else -> "u"
+    }
+
+    val child = when (_childRating.value) {
+      R.string.yes -> 0
+      R.string.no -> 1
+      else -> 0
+    }
+
 
     outputData.addProperty("accuracy", accuracy)
     outputData.addProperty("quality", quality)
     outputData.addProperty("volume", volume)
     outputData.addProperty("fluency", fluency)
+    outputData.addProperty("gender", gender)
+    outputData.addProperty("child", child)
 
     viewModelScope.launch {
       completeAndSaveCurrentMicrotask()
@@ -335,12 +357,24 @@ constructor(
     updateReviewStatus()
   }
 
+  fun handleGenderChange(@StringRes gender: Int) {
+    _genderRating.value = gender
+    updateReviewStatus()
+  }
+
+  fun handleChildChange(@StringRes child: Int) {
+    _childRating.value = child
+    updateReviewStatus()
+  }
+
   private fun updateReviewStatus() {
     reviewCompleted =
       _accuracyRating.value != R.string.rating_undefined &&
         _qualityRating.value != R.string.rating_undefined &&
         _volumeRating.value != R.string.rating_undefined &&
-        _fluencyRating.value != R.string.rating_undefined
+        _fluencyRating.value != R.string.rating_undefined &&
+        _genderRating.value != R.string.rating_undefined &&
+        _childRating.value != R.string.rating_undefined
 
     if (reviewCompleted) {
       setButtonStates(ButtonState.ENABLED, ButtonState.ENABLED, ButtonState.ENABLED)

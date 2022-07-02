@@ -168,8 +168,7 @@
         android:id="@+id/fluencyCl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/_10sdp"
-        app:layout_constraintBottom_toTopOf="@id/buttonGroup">
+        app:layout_constraintBottom_toTopOf="@id/genderCl">
 
         <TextView
             android:id="@+id/fluencyLbl"
@@ -201,6 +200,79 @@
                 android:id="@+id/fluencyGoodBtn"
                 style="@style/RatingButton"
                 android:text="@string/fluency_good" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/genderCl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/childCl">
+
+        <TextView
+            android:id="@+id/genderLbl"
+            style="@style/RatingLabel"
+            android:gravity="right"
+            android:text="Gender"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.22" />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/genderGroup"
+            style="@style/RatingButtonGroup"
+            app:layout_constraintLeft_toRightOf="@id/genderLbl"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <Button
+                android:id="@+id/genderMaleBtn"
+                style="@style/RatingButton"
+                android:text="@string/male" />
+
+            <Button
+                android:id="@+id/genderFemaleBtn"
+                style="@style/RatingButton"
+                android:text="@string/female" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/childCl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/_10sdp"
+        app:layout_constraintBottom_toTopOf="@id/buttonGroup">
+
+        <TextView
+            android:id="@+id/childLbl"
+            style="@style/RatingLabel"
+            android:gravity="right"
+            android:text="Child"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.22" />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/childGroup"
+            style="@style/RatingButtonGroup"
+            app:layout_constraintLeft_toRightOf="@id/childLbl"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <Button
+                android:id="@+id/childYesBtn"
+                style="@style/RatingButton"
+                android:text="@string/yes" />
+
+            <Button
+                android:id="@+id/childNoBtn"
+                style="@style/RatingButton"
+                android:text="@string/no" />
 
         </com.google.android.material.button.MaterialButtonToggleGroup>
 

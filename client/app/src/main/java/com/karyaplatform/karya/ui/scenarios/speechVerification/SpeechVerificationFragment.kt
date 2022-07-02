@@ -85,6 +85,24 @@ class SpeechVerificationFragment : BaseMTRendererFragment(R.layout.microtask_spe
           }
         }
       }
+
+      genderGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
+        if (isChecked) {
+          when (checkedId) {
+            genderMaleBtn.id -> handleGenderChange(R.string.male)
+            genderFemaleBtn.id -> handleGenderChange(R.string.female)
+          }
+        }
+      }
+
+      childGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
+        if (isChecked) {
+          when (checkedId) {
+            childYesBtn.id -> handleChildChange(R.string.yes)
+            childNoBtn.id -> handleChildChange(R.string.no)
+          }
+        }
+      }
     }
   }
 
