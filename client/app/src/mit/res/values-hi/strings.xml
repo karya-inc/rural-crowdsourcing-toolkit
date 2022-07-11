@@ -144,6 +144,7 @@
 </p> ]]>
     </string>
 
+    <string name="access_code">एक्सेस कोड</string>
     <!-- Phone Number -->
     <string name="phone_number_title"> फ़ोन नंबर</string>
     <string name="phone_number_prompt">कार्या का उपयोग करने के लिए, आपको अपने फोन नंबर का उपयोग करके हमारे आवेदन के साथ पंजीकरण करना होगा। कृपया अपना फ़ोन नंबर नीचे दर्ज करें।</string>

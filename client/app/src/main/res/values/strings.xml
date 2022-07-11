@@ -164,6 +164,8 @@
  ]]>
     </string>
 
+    <string name="access_code">Access Code</string>
+
     <!-- Phone Number -->
     <string name="phone_number_title">Phone Number</string>
     <string name="phone_number_prompt">To use Karya, you need to register with our application using your phone number. Please enter your phone number below.</string>

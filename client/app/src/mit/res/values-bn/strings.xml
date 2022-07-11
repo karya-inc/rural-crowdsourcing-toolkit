@@ -81,6 +81,8 @@ Karya প্ল্যাটফর্মে আপনার অংশগ্রহ
 ]]>
 </string>
 
+    <string name="access_code">এক্সেস কোড</string>
+
     <!-- Phone number -->
     <string name="phone_number_title">ফোন নং</string>
     <string name="phone_number_prompt">

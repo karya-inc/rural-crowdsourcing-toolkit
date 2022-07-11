@@ -63,6 +63,10 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
       }
     }
 
+    viewModel.workerAccessCode.observe(viewLifecycleOwner.lifecycle, lifecycleScope) { code ->
+      binding.accessCodeTv.text = code
+    }
+
     viewModel.progress.observe(lifecycle, lifecycleScope) { i ->
       binding.syncProgressBar.progress = i
     }

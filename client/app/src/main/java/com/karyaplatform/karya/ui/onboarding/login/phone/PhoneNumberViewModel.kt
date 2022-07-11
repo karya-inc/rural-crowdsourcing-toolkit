@@ -22,8 +22,18 @@ constructor(
     MutableStateFlow(PhoneNumberUiState.Initial)
   val phoneNumberUiState = _phoneNumberUiState.asStateFlow()
 
+  private val _workerAccessCode: MutableStateFlow<String> = MutableStateFlow("")
+  val workerAccessCode = _workerAccessCode.asStateFlow()
+
   private val _phoneNumberEffects: MutableSharedFlow<PhoneNumberEffects> = MutableSharedFlow()
   val phoneNumberEffects = _phoneNumberEffects.asSharedFlow()
+
+  init {
+      viewModelScope.launch {
+        val worker = authManager.getLoggedInWorker()
+        _workerAccessCode.value = worker.accessCode
+      }
+  }
 
   fun sendOTP(phoneNumber: String) {
     viewModelScope.launch {

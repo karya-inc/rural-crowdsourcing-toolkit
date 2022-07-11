@@ -34,6 +34,9 @@ constructor(
     MutableStateFlow(DashboardUiState.Success(DashboardStateSuccess(emptyList(), 0.0f)))
   val dashboardUiState = _dashboardUiState.asStateFlow()
 
+  private val _workerAccessCode: MutableStateFlow<String> = MutableStateFlow("")
+  val workerAccessCode = _workerAccessCode.asStateFlow()
+
   private val _progress: MutableStateFlow<Int> =
     MutableStateFlow(0)
   val progress = _progress.asStateFlow()
@@ -75,6 +78,7 @@ constructor(
   fun getAllTasks() {
     viewModelScope.launch {
       val worker = authManager.getLoggedInWorker()
+      _workerAccessCode.value = worker.accessCode
 
       taskRepository
         .getAllTasksFlow()
