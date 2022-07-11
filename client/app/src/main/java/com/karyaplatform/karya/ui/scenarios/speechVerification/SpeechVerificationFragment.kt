@@ -180,6 +180,22 @@ class SpeechVerificationFragment : BaseMTRendererFragment(R.layout.microtask_spe
       }
     }
 
+    viewModel.genderRating.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { value ->
+      when (value) {
+        R.string.male -> genderGroup.check(genderMaleBtn.id)
+        R.string.female -> genderGroup.check(genderFemaleBtn.id)
+        else -> genderGroup.clearChecked()
+      }
+    }
+
+    viewModel.childRating.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { value ->
+      when (value) {
+        R.string.yes -> childGroup.check(childYesBtn.id)
+        R.string.no -> childGroup.check(childNoBtn.id)
+        else -> childGroup.clearChecked()
+      }
+    }
+
     viewModel.reviewEnabled.observe(
       viewLifecycleOwner.lifecycle, viewLifecycleScope
     ) { enabled ->
