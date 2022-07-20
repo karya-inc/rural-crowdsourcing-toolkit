@@ -78,7 +78,16 @@ router.post<KaryaFileController.KaryaFileSubmitRouteState, {}>(
 );
 
 // Assignment routes
-router.put('/assignments', needIdToken, BodyParser({ jsonLimit: '10mb' }), AssignmentController.submit);
+router.put('/assignments', needIdToken, BodyParser({ jsonLimit: '20mb' }), AssignmentController.submit);
+router.put(
+  '/skipped_expired_assignments',
+  needIdToken,
+  BodyParser({ jsonLimit: '20mb' }),
+  AssignmentController.submitSkippedExpired
+);
 router.get('/assignments', needIdToken, AssignmentController.get);
+
+// Token Routes
+router.get('/renew_id_token', needIdToken, generateToken, WorkerController.sendGeneratedIdToken);
 
 export default router;

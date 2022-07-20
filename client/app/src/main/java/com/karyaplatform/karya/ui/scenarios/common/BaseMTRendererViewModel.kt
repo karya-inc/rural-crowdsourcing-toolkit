@@ -90,11 +90,26 @@ constructor(
     runBlocking {
       task = taskRepository.getById(taskId)
       microtaskAssignmentIDs =
-        assignmentRepository.getUnsubmittedIDsForTask(
+        assignmentRepository.getIDsForTask(
           task.id,
-          includeCompleted
-        ) // TODO: Generalise the includeCompleted parameter (Can be done when we have viewModel
-      // factory)
+          arrayListOf(MicrotaskAssignmentStatus.ASSIGNED)
+        ) // TODO: Generalise the includeCompleted parameter (Can be done when we have viewModel factory)
+
+      // Get Skipped Assignments
+      microtaskAssignmentIDs = microtaskAssignmentIDs +
+        assignmentRepository.getIDsForTask(
+          task.id,
+          arrayListOf(MicrotaskAssignmentStatus.SKIPPED)
+      )
+
+      // Determine if we have to include completed assignments
+      if (includeCompleted) {
+        microtaskAssignmentIDs = microtaskAssignmentIDs +
+          assignmentRepository.getIDsForTask(
+            task.id,
+            arrayListOf(MicrotaskAssignmentStatus.COMPLETED)
+          )
+      }
 
       if (microtaskAssignmentIDs.isEmpty()) {
         navigateBack()
@@ -104,7 +119,8 @@ constructor(
       while (currentAssignmentIndex < microtaskAssignmentIDs.size - 1) {
         val microtaskAssignmentID = microtaskAssignmentIDs[currentAssignmentIndex]
         val microtaskAssignment = assignmentRepository.getAssignmentById(microtaskAssignmentID)
-        if (microtaskAssignment.status == MicrotaskAssignmentStatus.ASSIGNED) {
+        if (microtaskAssignment.status == MicrotaskAssignmentStatus.ASSIGNED ||
+          microtaskAssignment.status == MicrotaskAssignmentStatus.SKIPPED) {
           break
         }
         currentAssignmentIndex++
@@ -195,6 +211,19 @@ constructor(
     }
   }
 
+  /**
+   * Mark the assignment as expire and save
+   */
+  protected suspend fun expireAndSaveCurrentMicrotask() {
+    /** Delete all scratch files */
+    withContext(Dispatchers.IO) {
+      assignmentRepository.markExpire(
+        microtaskAssignmentIDs[currentAssignmentIndex],
+        date = DateUtils.getCurrentDate()
+      )
+    }
+  }
+
   private fun deleteAssignmentScratchFiles() {
     val directory = File(getRelativePath("microtask-assignment-scratch"))
     val files = directory.listFiles()
@@ -244,6 +273,22 @@ constructor(
   /** Get the microtask record for the current assignment and setup the microtask */
   fun getAndSetupMicrotask() {
     viewModelScope.launch {
+
+      val assignmentID = microtaskAssignmentIDs[currentAssignmentIndex]
+
+      // Fetch the assignment and the microtask
+      currentAssignment = assignmentRepository.getAssignmentById(assignmentID)
+      currentMicroTask = microTaskRepository.getById(currentAssignment.microtask_id)
+
+      // Check if the current microtask is expired
+      if (!(currentMicroTask.deadline).isNullOrEmpty()
+        && (currentMicroTask.deadline!!) < DateUtils.getCurrentDate()) {
+        // Mark the microtask as expired
+        expireAndSaveCurrentMicrotask()
+        moveToNextMicrotask()
+        return@launch
+      }
+
       var taskStartTime = try {
         task.params.asJsonObject.get("startTime").asString.trim()
       } catch (e: Exception) {
@@ -268,12 +313,6 @@ constructor(
           return@launch
         }
       }
-
-      val assignmentID = microtaskAssignmentIDs[currentAssignmentIndex]
-
-      // Fetch the assignment and the microtask
-      currentAssignment = assignmentRepository.getAssignmentById(assignmentID)
-      currentMicroTask = microTaskRepository.getById(currentAssignment.microtask_id)
 
       // Check if we are crossing group boundaries
       if (groupId != null && currentMicroTask.group_id != groupId) {

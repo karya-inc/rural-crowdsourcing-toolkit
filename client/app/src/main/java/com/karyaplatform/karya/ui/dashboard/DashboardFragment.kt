@@ -253,7 +253,7 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
   }
 
   fun onDashboardItemClick(task: TaskInfo) {
-    if (!task.isGradeCard && task.taskStatus.assignedMicrotasks > 0) {
+    if (!task.isGradeCard && (task.taskStatus.assignedMicrotasks + task.taskStatus.skippedMicrotasks) > 0) {
       val taskId = task.taskID
       val status = task.taskStatus
       val completed =
@@ -286,9 +286,24 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
             completed,
             total
           )
+          ScenarioType.IMAGE_ANNOTATION -> actionDashboardActivityToImageAnnotationFragment(
+            taskId,
+            completed,
+            total
+          )
           ScenarioType.QUIZ -> actionDashboardActivityToQuiz(taskId, completed, total)
           ScenarioType.IMAGE_DATA -> actionDashboardActivityToImageData(taskId, completed, total)
           ScenarioType.SENTENCE_VALIDATION -> actionDashboardActivityToSentenceValidation(
+            taskId,
+            completed,
+            total
+          )
+          ScenarioType.SPEECH_TRANSCRIPTION -> actionDashboardActivityToSpeechTranscriptionFragment(
+            taskId,
+            completed,
+            total
+          )
+          ScenarioType.SENTENCE_CORPUS -> actionDashboardActivityToSentenceCorpusFragment(
             taskId,
             completed,
             total
@@ -311,7 +326,20 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
           else -> null
         }
       }
-      if (action != null) findNavController().navigate(action)
+      if (action != null) {
+        if (task.taskInstruction == null) {
+          findNavController().navigate(action)
+        } else {
+          val builder = AlertDialog.Builder(requireContext())
+          val message = task.taskInstruction
+          builder.setMessage(message)
+          builder.setNeutralButton(R.string.okay) { _, _ ->
+            findNavController().navigate(action)
+          }
+          val dialog = builder.create()
+          dialog.show()
+        }
+      }
     }
   }
 }

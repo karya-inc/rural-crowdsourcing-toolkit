@@ -1,5 +1,6 @@
 package com.karyaplatform.karya.ui.scenarios.speechData
 
+import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.karyaplatform.karya.R
 import com.karyaplatform.karya.data.model.karya.enums.AssistantAudio
@@ -65,13 +67,13 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
     recordBtn.setOnClickListener { viewModel.handleRecordClick() }
     playBtn.setOnClickListener { viewModel.handlePlayClick() }
     nextBtnCv.setOnClickListener { viewModel.handleNextClick() }
-    backBtnCv.setOnClickListener { viewModel.handleBackClick() }
+    backBtn.setOnClickListener { viewModel.handleBackClick() }
   }
 
   private fun setupObservers() {
     viewModel.backBtnState.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { state ->
-      backBtnCv.isClickable = state != DISABLED
-      backBtnCv.backIv.setBackgroundResource(
+      backBtn.isClickable = state != DISABLED
+      backBtn.backIv.setBackgroundResource(
         when (state) {
           DISABLED -> R.drawable.ic_back_disabled
           ENABLED -> R.drawable.ic_back_enabled
@@ -113,6 +115,13 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
       )
     }
 
+    // Set microtask instruction if available
+    viewModel.microTaskInstruction.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { text ->
+      if (!text.isNullOrEmpty()) {
+        instructionTv.text = text
+      }
+    }
+
     viewModel.sentenceTvText.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { text ->
       sentenceTv.text = text
     }
@@ -151,6 +160,26 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
     ) { play ->
       if (play) {
         playRecordPrompt()
+      }
+    }
+
+    viewModel.skipTaskAlertTrigger.observe(
+      viewLifecycleOwner.lifecycle,
+      viewLifecycleScope
+    ) { showAlert ->
+      if (showAlert) {
+        val builder = AlertDialog.Builder(requireContext())
+        val message = getString(R.string.skip_task_warning)
+        builder.setMessage(message)
+        builder.setPositiveButton(R.string.yes) { _, _ ->
+          viewModel.skipMicrotask()
+        }
+        builder.setNegativeButton(R.string.no) { _, _ ->
+          viewModel.setSkipTaskAlertTrigger(false)
+          viewModel.moveToPrerecording()
+        }
+        val dialog = builder.create()
+        dialog.show()
       }
     }
   }
@@ -309,11 +338,11 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
       AssistantAudio.PREVIOUS_ACTION,
       uiCue = {
         backPointerIv.visible()
-        backBtnCv.backIv.setBackgroundResource(R.drawable.ic_back_enabled)
+        backBtn.backIv.setBackgroundResource(R.drawable.ic_back_enabled)
       },
       onCompletionListener = {
         lifecycleScope.launch {
-          backBtnCv.backIv.setBackgroundResource(R.drawable.ic_back_disabled)
+          backBtn.backIv.setBackgroundResource(R.drawable.ic_back_disabled)
           backPointerIv.invisible()
           delay(500)
           viewModel.moveToPrerecording()
