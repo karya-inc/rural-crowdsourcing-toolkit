@@ -293,7 +293,7 @@ constructor(
       // Check if the worker has a start-end constraints
       val worker = authManager.getLoggedInWorker()
       val tcTag = try {
-        if (worker.params != null) {
+        if (worker.params != null && !worker.params.isJsonNull) {
           val tags = worker.params.asJsonObject.getAsJsonArray("tags")
           var tag: String? = null
           for (tagJ in tags) {
