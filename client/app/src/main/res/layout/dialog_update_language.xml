@@ -27,4 +27,19 @@
         style="@style/LanguageUpdateButton"
         android:text="മലയാളം" />
 
+    <Button
+        android:id="@+id/languageBodo"
+        style="@style/LanguageUpdateButton"
+        android:text="बड़" />
+
+    <Button
+        android:id="@+id/languageMeitei"
+        style="@style/LanguageUpdateButton"
+        android:text="ꯃꯩꯇꯩꯂꯣꯟ (Meitei)" />
+
+    <Button
+        android:id="@+id/languageChokri"
+        style="@style/LanguageUpdateButton"
+        android:text="Chokri" />
+
 </GridLayout>
