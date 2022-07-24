@@ -123,6 +123,21 @@ class KaryaToolbar : Toolbar {
       updateUserLanguage(LanguageType.ML)
       dialog.cancel()
     }
+
+    languageDialog.findViewById<Button>(R.id.languageBodo).setOnClickListener {
+      updateUserLanguage(LanguageType.BRX)
+      dialog.cancel()
+    }
+
+    languageDialog.findViewById<Button>(R.id.languageMeitei).setOnClickListener {
+      updateUserLanguage(LanguageType.MNI)
+      dialog.cancel()
+    }
+
+    languageDialog.findViewById<Button>(R.id.languageChokri).setOnClickListener {
+      updateUserLanguage(LanguageType.NRI)
+      dialog.cancel()
+    }
   }
 
   fun setLanguageUpdater(updater: (l: LanguageType) -> Unit) {
