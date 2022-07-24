@@ -24,7 +24,7 @@ import com.potyvideo.library.globalInterfaces.AndExoPlayerListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.microtask_common_back_button.view.*
 import kotlinx.android.synthetic.main.microtask_common_next_button.view.*
-import kotlinx.android.synthetic.main.microtask_sign_video_data.*
+import kotlinx.android.synthetic.large.microtask_sign_video_data.*
 
 private const val testVideo: String ="""<iframe
 width="100%"

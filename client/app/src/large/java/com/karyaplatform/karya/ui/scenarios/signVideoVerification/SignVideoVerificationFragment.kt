@@ -20,7 +20,7 @@ import com.karyaplatform.karya.utils.extensions.viewLifecycleScope
 import com.karyaplatform.karya.utils.extensions.visible
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.microtask_common_next_button.view.*
-import kotlinx.android.synthetic.main.microtask_sign_video_verification.*
+import kotlinx.android.synthetic.large.microtask_sign_video_verification.*
 
 @AndroidEntryPoint
 class SignVideoVerificationFragment :
