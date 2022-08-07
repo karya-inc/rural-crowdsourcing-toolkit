@@ -1,9 +1,6 @@
 package com.karyaplatform.karya.ui.scenarios.sentenceCorpus
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.karyaplatform.karya.data.manager.AuthManager
 import com.karyaplatform.karya.data.model.karya.enums.LanguageType
@@ -12,14 +9,11 @@ import com.karyaplatform.karya.data.repo.MicroTaskRepository
 import com.karyaplatform.karya.data.repo.TaskRepository
 import com.karyaplatform.karya.injection.qualifier.FilesDir
 import com.karyaplatform.karya.ui.scenarios.common.BaseMTRendererViewModel
-import com.karyaplatform.karya.ui.scenarios.transliteration.TransliterationViewModel.WordOrigin.HUMAN
-import com.karyaplatform.karya.ui.scenarios.transliteration.TransliterationViewModel.WordVerificationStatus.NEW
-import com.karyaplatform.karya.ui.scenarios.transliteration.TransliterationViewModel.WordVerificationStatus.UNKNOWN
+import com.karyaplatform.karya.data.model.karya.enums.MicrotaskAssignmentStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.json.JSONArray
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
@@ -64,6 +58,19 @@ constructor(
 
     // Reset sentence list
     _sentences.value = ArrayList()
+
+    if (currentAssignment.status == MicrotaskAssignmentStatus.COMPLETED) {
+      renderOutputData()
+    }
+  }
+
+  private fun renderOutputData() {
+    val outputData = currentAssignment.output.asJsonObject.getAsJsonObject("data")
+    val sentences = outputData.getAsJsonObject("sentences")
+
+    for (sentence in sentences.keySet()) {
+      addSentence(sentence)
+    }
   }
 
   /** Handle next button click */
@@ -89,6 +96,11 @@ constructor(
       completeAndSaveCurrentMicrotask()
       moveToNextMicrotask()
     }
+  }
+
+  /** Handle next button click */
+  fun handleBackClick() {
+    moveToPreviousMicrotask()
   }
 
   fun addSentence(sentence: String) {
