@@ -15,5 +15,9 @@
 .externalNativeBuild
 .idea
 app/release
-
+app/large
+app/mit
+app/standard
+app/rani
+app/schemas
 google-services.json
