@@ -7,11 +7,13 @@ package com.karyaplatform.karya.ui.views.numpad
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.FrameLayout
 import com.karyaplatform.karya.R
 import com.karyaplatform.karya.databinding.NumpadBinding
+import androidx.annotation.ColorRes
 
 class NumPad : FrameLayout {
 
@@ -29,6 +31,8 @@ class NumPad : FrameLayout {
   }
 
   private var fieldId: Int = 0
+  @ColorRes private var primaryColorId: Int = 0
+
   private lateinit var binding: NumpadBinding
   private var doneButtonState: Boolean = false
   private lateinit var onDoneListener: OnClickListener
@@ -55,6 +59,13 @@ class NumPad : FrameLayout {
       context.theme.obtainStyledAttributes(attrs, R.styleable.NumPad, defStyleAttr, 0)
     fieldId = attributes.getResourceId(R.styleable.NumPad_field, 0)
     maxLength = attributes.getInteger(R.styleable.NumPad_maxLength, 0)
+
+    // Set the color
+    val theme = context.theme
+    val typedValue = TypedValue()
+    theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
+    primaryColorId = typedValue.resourceId
+
     post { initViews() }
   }
 
@@ -130,7 +141,7 @@ class NumPad : FrameLayout {
     binding.keyDone.isClickable = enabled
     binding.keyDone.isEnabled = enabled
     when (enabled) {
-      true -> binding.keyDone.setIconTintResource(R.color.c_dark_green)
+      true -> binding.keyDone.setIconTintResource(primaryColorId)
       false -> binding.keyDone.setIconTintResource(R.color.c_light_grey)
     }
   }
