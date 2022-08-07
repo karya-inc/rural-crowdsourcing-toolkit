@@ -19,6 +19,7 @@ import com.karyaplatform.karya.utils.extensions.invisible
 import com.karyaplatform.karya.utils.extensions.observe
 import com.karyaplatform.karya.utils.extensions.viewLifecycleScope
 import com.karyaplatform.karya.utils.extensions.visible
+import com.karyaplatform.karya.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.microtask_common_back_button.view.*
 import kotlinx.android.synthetic.main.microtask_common_next_button.view.*
@@ -68,6 +69,7 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
     playBtn.setOnClickListener { viewModel.handlePlayClick() }
     nextBtnCv.setOnClickListener { viewModel.handleNextClick() }
     backBtn.setOnClickListener { viewModel.handleBackClick() }
+    hintAudioBtn.setOnClickListener { viewModel.handleHintAudioBtnClick() }
   }
 
   private fun setupObservers() {
@@ -113,6 +115,26 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
           ACTIVE -> R.drawable.ic_next_enabled
         }
       )
+    }
+
+    viewModel.playHintBtnState.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { state ->
+      if (state) {
+        hintAudioBtn.isClickable = true
+        hintAudioBtn.enable()
+        hintAudioBtn.setTextColor(resources.getColor(R.color.c_black))
+      } else {
+        hintAudioBtn.setTextColor(resources.getColor(R.color.c_white))
+        hintAudioBtn.isClickable = false
+        hintAudioBtn.disable()
+      }
+    }
+
+    viewModel.hintAvailable.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { state ->
+      if (state) {
+        hintAudioBtn.visible()
+      } else {
+        hintAudioBtn.gone()
+      }
     }
 
     // Set microtask instruction if available

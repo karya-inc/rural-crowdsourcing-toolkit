@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import android.util.Log
 
 private const val UNIQUE_SYNC_WORK_NAME = "syncWork"
 
@@ -63,52 +65,101 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
       }
     }
 
-    viewModel.progress.observe(lifecycle, lifecycleScope) { i ->
-      binding.syncProgressBar.progress = i
+    viewModel.workerAccessCode.observe(viewLifecycleOwner.lifecycle, lifecycleScope) { code ->
+      binding.accessCodeTv.text = code
     }
 
-    WorkManager.getInstance(requireContext())
-      .getWorkInfosForUniqueWorkLiveData(UNIQUE_SYNC_WORK_NAME)
-      .observe(viewLifecycleOwner, { workInfos ->
-        if (workInfos.size == 0) return@observe // Return if the workInfo List is empty
-        val workInfo = workInfos[0] // Picking the first workInfo
-        if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-          lifecycleScope.launch {
-            val warningMsg = workInfo.outputData.getString("warningMsg")
-            if (warningMsg != null) { // Check if there are any warning messages set by Workmanager
-              showErrorUi(Throwable(warningMsg), ERROR_TYPE.SYNC_ERROR, ERROR_LVL.WARNING)
-            }
-            viewModel.setProgress(100)
-            viewModel.refreshList()
+    // Work for center user
+    viewModel.workFromCenterUser.observe(viewLifecycleOwner.lifecycle, lifecycleScope) { wfc ->
+      if (wfc) {
+        if (!viewModel.userInCenter.value) {
+          binding.wfcEnterCodeLL.visible()
+          binding.revokeWFCAuthorizationBtn.gone()
+        } else {
+          binding.wfcEnterCodeLL.gone()
+          binding.revokeWFCAuthorizationBtn.visible()
+        }
+      }
+    }
+
+    viewModel.userInCenter.observe(viewLifecycleOwner.lifecycle, lifecycleScope) { uIC ->
+      if (viewModel.workFromCenterUser.value) {
+        if (!uIC) {
+          binding.wfcEnterCodeLL.visible()
+          binding.revokeWFCAuthorizationBtn.gone()
+        } else {
+          binding.wfcEnterCodeLL.gone()
+          binding.revokeWFCAuthorizationBtn.visible()
+        }
+      }
+    }
+
+    viewModel.progress.observe(lifecycle, lifecycleScope) { i ->
+      binding.syncProgressBar.progress = i
+      viewModel.progress.observe(lifecycle, lifecycleScope) { i -> binding.syncProgressBar.progress = i }
+
+      viewModel.navigationFlow.observe(viewLifecycle, viewLifecycleScope) { navigation ->
+        // Return if payments is not enabled in current config
+        if (!BuildConfig.PAYMENTS_ENABLED) {
+          return@observe
+        }
+        val resId =
+          when (navigation) {
+            DashboardNavigation.PAYMENT_REGISTRATION -> R.id.action_dashboardActivity_to_paymentRegistrationFragment
+            DashboardNavigation.PAYMENT_VERIFICATION -> R.id.action_dashboardActivity_to_paymentVerificationFragment
+            DashboardNavigation.PAYMENT_DASHBOARD -> R.id.action_dashboardActivity_to_paymentDashboardFragment
+            DashboardNavigation.PAYMENT_FAILURE -> R.id.action_global_paymentFailureFragment
           }
+
+        try {
+          findNavController().navigate(resId)
+        } catch (e:Exception) {
+          Log.e("DASHBOARD_NAV_ERROR", e.toString())
         }
-        if (workInfo != null && workInfo.state == WorkInfo.State.ENQUEUED) {
-          viewModel.setProgress(0)
-          viewModel.setLoading()
-        }
-        if (workInfo != null && workInfo.state == WorkInfo.State.RUNNING) {
-          // Check if the current work's state is "successfully finished"
-          val progress: Int = workInfo.progress.getInt("progress", 0)
-          viewModel.setProgress(progress)
-          viewModel.setLoading()
-          // refresh the UI to show microtasks
-          if (progress == 100)
-            viewLifecycleScope.launch {
+      }
+
+      WorkManager.getInstance(requireContext())
+        .getWorkInfosForUniqueWorkLiveData(UNIQUE_SYNC_WORK_NAME)
+        .observe(viewLifecycleOwner) { workInfos ->
+          if (workInfos.size == 0) return@observe // Return if the workInfo List is empty
+          val workInfo = workInfos[0] // Picking the first workInfo
+          if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
+            lifecycleScope.launch {
+              val warningMsg = workInfo.outputData.getString("warningMsg")
+              if (warningMsg != null) { // Check if there are any warning messages set by Workmanager
+                showErrorUi(Throwable(warningMsg), ERROR_TYPE.SYNC_ERROR, ERROR_LVL.WARNING)
+              }
+              viewModel.setProgress(100)
               viewModel.refreshList()
             }
-        }
-        if (workInfo != null && workInfo.state == WorkInfo.State.FAILED) {
-          lifecycleScope.launch {
-            showErrorUi(
-              Throwable(workInfo.outputData.getString("errorMsg")),
-              ERROR_TYPE.SYNC_ERROR,
-              ERROR_LVL.ERROR
-            )
-            viewModel.refreshList()
+          }
+          if (workInfo != null && workInfo.state == WorkInfo.State.ENQUEUED) {
+            viewModel.setProgress(0)
+            viewModel.setLoading()
+          }
+          if (workInfo != null && workInfo.state == WorkInfo.State.RUNNING) {
+            // Check if the current work's state is "successfully finished"
+            val progress: Int = workInfo.progress.getInt("progress", 0)
+            viewModel.setProgress(progress)
+            viewModel.setLoading()
+            // refresh the UI to show microtasks
+            if (progress == 100)
+              viewLifecycleScope.launch {
+                viewModel.refreshList()
+              }
+          }
+          if (workInfo != null && workInfo.state == WorkInfo.State.FAILED) {
+            lifecycleScope.launch {
+              showErrorUi(
+                Throwable(workInfo.outputData.getString("errorMsg")),
+                ERROR_TYPE.SYNC_ERROR,
+                ERROR_LVL.ERROR
+              )
+              viewModel.refreshList()
+            }
           }
         }
-      })
-
+    }
   }
 
   override fun onSessionExpired() {
@@ -142,6 +193,16 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
 
       binding.syncCv.setOnClickListener { syncWithServer() }
 
+      binding.submitCenterCodeBtn.setOnClickListener {
+        viewModel.authorizeWorkFromCenterUser(binding.centerCode.text.toString())
+        binding.centerCode.text.clear()
+      }
+
+      binding.revokeWFCAuthorizationBtn.setOnClickListener {
+        viewModel.revokeWFCAuthorization()
+        binding.centerCode.text.clear()
+      }
+
       loadProfilePic()
     }
   }
@@ -163,9 +224,16 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
     data.apply {
       (binding.tasksRv.adapter as TaskListAdapter).updateList(taskInfoData)
       // Show total credits if it is greater than 0
-      if (totalCreditsEarned > 0.0f) {
+      if (workerBalance > 0.0f) {
         binding.rupeesEarnedCl.visible()
-        binding.rupeesEarnedTv.text = "%.2f".format(Locale.ENGLISH, totalCreditsEarned)
+        binding.rupeesEarnedTv.text = "%.2f".format(Locale.ENGLISH, workerBalance)
+        if (workerBalance > 2.0f) {
+          binding.rupeesEarnedCl.setOnClickListener { viewModel.navigatePayment() }
+        } else {
+          binding.rupeesEarnedCl.setOnClickListener {
+            Toast.makeText(requireContext(), "Please earn at least Rs 2", Toast.LENGTH_LONG).show()
+          }
+        }
       } else {
         binding.rupeesEarnedCl.gone()
       }
@@ -308,6 +376,16 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
             completed,
             total
           )
+          ScenarioType.IMAGE_ANNOTATION_VALIDATION -> actionDashboardActivityToImageAnnotationVerificationFragment(
+            taskId,
+            completed,
+            total
+          )
+          ScenarioType.SENTENCE_CORPUS_VERIFICATION -> actionDashboardActivityToSentenceCorpusVerificationFragment(
+            taskId,
+            completed,
+            total
+          )
           else -> null
         }
       }
@@ -327,6 +405,15 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
         }
       }
       if (action != null) {
+        // Check if user is in center
+        if (viewModel.workFromCenterUser.value) {
+          viewModel.checkWorkFromCenterUserAuth()
+          if (!viewModel.userInCenter.value) {
+            binding.centerCode.requestFocus()
+            return
+          }
+        }
+
         if (task.taskInstruction == null) {
           findNavController().navigate(action)
         } else {

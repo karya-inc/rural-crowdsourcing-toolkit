@@ -7,6 +7,8 @@ import com.karyaplatform.karya.data.local.daosExtra.MicrotaskDaoExtra
 import com.karyaplatform.karya.data.repo.*
 import com.karyaplatform.karya.data.service.LanguageAPI
 import com.karyaplatform.karya.data.service.WorkerAPI
+import com.karyaplatform.karya.data.local.daos.PaymentAccountDao
+import com.karyaplatform.karya.data.service.PaymentAPI
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,5 +50,11 @@ class RepositoryModule {
   @Singleton
   fun provideAuthRepository(workerDao: WorkerDao): AuthRepository {
     return AuthRepository(workerDao)
+  }
+
+  @Provides
+  @Singleton
+  fun providesPaymentRepository(paymentAPI: PaymentAPI, paymentAccountDao: PaymentAccountDao): PaymentRepository {
+    return PaymentRepository(paymentAPI, paymentAccountDao)
   }
 }

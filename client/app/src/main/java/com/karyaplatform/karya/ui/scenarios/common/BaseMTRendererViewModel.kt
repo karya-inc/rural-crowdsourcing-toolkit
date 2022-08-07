@@ -36,7 +36,7 @@ constructor(
   var microTaskRepository: MicroTaskRepository,
   var fileDirPath: String,
   var authManager: AuthManager,
-  val includeCompleted: Boolean = false
+  val includeCompleted: Boolean = true
 ) : ViewModel() {
 
   private lateinit var taskId: String
@@ -151,7 +151,7 @@ constructor(
     logs.add(logObj)
   }
 
-  /** Add a string message to the log */
+  /** Add a Json object to the log */
   protected fun log(obj: JsonObject) {
     val logObj = JsonObject()
     val currentTime = DateUtils.getCurrentDate()
@@ -180,6 +180,7 @@ constructor(
    */
   protected suspend fun completeAndSaveCurrentMicrotask() {
 
+    log("marking microtask complete")
     val output = buildOutputJsonObject()
     val logObj = JsonObject()
     logObj.add("logs", logs)
@@ -252,6 +253,7 @@ constructor(
     if (hasNextMicrotask()) {
       currentAssignmentIndex++
       getAndSetupMicrotask()
+      log("moved to next microtask")
     } else {
       navigateBack()
     }
@@ -265,6 +267,7 @@ constructor(
     if (hasPreviousMicrotask()) {
       currentAssignmentIndex--
       getAndSetupMicrotask()
+      log("moved to previous microtask")
     } else {
       navigateBack()
     }
@@ -280,25 +283,59 @@ constructor(
       currentAssignment = assignmentRepository.getAssignmentById(assignmentID)
       currentMicroTask = microTaskRepository.getById(currentAssignment.microtask_id)
 
-      // Check if the current microtask is expired
-      if (!(currentMicroTask.deadline).isNullOrEmpty()
-        && (currentMicroTask.deadline!!) < DateUtils.getCurrentDate()) {
+      // Check if the current assignment is expired
+      if (!(currentAssignment.deadline).isNullOrEmpty()
+        && (currentAssignment.deadline!!) < DateUtils.getCurrentDate()) {
         // Mark the microtask as expired
         expireAndSaveCurrentMicrotask()
         moveToNextMicrotask()
         return@launch
       }
 
-      var taskStartTime = try {
-        task.params.asJsonObject.get("startTime").asString.trim()
-      } catch (e: Exception) {
+      // Check if the worker has a start-end constraints
+      val worker = authManager.getLoggedInWorker()
+      val tcTag = try {
+        if (worker.params != null) {
+          val tags = worker.params.asJsonObject.getAsJsonArray("tags")
+          var tag: String? = null
+          for (tagJ in tags) {
+            if (tagJ.asString.startsWith("_tc_")) {
+              tag = tagJ.asString.substring(4)
+            }
+          }
+          tag
+        } else {
+          null
+        }
+      } catch(e: Exception) {
         null
       }
-      var taskEndTime = try {
-        task.params.asJsonObject.get("endTime").asString.trim()
-      } catch (e: Exception) {
+
+      var taskStartTime = if (tcTag != null) {
+        tcTag.split("-")[0]
+      } else {
         null
       }
+
+      var taskEndTime = if (tcTag != null) {
+        tcTag.split("-")[1]
+      } else {
+        null
+      }
+
+      val taskParams = task.params.asJsonObject
+
+      taskStartTime = if (taskParams.has("startTime")) {
+        taskParams.get("startTime").asString.trim()
+      } else {
+        taskStartTime
+      }
+      taskEndTime = if (taskParams.has("endTime")) {
+        taskParams.get("endTime").asString.trim()
+      } else {
+        taskEndTime
+      }
+
       taskStartTime = if (taskStartTime == "") null else taskStartTime
       taskEndTime = if (taskEndTime == "") null else taskEndTime
 
@@ -306,7 +343,7 @@ constructor(
         val currentTime = Calendar.getInstance()
         val hour = currentTime.get(Calendar.HOUR_OF_DAY)
         val minutes = currentTime.get(Calendar.MINUTE)
-        val now = "$hour:$minutes"
+        val now = String.format(Locale.US, "%02d:%02d", hour, minutes)
 
         if (now < taskStartTime || now > taskEndTime) {
           _outsideTimeBound.emit(Triple(true, taskStartTime, taskEndTime))
@@ -368,6 +405,7 @@ constructor(
         }
 
       setupMicrotask()
+      log("microtask setup complete")
     }
   }
 

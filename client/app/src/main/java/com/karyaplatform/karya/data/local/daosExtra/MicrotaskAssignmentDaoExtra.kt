@@ -9,6 +9,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonNull
 import com.karyaplatform.karya.data.model.karya.MicroTaskAssignmentRecord
 import com.karyaplatform.karya.data.model.karya.enums.MicrotaskAssignmentStatus
+import com.karyaplatform.karya.data.model.karya.modelsExtra.AssignmentReport
 
 @Dao
 interface MicrotaskAssignmentDaoExtra {
@@ -179,10 +180,11 @@ interface MicrotaskAssignmentDaoExtra {
   ): Float?
 
   /** Update all expired tasks **/
-  @Query("UPDATE microtask_assignment SET status=:status WHERE worker_id=:worker_id AND deadline < :currentTime")
+  @Query("UPDATE microtask_assignment SET status=:status WHERE worker_id=:worker_id AND status in (:currentStatus) AND deadline < :currentTime")
   suspend fun updateExpired(
     worker_id: String,
     currentTime: String,
+    currentStatus: List<MicrotaskAssignmentStatus> = arrayListOf(MicrotaskAssignmentStatus.ASSIGNED, MicrotaskAssignmentStatus.SKIPPED),
     status: MicrotaskAssignmentStatus = MicrotaskAssignmentStatus.EXPIRED
   )
 
@@ -192,4 +194,10 @@ interface MicrotaskAssignmentDaoExtra {
     task_id: String,
     status: MicrotaskAssignmentStatus = MicrotaskAssignmentStatus.VERIFIED
   ): List<JsonElement>
+
+  @Query("SELECT task_id, report FROM microtask_assignment WHERE worker_id=:worker_id and status=:status")
+  suspend fun getAssignmentReports(
+    worker_id: String,
+    status: MicrotaskAssignmentStatus = MicrotaskAssignmentStatus.VERIFIED
+  ): List<AssignmentReport>
 }

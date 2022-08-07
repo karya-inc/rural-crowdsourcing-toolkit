@@ -1,5 +1,6 @@
 package com.karyaplatform.karya.ui.scenarios.imageAnnotation
 
+import android.graphics.PointF
 import android.graphics.RectF
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonArray
@@ -12,6 +13,7 @@ import com.karyaplatform.karya.data.repo.MicroTaskRepository
 import com.karyaplatform.karya.data.repo.TaskRepository
 import com.karyaplatform.karya.injection.qualifier.FilesDir
 import com.karyaplatform.karya.ui.scenarios.common.BaseMTRendererViewModel
+import com.karyaplatform.karya.data.model.karya.enums.MicrotaskAssignmentStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -80,6 +82,32 @@ constructor(
       // Since default shape is rectangle
       4
     }
+  }
+
+  /**
+   * render the output data on screen
+   * TODO: Generalise this method as it only works for single polygon crop object
+   */
+  fun renderOutputData() {
+    if (currentAssignment.status != MicrotaskAssignmentStatus.COMPLETED) {
+      return
+    }
+    val annotations = currentAssignment.output.asJsonObject.getAsJsonObject("annotations")
+    // taking first label for now TODO: Generalise for all labels
+    val label = annotations.keySet().elementAt(0)
+    // Get coordinates with respect to a label for the first crop object
+    val coorsJsonArray = annotations.getAsJsonArray(label).get(0).asJsonArray
+    val coors = Array<PointF>(coorsJsonArray.size()) { PointF(0F, 0F) }
+
+    for (i in coors.indices) {
+      val ele = coorsJsonArray.get(i)
+      val x = ele.asJsonArray.get(0).asFloat
+      val y = ele.asJsonArray.get(1).asFloat
+      coors[i] = PointF(x, y)
+    }
+    val polygon = Polygon(coors)
+    val polygonMap = hashMapOf<String, Polygon>(Pair(label, polygon))
+    setPolygonCoors(polygonMap)
   }
 
   /**

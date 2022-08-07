@@ -7,7 +7,7 @@ plugins {
   id("com.google.firebase.crashlytics")
   id("dagger.hilt.android.plugin")
   id("androidx.navigation.safeargs.kotlin")
-  id("com.ncorti.ktfmt.gradle") version "0.5.0"
+  id("com.ncorti.ktfmt.gradle") version "0.7.0"
   id("com.github.ben-manes.versions") version "0.38.0"
 }
 
@@ -22,6 +22,8 @@ android {
     versionName = "1"
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables.useSupportLibrary = true
+    // Build config field to enable or disable payments
+    buildConfigField("boolean", "PAYMENTS_ENABLED", "false")
   }
   buildTypes {
     named("release") {
@@ -40,6 +42,11 @@ android {
   }
   kotlinOptions {
     jvmTarget = "1.8"
+    kapt {
+      arguments {
+        arg("room.schemaLocation", "$projectDir/schemas")
+      }
+    }
   }
   lintOptions {
     isAbortOnError = false
@@ -67,18 +74,23 @@ android {
       enableSplit = false
     }
   }
-  flavorDimensions("size")
+  flavorDimensions("study")
   productFlavors {
     create ("mit") {
-      dimension = "size"
-      applicationIdSuffix = "mit2022"
+      dimension = "study"
+      applicationIdSuffix = ".mit2022"
+    }
+    create ("rani") {
+      dimension = "study"
+      applicationIdSuffix = ".rani"
     }
     create("large") {
-      dimension = "size"
-      applicationIdSuffix = "large"
+      dimension = "study"
+      applicationIdSuffix = ".large"
     }
     create("standard") {
-      dimension = "size"
+      dimension = "study"
+      buildConfigField("boolean", "PAYMENTS_ENABLED", "true")
     }
   }
 }
@@ -174,6 +186,9 @@ dependencies {
   implementation("me.zhanghai.android.materialratingbar:library:1.3.1")
   // Custom aars
   implementation(files("libs/zoomage-debug.aar"))
+
+  // Grid layout for lower API levels
+  implementation ("androidx.gridlayout:gridlayout:1.0.0")
 
   // Video data collection
   "largeImplementation" ("com.github.HamidrezaAmz:MagicalExoPlayer:2.0.6")

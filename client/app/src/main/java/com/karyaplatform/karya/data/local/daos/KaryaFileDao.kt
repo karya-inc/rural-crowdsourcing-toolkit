@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-/**
- * This file was auto-generated using specs and scripts in the db-schema repository. DO NOT EDIT
- * DIRECTLY.
- */
 package com.karyaplatform.karya.data.local.daos
 
 import androidx.room.Dao
@@ -15,11 +11,9 @@ import com.karyaplatform.karya.data.model.karya.KaryaFileRecord
 @Dao
 interface KaryaFileDao : BasicDao<KaryaFileRecord> {
 
-  @Query("SELECT * FROM karya_file")
-  suspend fun getAll(): List<KaryaFileRecord>
+  @Query("SELECT * FROM karya_file") suspend fun getAll(): List<KaryaFileRecord>
 
-  @Query("SELECT * FROM karya_file WHERE id == :id")
-  suspend fun getById(id: String): KaryaFileRecord
+  @Query("SELECT * FROM karya_file WHERE id == :id") suspend fun getById(id: String): KaryaFileRecord
 
   /** Upsert a [record] in the table */
   @Transaction

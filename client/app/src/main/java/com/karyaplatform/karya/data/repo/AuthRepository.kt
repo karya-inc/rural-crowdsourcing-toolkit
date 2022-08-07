@@ -2,15 +2,12 @@ package com.karyaplatform.karya.data.repo
 
 import com.karyaplatform.karya.data.local.daos.WorkerDao
 import com.karyaplatform.karya.data.model.karya.WorkerRecord
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-class AuthRepository @Inject constructor(
-  private val workerDao: WorkerDao
-){
-  suspend fun updateAfterAuth(worker: WorkerRecord) =
-    withContext(Dispatchers.IO) { workerDao.upsert(worker) }
+class AuthRepository @Inject constructor(private val workerDao: WorkerDao) {
+  suspend fun updateAfterAuth(worker: WorkerRecord) = withContext(Dispatchers.IO) { workerDao.upsert(worker) }
 
   suspend fun getWorkerById(id: String) =
     withContext(Dispatchers.IO) {

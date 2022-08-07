@@ -14,6 +14,7 @@ import com.karyaplatform.karya.databinding.AppToolbarBinding
 import com.karyaplatform.karya.utils.extensions.gone
 import com.karyaplatform.karya.utils.extensions.visible
 import com.karyaplatform.karya.data.model.karya.enums.LanguageType
+import com.karyaplatform.karya.BuildConfig
 
 class KaryaToolbar : Toolbar {
 
@@ -50,6 +51,8 @@ class KaryaToolbar : Toolbar {
     binding.languageName.setOnClickListener {
       showUpdateLanguageDialog(context)
     }
+
+    binding.versionCode.text = BuildConfig.VERSION_CODE.toString()
   }
 
   override fun onFinishInflate() {

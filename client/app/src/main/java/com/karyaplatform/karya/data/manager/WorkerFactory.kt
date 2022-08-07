@@ -1,6 +1,8 @@
 package com.karyaplatform.karya.data.manager
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
@@ -9,11 +11,14 @@ import com.karyaplatform.karya.data.repo.KaryaFileRepository
 import com.karyaplatform.karya.data.repo.MicroTaskRepository
 import com.karyaplatform.karya.injection.qualifier.FilesDir
 import com.karyaplatform.karya.ui.dashboard.DashboardSyncWorker
+import com.karyaplatform.karya.data.repo.PaymentRepository
 
 class WorkerFactory(
   private val assignmentRepository: AssignmentRepository,
   private val karyaFileRepository: KaryaFileRepository,
   private val microTaskRepository: MicroTaskRepository,
+  private val paymentRepository: PaymentRepository,
+  private val datastore: DataStore<Preferences>,
   @FilesDir private val fileDirPath: String,
   private val authManager: AuthManager,
 ) : WorkerFactory() {
@@ -32,6 +37,8 @@ class WorkerFactory(
           assignmentRepository,
           karyaFileRepository,
           microTaskRepository,
+          paymentRepository,
+          datastore,
           fileDirPath,
           authManager
         )
@@ -39,6 +46,5 @@ class WorkerFactory(
         // Return null, so that the base class can delegate to the default WorkerFactory.
         null
     }
-
   }
 }

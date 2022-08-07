@@ -1,5 +1,10 @@
 package com.karyaplatform.karya.ui.dashboard
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karyaplatform.karya.data.manager.AuthManager
@@ -8,12 +13,20 @@ import com.karyaplatform.karya.data.model.karya.modelsExtra.TaskStatus
 import com.karyaplatform.karya.data.repo.AssignmentRepository
 import com.karyaplatform.karya.data.repo.TaskRepository
 import com.karyaplatform.karya.utils.Result
-import com.karyaplatform.karya.data.model.karya.enums.ScenarioType
+import com.karyaplatform.karya.data.repo.PaymentRepository
+import com.karyaplatform.karya.ui.payment.PaymentFlowNavigation
+import com.karyaplatform.karya.utils.PreferenceKeys
+import com.karyaplatform.karya.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.math.BigInteger
+import java.security.MessageDigest
+import java.util.*
 import javax.inject.Inject
+
+private const val WFC_CODE_SEED="93848374"
 
 @HiltViewModel
 class DashboardViewModel
@@ -22,32 +35,91 @@ constructor(
   private val taskRepository: TaskRepository,
   private val assignmentRepository: AssignmentRepository,
   private val authManager: AuthManager,
+  private val paymentRepository: PaymentRepository,
+  private val datastore: DataStore<Preferences>
 ) : ViewModel() {
 
   private var taskInfoList = listOf<TaskInfo>()
   private val taskInfoComparator =
-    compareByDescending<TaskInfo> { taskInfo -> taskInfo.taskStatus.assignedMicrotasks }.thenBy { taskInfo ->
-      taskInfo.taskID
-    }
+    compareByDescending<TaskInfo> { taskInfo -> taskInfo.taskStatus.assignedMicrotasks }
+      .thenByDescending { taskInfo -> taskInfo.taskStatus.skippedMicrotasks }
+      .thenBy { taskInfo -> taskInfo.taskID }
 
   private val _dashboardUiState: MutableStateFlow<DashboardUiState> =
     MutableStateFlow(DashboardUiState.Success(DashboardStateSuccess(emptyList(), 0.0f)))
   val dashboardUiState = _dashboardUiState.asStateFlow()
 
-  private val _progress: MutableStateFlow<Int> =
-    MutableStateFlow(0)
+  private val _navigationFlow = MutableSharedFlow<DashboardNavigation>()
+  val navigationFlow = _navigationFlow.asSharedFlow()
+
+  private val _progress: MutableStateFlow<Int> = MutableStateFlow(0)
   val progress = _progress.asStateFlow()
+
+  private val _workerAccessCode: MutableStateFlow<String> = MutableStateFlow("")
+  val workerAccessCode = _workerAccessCode.asStateFlow()
+
+  // Work from center user
+  private val _workFromCenterUser: MutableStateFlow<Boolean> = MutableStateFlow(false)
+  val workFromCenterUser = _workFromCenterUser.asStateFlow()
+  private val _userInCenter: MutableStateFlow<Boolean> = MutableStateFlow(false)
+  val userInCenter = _userInCenter.asStateFlow()
+  var centerAuthExpirationTime: Long = 0
+
+  init {
+    viewModelScope.launch {
+      val worker = authManager.getLoggedInWorker()
+      _workerAccessCode.value = worker.accessCode
+
+      try {
+        if (worker.params != null && !worker.params.isJsonNull) {
+          val tags = worker.params.asJsonObject.getAsJsonArray("tags")
+          for (tag in tags) {
+            if (tag.asString == "_wfc_") {
+              _workFromCenterUser.value = true
+            }
+          }
+        }
+      } catch (e: Exception) {
+        _workFromCenterUser.value = false
+      }
+    }
+  }
+
+  fun authorizeWorkFromCenterUser(code: String) {
+    val today = DateUtils.getCurrentDate().substring(0,10)
+    val message = WFC_CODE_SEED + today + "\n"
+    val md5Encoder = MessageDigest.getInstance("MD5")
+    md5Encoder.update(message.toByteArray(), 0, message.length)
+    val hash = BigInteger(1, md5Encoder.digest()).toString(16).substring(0,6)
+    if (code == hash) {
+      _userInCenter.value = true
+      // TODO: hour offset is hard coded
+      centerAuthExpirationTime = Date().time + 2 * 60 * 60 * 1000
+    }
+  }
+
+  fun revokeWFCAuthorization() {
+    _userInCenter.value = false
+  }
+
+  fun checkWorkFromCenterUserAuth() {
+    val currentTime = Date().time
+    if (currentTime > centerAuthExpirationTime) {
+      _userInCenter.value = false
+    }
+  }
 
   suspend fun refreshList() {
     val worker = authManager.getLoggedInWorker()
     val tempList = mutableListOf<TaskInfo>()
+
+    // Get task report summary
+    val taskSummary = assignmentRepository.getTaskReportSummary(worker.id)
+
     taskInfoList.forEach { taskInfo ->
-      val taskStatus = fetchTaskStatus(taskInfo.taskID)
-      val speechReport = if (taskInfo.scenarioName == ScenarioType.SPEECH_DATA) {
-        assignmentRepository.getSpeechReportSummary(worker.id, taskInfo.taskID)
-      } else {
-        null
-      }
+      val taskId = taskInfo.taskID
+      val taskStatus = fetchTaskStatus(taskId)
+      val summary = if (taskSummary.containsKey(taskId)) taskSummary[taskId] else null
       tempList.add(
         TaskInfo(
           taskInfo.taskID,
@@ -56,15 +128,20 @@ constructor(
           taskInfo.scenarioName,
           taskStatus,
           taskInfo.isGradeCard,
-          speechReport
+          summary
         )
       )
     }
     taskInfoList = tempList.sortedWith(taskInfoComparator)
 
-    val totalCreditsEarned = assignmentRepository.getTotalCreditsEarned(worker.id) ?: 0.0f
-    _dashboardUiState.value =
-      DashboardUiState.Success(DashboardStateSuccess(taskInfoList, totalCreditsEarned))
+    val balanceKey = floatPreferencesKey(PreferenceKeys.WORKER_BALANCE)
+    val data = datastore.data.first()
+    val workerBalance: Float = data[balanceKey] ?: 0f
+    val success =
+      DashboardUiState.Success(
+        DashboardStateSuccess(taskInfoList.sortedWith(taskInfoComparator), workerBalance)
+      )
+    _dashboardUiState.value = success
   }
 
   /**
@@ -80,19 +157,21 @@ constructor(
         .getAllTasksFlow()
         .flowOn(Dispatchers.IO)
         .onEach { taskList ->
+
+          // Get task report summary
+          val taskSummary = assignmentRepository.getTaskReportSummary(worker.id)
+
           val tempList = mutableListOf<TaskInfo>()
           taskList.forEach { taskRecord ->
             val taskInstruction = try {
               taskRecord.params.asJsonObject.get("instruction").asString
-            } catch(e: Exception) {
+            } catch (e: Exception) {
               null
             }
-            val taskStatus = fetchTaskStatus(taskRecord.id)
-            val speechReport = if (taskRecord.scenario_name == ScenarioType.SPEECH_DATA) {
-              assignmentRepository.getSpeechReportSummary(worker.id, taskRecord.id)
-            } else {
-              null
-            }
+            val taskId = taskRecord.id
+            val taskStatus = fetchTaskStatus(taskId)
+            val summary = if (taskSummary.containsKey(taskId)) taskSummary[taskId] else null
+
             tempList.add(
               TaskInfo(
                 taskRecord.id,
@@ -101,16 +180,19 @@ constructor(
                 taskRecord.scenario_name,
                 taskStatus,
                 false,
-                speechReport
+                summary
               )
             )
           }
           taskInfoList = tempList
 
-          val totalCreditsEarned = assignmentRepository.getTotalCreditsEarned(worker.id) ?: 0.0f
+//          val totalCreditsEarned = assignmentRepository.getTotalCreditsEarned(worker.id) ?
+          val balanceKey = floatPreferencesKey(PreferenceKeys.WORKER_BALANCE)
+          val data = datastore.data.first()
+          val workerBalance: Float = data[balanceKey] ?: 0f
           val success =
             DashboardUiState.Success(
-              DashboardStateSuccess(taskInfoList.sortedWith(taskInfoComparator), totalCreditsEarned)
+              DashboardStateSuccess(taskInfoList.sortedWith(taskInfoComparator), workerBalance)
             )
           _dashboardUiState.value = success
         }
@@ -123,28 +205,6 @@ constructor(
     _dashboardUiState.value = DashboardUiState.Loading
   }
 
-  fun updateTaskStatus(taskId: String) {
-    viewModelScope.launch {
-      val worker = authManager.getLoggedInWorker()
-
-      val taskStatus = fetchTaskStatus(taskId)
-
-      val updatedList =
-        taskInfoList.map { taskInfo ->
-          if (taskInfo.taskID == taskId) {
-            taskInfo.copy(taskStatus = taskStatus)
-          } else {
-            taskInfo
-          }
-        }
-
-      taskInfoList = updatedList
-      val totalCreditsEarned = assignmentRepository.getTotalCreditsEarned(worker.id)
-      _dashboardUiState.value =
-        DashboardUiState.Success(DashboardStateSuccess(taskInfoList, totalCreditsEarned))
-    }
-  }
-
   private suspend fun fetchTaskStatus(taskId: String): TaskStatus {
     return taskRepository.getTaskStatus(taskId)
   }
@@ -153,4 +213,17 @@ constructor(
     _progress.value = i
   }
 
+  fun navigatePayment() {
+    viewModelScope.launch {
+      val workerId = authManager.getLoggedInWorker().id
+      val status = paymentRepository.getPaymentRecordStatus(workerId)
+      when (status.getNavigationDestination()) {
+        PaymentFlowNavigation.DASHBOARD -> _navigationFlow.emit(DashboardNavigation.PAYMENT_DASHBOARD)
+        PaymentFlowNavigation.FAILURE -> _navigationFlow.emit(DashboardNavigation.PAYMENT_FAILURE)
+        PaymentFlowNavigation.REGISTRATION -> _navigationFlow.emit(DashboardNavigation.PAYMENT_REGISTRATION)
+        PaymentFlowNavigation.VERIFICATION -> _navigationFlow.emit(DashboardNavigation.PAYMENT_VERIFICATION)
+        else -> {}
+      }
+    }
+  }
 }

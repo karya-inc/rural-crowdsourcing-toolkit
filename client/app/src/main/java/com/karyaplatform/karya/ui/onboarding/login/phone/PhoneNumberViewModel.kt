@@ -6,9 +6,9 @@ import com.karyaplatform.karya.data.manager.AuthManager
 import com.karyaplatform.karya.data.model.karya.WorkerRecord
 import com.karyaplatform.karya.data.repo.WorkerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class PhoneNumberViewModel
@@ -18,12 +18,21 @@ constructor(
   private val workerRepository: WorkerRepository,
 ) : ViewModel() {
 
-  private val _phoneNumberUiState: MutableStateFlow<PhoneNumberUiState> =
-    MutableStateFlow(PhoneNumberUiState.Initial)
+  private val _phoneNumberUiState: MutableStateFlow<PhoneNumberUiState> = MutableStateFlow(PhoneNumberUiState.Initial)
   val phoneNumberUiState = _phoneNumberUiState.asStateFlow()
 
   private val _phoneNumberEffects: MutableSharedFlow<PhoneNumberEffects> = MutableSharedFlow()
   val phoneNumberEffects = _phoneNumberEffects.asSharedFlow()
+
+  private val _workerAccessCode: MutableStateFlow<String> = MutableStateFlow("")
+  val workerAccessCode = _workerAccessCode.asStateFlow()
+
+  init {
+    viewModelScope.launch {
+      val worker = authManager.getLoggedInWorker()
+      _workerAccessCode.value = worker.accessCode
+    }
+  }
 
   fun sendOTP(phoneNumber: String) {
     viewModelScope.launch {
