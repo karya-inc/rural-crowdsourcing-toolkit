@@ -1,0 +1,7 @@
+{
+  "directs": [
+    "https://karyaboxtest.eastus.cloudapp.azure.com",
+    "https://karyaranibox.centralindia.cloudapp.azure.com"
+  ],
+  "templates": []
+}
