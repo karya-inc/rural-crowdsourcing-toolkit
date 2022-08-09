@@ -1,9 +1,12 @@
 package com.karyaplatform.karya.ui.scenarios.speechData
 
+import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -70,6 +73,7 @@ constructor(
   private var samplingRate: Int = 44100
   private var audioEncoding: Int = AudioFormat.ENCODING_PCM_16BIT
   private var compressAudio: Boolean = false
+  private var bytesPerSample: Int = 2
 
   /**
    * UI button states
@@ -159,7 +163,7 @@ constructor(
   val playbackProgressPbMax = _playbackProgressPbMax.asStateFlow()
 
   /** Recording config and state */
-  private val maxPreRecordBytes = timeToSamples(prerecordingTime) * 2
+  private val maxPreRecordBytes = timeToSamples(prerecordingTime) * 4
 
   /** Microtask config */
   private var allowSkipping: Boolean = false
@@ -225,6 +229,7 @@ constructor(
     } catch (e: Exception) {
       44100
     }
+    samplingRate = 44100
 
     audioEncoding = try {
       val bitwidth = task.params.asJsonObject.get("bitwidth").asString
@@ -235,6 +240,15 @@ constructor(
       }
     } catch (e: Exception) {
       AudioFormat.ENCODING_PCM_16BIT
+    }
+    audioEncoding = AudioFormat.ENCODING_PCM_32BIT
+
+    bytesPerSample = when (audioEncoding) {
+      AudioFormat.ENCODING_PCM_8BIT -> 1
+      AudioFormat.ENCODING_PCM_16BIT -> 2
+      AudioFormat.ENCODING_PCM_24BIT_PACKED -> 3
+      AudioFormat.ENCODING_PCM_32BIT -> 4
+      else -> 2
     }
 
     outputRecordingFileParams = if (compressAudio) Pair("", "m4a") else Pair("", "wav")
@@ -983,6 +997,7 @@ constructor(
   }
 
   /** Initialize [audioRecorder] */
+  @SuppressLint("MissingPermission")
   private fun initializeAndStartRecorder() {
     audioRecorder =
       AudioRecord(
@@ -998,7 +1013,7 @@ constructor(
   /** Reset recording length */
   private fun resetRecordingLength(duration: Int? = null) {
     viewModelScope.launch {
-      val milliseconds = duration ?: samplesToTime(totalRecordedBytes / 2)
+      val milliseconds = duration ?: samplesToTime(totalRecordedBytes / bytesPerSample)
       val centiSeconds = (milliseconds / 10) % 100
       val seconds = milliseconds / 1000
       recordingLength = milliseconds.toFloat() / 1000
@@ -1182,8 +1197,7 @@ constructor(
 
   /** Write WAV file header */
   private fun writeWavFileHeader() {
-    val bitsPerSample = if (audioEncoding == AudioFormat.ENCODING_PCM_16BIT) 16 else 8
-    val bytesPerSample = bitsPerSample / 8
+    val bitsPerSample = bytesPerSample * 8
 
     writeString(scratchRecordingFile, "RIFF")
     writeInt(scratchRecordingFile, 0)
