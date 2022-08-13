@@ -2,6 +2,8 @@ package com.karyaplatform.karya.data.service
 
 import com.karyaplatform.karya.data.model.karya.WorkerRecord
 import com.karyaplatform.karya.data.remote.request.RegisterOrUpdateWorkerRequest
+import com.google.gson.JsonObject
+import com.karyaplatform.karya.data.model.karya.LeaderboardRecord
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -53,6 +55,11 @@ interface WorkerAPI {
   @PUT("/worker")
   suspend fun updateWorker(
     @Header("karya-id-token") idToken: String,
-    @Body worker: WorkerRecord,
+    @Body profile: JsonObject,
   ): Response<WorkerRecord>
+
+  @GET("/worker/leaderboard")
+  suspend fun getLeaderBoard(
+    @Header("karya-id-token") idToken: String,
+  ): Response<List<LeaderboardRecord>>
 }

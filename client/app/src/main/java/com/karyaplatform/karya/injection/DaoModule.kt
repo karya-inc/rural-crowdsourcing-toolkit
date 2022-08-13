@@ -61,4 +61,10 @@ class DaoModule {
   fun providePaymentAccountDao(karyaDatabase: KaryaDatabase): PaymentAccountDao {
     return karyaDatabase.paymentAccountDao()
   }
+
+  @Provides
+  @Reusable
+  fun provideLeaderboardDao(karyaDatabase: KaryaDatabase): LeaderboardDao {
+    return karyaDatabase.leaderboardDao()
+  }
 }

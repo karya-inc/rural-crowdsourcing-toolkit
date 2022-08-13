@@ -69,15 +69,14 @@ constructor(
         .onEach { worker ->
           authManager.startSession(worker.copy(isConsentProvided = true))
           _otpUiState.value = OTPUiState.Success
-          handleNavigation(worker)
+          if (worker.profile != null && !worker.profile.isJsonNull) {
+            _otpEffects.emit(OTPEffects.NavigateToHomeScreen)
+          } else {
+            _otpEffects.emit(OTPEffects.NavigateToProfile)
+          }
         }
         .catch { throwable -> _otpUiState.value = OTPUiState.Error(throwable) }
         .collect()
     }
-  }
-
-  private suspend fun handleNavigation(worker: WorkerRecord) {
-    val destination = Destination.Dashboard
-    _otpEffects.emit(OTPEffects.Navigate(destination))
   }
 }

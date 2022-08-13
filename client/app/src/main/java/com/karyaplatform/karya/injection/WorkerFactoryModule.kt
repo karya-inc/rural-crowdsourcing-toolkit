@@ -9,6 +9,7 @@ import com.karyaplatform.karya.injection.qualifier.FilesDir
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.karyaplatform.karya.data.repo.PaymentRepository
+import com.karyaplatform.karya.data.repo.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,21 +27,20 @@ class WorkerFactoryModule {
     karyaFileRepository: KaryaFileRepository,
     microTaskRepository: MicroTaskRepository,
     paymentRepository: PaymentRepository,
+    workerRepository: WorkerRepository,
     datastore: DataStore<Preferences>,
     @FilesDir fileDirPath: String,
     authManager: AuthManager,
   ): SyncDelegatingWorkerFactory {
-    val workerFactory =
-      SyncDelegatingWorkerFactory(
-        assignmentRepository,
-        karyaFileRepository,
-        microTaskRepository,
-        paymentRepository,
-        datastore,
-        fileDirPath,
-        authManager
-      )
-
-    return workerFactory
+    return SyncDelegatingWorkerFactory(
+      assignmentRepository,
+      karyaFileRepository,
+      microTaskRepository,
+      paymentRepository,
+      workerRepository,
+      datastore,
+      fileDirPath,
+      authManager
+    )
   }
 }

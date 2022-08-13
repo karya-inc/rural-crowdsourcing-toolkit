@@ -5,6 +5,9 @@ import com.karyaplatform.karya.data.local.daos.WorkerDao
 import com.karyaplatform.karya.data.model.karya.WorkerRecord
 import com.karyaplatform.karya.data.remote.request.RegisterOrUpdateWorkerRequest
 import com.karyaplatform.karya.data.service.WorkerAPI
+import com.google.gson.JsonObject
+import com.karyaplatform.karya.data.local.daos.LeaderboardDao
+import com.karyaplatform.karya.data.model.karya.LeaderboardRecord
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -12,7 +15,8 @@ import javax.inject.Inject
 
 class WorkerRepository @Inject constructor(
   private val workerAPI: WorkerAPI,
-  private val workerDao: WorkerDao
+  private val workerDao: WorkerDao,
+  private val leaderboardDao: LeaderboardDao
 ) {
 
   fun getOTP(
@@ -120,10 +124,9 @@ class WorkerRepository @Inject constructor(
 
   fun updateWorker(
     idToken: String,
-    accessCode: String,
     registerOrUpdateWorkerRequest: RegisterOrUpdateWorkerRequest,
   ) = flow {
-    val response = workerAPI.updateWorker(idToken, registerOrUpdateWorkerRequest, "register")
+    val response = workerAPI.updateWorker(idToken, registerOrUpdateWorkerRequest, "update")
     val workerRecord = response.body()
 
     if (!response.isSuccessful) {
@@ -140,11 +143,11 @@ class WorkerRepository @Inject constructor(
     }
   }
 
-  fun updateWorker(
+  fun updateWorkerProfile(
     idToken: String,
-    worker: WorkerRecord,
+    profile: JsonObject,
   ) = flow {
-    val response = workerAPI.updateWorker(idToken, worker)
+    val response = workerAPI.updateWorker(idToken, profile)
     val workerRecord = response.body()
 
     if (!response.isSuccessful) {
@@ -183,4 +186,38 @@ class WorkerRepository @Inject constructor(
     withContext(Dispatchers.IO) {
       workerDao.updateLanguage(id, lang)
     }
+
+  suspend fun getAllLeaderBoardRecords() = leaderboardDao.getAllLeaderboardRecords()
+
+  suspend fun getXPPoints(worker_id: String): Int? = withContext(Dispatchers.IO) {
+    return@withContext leaderboardDao.getXPPoints(worker_id)
+  }
+
+  /**
+   * The flow updates leaderboard by fetching it from network
+   */
+  fun updateLeaderboard(
+    idToken: String
+  ) = flow {
+    val response = workerAPI.getLeaderBoard(idToken)
+    val leaderboardRecords = response.body()
+
+    if (!response.isSuccessful) {
+      throw when (response.code()) {
+        401 -> InvalidAccessCodeException()
+        else -> KaryaException()
+      }
+    }
+
+    if (leaderboardRecords != null) {
+      saveLeaderboard(leaderboardRecords)
+      emit(leaderboardRecords)
+    } else {
+      error("Request failed, response body was null")
+    }
+  }
+
+  private suspend fun saveLeaderboard(records: List<LeaderboardRecord>) {
+    leaderboardDao.upsert(records)
+  }
 }

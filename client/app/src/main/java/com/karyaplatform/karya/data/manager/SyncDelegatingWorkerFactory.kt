@@ -8,6 +8,7 @@ import com.karyaplatform.karya.data.repo.KaryaFileRepository
 import com.karyaplatform.karya.data.repo.MicroTaskRepository
 import com.karyaplatform.karya.injection.qualifier.FilesDir
 import com.karyaplatform.karya.data.repo.PaymentRepository
+import com.karyaplatform.karya.data.repo.WorkerRepository
 import javax.inject.Inject
 
 class SyncDelegatingWorkerFactory
@@ -17,6 +18,7 @@ constructor(
   karyaFileRepository: KaryaFileRepository,
   microTaskRepository: MicroTaskRepository,
   paymentRepository: PaymentRepository,
+  workerRepository: WorkerRepository,
   datastore: DataStore<Preferences>,
   @FilesDir private val fileDirPath: String,
   authManager: AuthManager,
@@ -27,6 +29,7 @@ constructor(
       karyaFileRepository,
       microTaskRepository,
       paymentRepository,
+      workerRepository,
       datastore,
       fileDirPath,
       authManager))

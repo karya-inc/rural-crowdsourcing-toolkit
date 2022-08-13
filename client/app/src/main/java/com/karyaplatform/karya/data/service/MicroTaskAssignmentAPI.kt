@@ -3,6 +3,7 @@ package com.karyaplatform.karya.data.service
 import com.karyaplatform.karya.data.model.karya.KaryaFileRecord
 import com.karyaplatform.karya.data.model.karya.MicroTaskAssignmentRecord
 import com.karyaplatform.karya.data.remote.response.GetAssignmentsResponse
+import com.karyaplatform.karya.data.remote.response.GetVerifiedAssignmentsResponse
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -34,7 +35,7 @@ interface MicroTaskAssignmentAPI {
     @Header("karya-id-token") idTokenHeader: String,
     @Query("from") from: String,
     @Query("type") type: String = "verified",
-  ): Response<List<MicroTaskAssignmentRecord>>
+  ): Response<GetVerifiedAssignmentsResponse>
 
   @Multipart
   @POST("/assignment/{id}/output_file")

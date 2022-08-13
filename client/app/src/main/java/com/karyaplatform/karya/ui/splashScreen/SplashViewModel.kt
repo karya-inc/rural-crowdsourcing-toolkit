@@ -6,6 +6,7 @@ import com.karyaplatform.karya.data.manager.AuthManager
 import com.karyaplatform.karya.data.model.karya.WorkerRecord
 import com.karyaplatform.karya.data.repo.WorkerRepository
 import com.karyaplatform.karya.ui.Destination
+import com.google.gson.JsonNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -54,11 +55,15 @@ constructor(
     val worker = getLoggedInWorker()
     _splashEffects.emit(SplashEffects.UpdateLanguage(worker.language))
 
+    // TODO: @Anurag should the below line be JsonNull?
+    val workerProfilePresent = !(worker.profile?.isJsonNull ?: false)
+
     val destination =
       when {
         !worker.isConsentProvided -> Destination.AccessCodeFlow
         worker.idToken.isNullOrEmpty() -> Destination.LoginFlow
-        else -> Destination.Dashboard
+        !workerProfilePresent -> Destination.ProfileFragment
+        else -> Destination.HomeScreen
       }
 
     _splashDestination.emit(destination)

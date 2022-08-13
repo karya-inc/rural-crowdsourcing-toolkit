@@ -69,7 +69,8 @@ constructor(
     }
 
     if (assignmentResponse != null) {
-      saveMicroTaskAssignments(assignmentResponse)
+      saveTasks(assignmentResponse.tasks)
+      saveMicroTaskAssignments(assignmentResponse.assignments)
       emit(assignmentResponse)
     } else {
       error("Request failed, response body was null")
@@ -227,6 +228,13 @@ constructor(
     return (baseCredits ?: 0.0f) + (bonusCredits ?: 0.0f)
   }
 
+  suspend fun getWeekCreditsEarned(worker_id: String): Float {
+    val lastWeekTimeString = DateUtils.getCurrentDate(-7)
+    val baseCredits = assignmentDaoExtra.getWeekBaseCreditsEarned(worker_id, lastWeekTimeString)
+    val bonusCredits = assignmentDaoExtra.getWeekCreditsEarned(worker_id, lastWeekTimeString)
+    return (baseCredits ?: 0.0f) + (bonusCredits ?: 0.0f)
+  }
+
   suspend fun getIDsForTask(task_id: String, statuses: List<MicrotaskAssignmentStatus>): List<String> {
     return assignmentDaoExtra.getIDsForTask(task_id, statuses)
   }
@@ -340,5 +348,41 @@ constructor(
     }
 
     return taskSummary.toMap()
+  }
+
+
+  suspend fun getScenarioReportSummary(worker_id: String): Map<ScenarioType, JsonObject> {
+    val assignmentReports = assignmentDaoExtra.getScenarioReports(worker_id)
+    var scenarioReports: MutableMap<ScenarioType, MutableList<JsonObject>> = mutableMapOf()
+    scenarioReports[ScenarioType.SPEECH_DATA] = mutableListOf()
+    scenarioReports[ScenarioType.SPEECH_TRANSCRIPTION] = mutableListOf()
+    scenarioReports[ScenarioType.SENTENCE_CORPUS] = mutableListOf()
+    scenarioReports[ScenarioType.IMAGE_ANNOTATION] = mutableListOf()
+
+    assignmentReports.forEach { ar ->
+      if (scenarioReports.containsKey(ar.scenario_name)) {
+        if (ar.report != null && !ar.report.isJsonNull) {
+          try {
+            scenarioReports[ar.scenario_name]!!.add(ar.report.asJsonObject)
+          } catch (e: Exception) {}
+        }
+      }
+    }
+
+    var scenarioSummary: MutableMap<ScenarioType, JsonObject> = mutableMapOf()
+    arrayListOf(
+      ScenarioType.SPEECH_DATA,
+      ScenarioType.SPEECH_TRANSCRIPTION,
+      ScenarioType.SENTENCE_CORPUS,
+      ScenarioType.IMAGE_ANNOTATION
+    ).forEach { scenario ->
+      try {
+        val reports = scenarioReports[scenario] ?: mutableListOf()
+        val summary = reduceTaskReports(reports, arrayListOf("accuracy"), 5.0f)
+        scenarioSummary[scenario] = summary
+      } catch (e: Exception) {}
+
+    }
+    return scenarioSummary.toMap()
   }
 }

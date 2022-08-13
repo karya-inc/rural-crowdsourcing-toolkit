@@ -12,12 +12,14 @@ import com.karyaplatform.karya.data.repo.MicroTaskRepository
 import com.karyaplatform.karya.injection.qualifier.FilesDir
 import com.karyaplatform.karya.ui.dashboard.DashboardSyncWorker
 import com.karyaplatform.karya.data.repo.PaymentRepository
+import com.karyaplatform.karya.data.repo.WorkerRepository
 
 class WorkerFactory(
   private val assignmentRepository: AssignmentRepository,
   private val karyaFileRepository: KaryaFileRepository,
   private val microTaskRepository: MicroTaskRepository,
   private val paymentRepository: PaymentRepository,
+  private val workerRepository: WorkerRepository,
   private val datastore: DataStore<Preferences>,
   @FilesDir private val fileDirPath: String,
   private val authManager: AuthManager,
@@ -38,6 +40,7 @@ class WorkerFactory(
           karyaFileRepository,
           microTaskRepository,
           paymentRepository,
+          workerRepository,
           datastore,
           fileDirPath,
           authManager

@@ -178,6 +178,24 @@
     <string name="change_phone_number">Change Phone Number</string>
     <string name="invalid_otp">You have entered an invalid OTP.</string>
 
+    <!-- Home Screen -->
+    <string name="home_screen_title">Home Screen</string>
+    <string name="task_summary_label">Task Summary</string>
+    <string name="performance_label">Performance</string>
+    <string name="recording_task_label">Recording</string>
+    <string name="typing_task_label">Typing</string>
+    <string name="image_task_label">Image Annotation</string>
+    <string name="transcription_task_label">Transcription</string>
+    <string name="earning_label">Earnings</string>
+    <string name="earned_week_label">Last Week</string>
+    <string name="earned_total_label">Total Earned</string>
+    <string name="paid_total_label">Total Paid</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_screen_title">Your Profile</string>
+    <string name="submit_profile">Submit Profile</string>
+    <string name="back_to_home">Back to Home</string>
+
     <!-- Dashboard -->
     <string name="dashboard_title">Dashboard</string>
     <string name="sync_prompt">Submit Tasks / Get New Tasks</string>
@@ -187,6 +205,11 @@
     <string name="tasks_verified">verified</string>
     <string name="tasks_skipped">skipped</string>
     <string name="tasks_expired">expired</string>
+
+    <!-- Leaderboard -->
+    <string name="leaderboard_title">Leaderboard</string>
+    <string name="leaderboard_points">points</string>
+    <string name="leaderboard_empty">There is no one on the leaderboard now. Complete tasks and be the first to get on the leaderboard!</string>
 
 
     <string name="sync_prompt_message">You have completed tasks that can be submitted to the server. Do you want to submit the tasks now?</string>
@@ -310,4 +333,10 @@
     <string name="sentence_corpus_verification_valid">VALID</string>
     <string name="sentence_corpus_verification_errors">ERRORS</string>
     <string name="sentence_corpus_verification_invalid">INVALID</string>
+    <string name="profile_name_label">Name</string>
+    <string name="profile_gender_label">Gender</string>
+    <string name="profile_yob_label">Year Of Birth</string>
+    <string name="profile_missing_field_error_msg">Please fill all the fields</string>
+    <string name="profile_gender_male_label">Male</string>
+    <string name="profile_gender_female_label">Female</string>
 </resources>

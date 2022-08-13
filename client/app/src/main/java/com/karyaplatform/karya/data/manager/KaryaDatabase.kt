@@ -23,7 +23,9 @@ import com.karyaplatform.karya.data.model.karya.*
       TaskRecord::class,
       MicroTaskRecord::class,
       MicroTaskAssignmentRecord::class,
-      PaymentAccountRecord::class],
+      PaymentAccountRecord::class,
+      LeaderboardRecord::class
+    ],
   version = 1,
   exportSchema = true
 )
@@ -38,6 +40,7 @@ abstract class KaryaDatabase : RoomDatabase() {
   abstract fun microtaskDaoExtra(): MicrotaskDaoExtra
   abstract fun karyaFileDao(): KaryaFileDao
   abstract fun paymentAccountDao(): PaymentAccountDao
+  abstract fun leaderboardDao(): LeaderboardDao
 
   companion object {
     private var INSTANCE: KaryaDatabase? = null

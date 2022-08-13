@@ -80,7 +80,8 @@ class OTPFragment : BaseFragment(R.layout.fragment_otp) {
   private fun observeEffects() {
     viewModel.otpEffects.observe(viewLifecycle, viewLifecycleScope) { effect ->
       when (effect) {
-        is OTPEffects.Navigate -> navigate(effect.destination)
+        OTPEffects.NavigateToProfile -> navigateToProfileFragment()
+        OTPEffects.NavigateToHomeScreen -> navigateToHomeScreen()
       }
     }
   }
@@ -110,15 +111,12 @@ class OTPFragment : BaseFragment(R.layout.fragment_otp) {
     enableNextButton()
   }
 
-  private fun navigate(destination: Destination) {
-    when (destination) {
-      Destination.Dashboard -> navigateToDashBoard()
-      else -> {}
-    }
+  private fun navigateToProfileFragment() {
+    findNavController().navigate(R.id.action_OTPFragment_to_profileFragment)
   }
 
-  private fun navigateToDashBoard() {
-    findNavController().navigate(R.id.action_global_dashboardActivity)
+  private fun navigateToHomeScreen() {
+    findNavController().navigate(R.id.action_OTP_to_homeScreen)
   }
 
   private fun enableNextButton() {

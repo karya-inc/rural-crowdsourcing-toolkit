@@ -26,6 +26,9 @@ import com.karyaplatform.karya.utils.MicrotaskInput
 import com.karyaplatform.karya.utils.extensions.getBlobPath
 import com.karyaplatform.karya.data.repo.PaymentRepository
 import com.karyaplatform.karya.utils.PreferenceKeys
+import com.karyaplatform.karya.data.remote.response.WorkerBalanceResponse
+import com.karyaplatform.karya.data.repo.WorkerRepository
+import com.karyaplatform.karya.utils.extensions.getBlobPath
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.single
@@ -48,6 +51,7 @@ class DashboardSyncWorker(
   private val karyaFileRepository: KaryaFileRepository,
   private val microTaskRepository: MicroTaskRepository,
   private val paymentRepository: PaymentRepository,
+  private val workerRepository: WorkerRepository,
   private val datastore: DataStore<Preferences>,
   @FilesDir private val fileDirPath: String,
   private val authManager: AuthManager,
@@ -235,6 +239,10 @@ class DashboardSyncWorker(
     // Update worker balance data
     val workerBalanceKey = floatPreferencesKey(PreferenceKeys.WORKER_BALANCE)
     datastore.edit { prefs -> prefs[workerBalanceKey] = paymentResponse.workerBalance }
+    // Get Leaderboard data
+    workerRepository
+      .updateLeaderboard(worker.idToken)
+      .collect()
   }
 
   /**
