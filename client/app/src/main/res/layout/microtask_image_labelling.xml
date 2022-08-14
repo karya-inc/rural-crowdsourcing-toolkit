@@ -30,28 +30,30 @@
         android:layout_marginBottom="@dimen/_10sdp"
         android:contentDescription="source image"
         app:zoomage_restrictBounds="true"
-        app:layout_constraintBottom_toTopOf="@id/labelsLayout"
+        android:src="@color/c_light_grey"
+        app:layout_constraintBottom_toTopOf="@id/nextBtn"
         app:layout_constraintTop_toBottomOf="@id/instructionTv" />
 
     <ImageButton
         android:id="@+id/nextBtn"
         android:layout_width="@dimen/_40sdp"
         android:layout_height="@dimen/_40sdp"
-        android:layout_margin="@dimen/_15sdp"
+        android:layout_marginHorizontal="@dimen/_15sdp"
+        android:layout_marginBottom="@dimen/_20sdp"
         android:background="@drawable/ic_next_enabled"
         android:contentDescription="@string/next"
         android:soundEffectsEnabled="false"
-        app:layout_constraintBottom_toBottomOf="@id/labelsLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/labelsLayout" />
+        app:layout_constraintTop_toBottomOf="@id/sourceImageIv" />
 
     <com.nex3z.flowlayout.FlowLayout
         android:id="@+id/labelsLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:minHeight="@dimen/_50sdp"
+        android:minHeight="@dimen/_20sdp"
         android:layout_marginHorizontal="@dimen/_15sdp"
-        android:layout_marginBottom="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_20sdp"
         app:flChildSpacing="auto"
         app:flMaxRows="2"
         app:flMinChildSpacing="@dimen/_5sdp"
@@ -63,5 +65,26 @@
         >
 
     </com.nex3z.flowlayout.FlowLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/pictureInputLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/sourceImageIv"
+        app:layout_constraintRight_toRightOf="@id/sourceImageIv"
+        app:layout_constraintTop_toTopOf="@id/sourceImageIv"
+        app:layout_constraintBottom_toBottomOf="@id/sourceImageIv"
+        android:gravity="center"
+        android:orientation="vertical">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_camera"/>
+        <Button
+            android:id="@+id/takePictureBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/image_labelling_take_picture_text" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

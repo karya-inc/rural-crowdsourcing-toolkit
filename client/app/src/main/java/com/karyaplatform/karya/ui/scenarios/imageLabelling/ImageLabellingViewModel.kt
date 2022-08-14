@@ -11,6 +11,7 @@ import com.karyaplatform.karya.data.repo.MicroTaskRepository
 import com.karyaplatform.karya.data.repo.TaskRepository
 import com.karyaplatform.karya.injection.qualifier.FilesDir
 import com.karyaplatform.karya.ui.scenarios.common.BaseMTRendererViewModel
+import com.otaliastudios.cameraview.PictureResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,13 +45,22 @@ constructor(
   private val _labelState: MutableStateFlow<MutableMap<String, Boolean>> = MutableStateFlow(mutableMapOf())
   val labelState = _labelState.asStateFlow()
 
-  /** Complete microtask and move to next */
+  // State of capture result
+  private val _captureResult: MutableStateFlow<PictureResult?> = MutableStateFlow(null)
+  val captureResult = _captureResult.asStateFlow()
+
+  /**
+   * Complete microtask and move to next
+   */
   fun completeLabelling() {
     // Add all labels to the outputData
     val labels = JsonObject()
     labelState.value.forEach { (label, state) -> labels.addProperty(label, state) }
     outputData.add("labels", labels)
+    // add output files
+    addOutputFile("image", outputFileParams())
     _labelState.value = mutableMapOf()
+    _captureResult.value = null
     viewModelScope.launch {
       completeAndSaveCurrentMicrotask()
       moveToNextMicrotask()
@@ -89,4 +99,25 @@ constructor(
     }
     _labelState.value = newState
   }
+
+  fun setCaptureResult(captureResult: PictureResult) {
+    _captureResult.value = captureResult
+  }
+
+  /**
+   * Get output file params for image
+   */
+  private fun outputFileParams(): Pair<String, String> {
+    val filename = microtaskAssignmentIDs[currentAssignmentIndex]
+    return Pair(filename, "jpg")
+  }
+
+  /**
+   * Output file name
+   */
+  fun outputFilePath(): String {
+    val assignmentId = microtaskAssignmentIDs[currentAssignmentIndex]
+    return assignmentOutputContainer.getAssignmentOutputFilePath(assignmentId, outputFileParams())
+  }
+
 }
