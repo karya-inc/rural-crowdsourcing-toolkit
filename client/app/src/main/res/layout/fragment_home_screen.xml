@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:background="?colorPrimaryLight"
-    tools:context=".ui.leaderboard.LeaderboardFragment">
+    tools:context=".ui.homeScreen.HomeScreenFragment">
 
     <com.karyaplatform.karya.ui.views.KaryaToolbar
         android:id="@+id/appTb"

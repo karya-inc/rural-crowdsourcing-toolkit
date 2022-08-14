@@ -83,6 +83,7 @@ android {
     create ("rani") {
       dimension = "study"
       applicationIdSuffix = ".rani"
+      buildConfigField("boolean", "PAYMENTS_ENABLED", "true")
     }
     create("large") {
       dimension = "study"
