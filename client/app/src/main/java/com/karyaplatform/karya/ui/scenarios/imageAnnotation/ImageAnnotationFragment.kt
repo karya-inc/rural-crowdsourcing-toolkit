@@ -111,7 +111,7 @@ class ImageAnnotationFragment : BaseMTRendererFragment(R.layout.microtask_image_
           if (viewModel.annotationType == CropObjectType.RECTANGLE) {
             sourceImageIv.addCropRectangle(key, colors[position])
           } else {
-            sourceImageIv.addCropPolygon(key, colors[position], viewModel.numberOfSides)
+            // sourceImageIv.addCropPolygon(key, colors[position], viewModel.numberOfSides)
           }
 
           alertDialog!!.dismiss()
@@ -184,7 +184,7 @@ class ImageAnnotationFragment : BaseMTRendererFragment(R.layout.microtask_image_
       for (id in polygonCropCoors!!.keys) {
         val label = id.split("_")[0]
         val position = labels.indexOf(label)
-        sourceImageIv.addCropPolygon(id, colors[position], polygonCropCoors!![id])
+        // sourceImageIv.addCropPolygon(id, colors[position], polygonCropCoors!![id])
       }
     }
   }
