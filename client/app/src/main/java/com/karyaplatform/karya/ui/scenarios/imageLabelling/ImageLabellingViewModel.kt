@@ -44,6 +44,9 @@ constructor(
   private val _captureResult: MutableStateFlow<PictureResult?> = MutableStateFlow(null)
   val captureResult = _captureResult.asStateFlow()
 
+  // single selection?
+  private var singleSelection = false
+
   /**
    * Complete microtask and move to next
    */
@@ -83,6 +86,11 @@ constructor(
     }
     labels.forEach { _labelState.value[it] = false }
 
+    singleSelection = try {
+      task.params.asJsonObject.get("single").asBoolean
+    } catch (e: Exception) {
+      false
+    }
   }
 
   /**
@@ -90,14 +98,13 @@ constructor(
    */
   fun flipState(label: String) {
     val newState: MutableMap<String, Boolean> = mutableMapOf()
-    _labelState.value.forEach { (s, b) ->  newState[s] = b}
+    _labelState.value.forEach { (s, b) -> newState[s] = if (singleSelection) false else b }
     if (newState.containsKey(label)) {
       newState[label] = !newState[label]!!
     } else {
       newState[label] = true
     }
     _labelState.value = newState
-
   }
 
   fun setCaptureResult(captureResult: PictureResult) {
