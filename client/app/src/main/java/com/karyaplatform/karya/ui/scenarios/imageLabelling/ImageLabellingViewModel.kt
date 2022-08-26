@@ -47,6 +47,8 @@ constructor(
   // single selection?
   private var singleSelection = false
 
+  private lateinit var imageSource: String
+
   /**
    * Complete microtask and move to next
    */
@@ -56,7 +58,12 @@ constructor(
     labelState.value.forEach { (label, state) -> labels.addProperty(label, state) }
     outputData.add("labels", labels)
     // add output files
-    addOutputFile("image", outputFileParams())
+
+    // Add image to output file if source is user
+    if (imageSource == "user") {
+      addOutputFile("image", outputFileParams())
+    }
+
     _labelState.value = mutableMapOf()
     _captureResult.value = null
     viewModelScope.launch {
@@ -76,6 +83,12 @@ constructor(
       microtaskInputContainer.getMicrotaskInputFilePath(currentMicroTask.id, imageFileName)
     } catch (e: Exception) {
       ""
+    }
+
+    imageSource = try {
+      task.params.asJsonObject.get("imageByUsers").asString
+    } catch (e: Exception) {
+      "server"
     }
 
     // Set up the labels
