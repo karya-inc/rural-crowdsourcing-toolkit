@@ -126,6 +126,10 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
       sentenceTv.text = text
     }
 
+    viewModel.indexTvText.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { text ->
+      sentenceIdTv.text = text
+    }
+
     viewModel.recordSecondsTvText.observe(
       viewLifecycleOwner.lifecycle,
       viewLifecycleScope

@@ -150,6 +150,9 @@ constructor(
   private val _sentenceTvText: MutableStateFlow<String> = MutableStateFlow("")
   val sentenceTvText = _sentenceTvText.asStateFlow()
 
+  private val _indexTvText: MutableStateFlow<String> = MutableStateFlow("")
+  val indexTvText = _indexTvText.asStateFlow()
+
   private val _recordSecondsTvText: MutableStateFlow<String> = MutableStateFlow("")
   val recordSecondsTvText = _recordSecondsTvText.asStateFlow()
 
@@ -252,6 +255,7 @@ constructor(
     }
 
     outputRecordingFileParams = if (compressAudio) Pair("", "m4a") else Pair("", "wav")
+    noForcedReplay = true
   }
 
   /** Shortcut to set and flush all four button states (in sequence) */
@@ -287,6 +291,14 @@ constructor(
 
     _sentenceTvText.value =
       currentMicroTask.input.asJsonObject.getAsJsonObject("data").get("sentence").toString()
+
+    var index = try {
+      currentMicroTask.input.asJsonObject.getAsJsonObject("data").get("index").asString
+    } catch (e: Exception) {
+      ""
+    }
+    _indexTvText.value = index
+
     totalRecordedBytes = 0
 
     /** Get microtask config */
