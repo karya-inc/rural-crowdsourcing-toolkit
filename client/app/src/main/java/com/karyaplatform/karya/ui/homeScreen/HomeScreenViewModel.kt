@@ -2,7 +2,6 @@ package com.karyaplatform.karya.ui.homeScreen
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karyaplatform.karya.data.manager.AuthManager
@@ -22,7 +21,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -83,7 +82,7 @@ constructor(
     refreshXPPoints()
     refreshTaskSummary()
     refreshPerformanceSummary()
-    refreshEarningSummary()
+    setEarningSummary()
   }
 
   private fun refreshWorker() {
@@ -159,18 +158,9 @@ constructor(
     }
   }
 
-  fun refreshEarningSummary() {
+  fun setEarningSummary() {
     viewModelScope.launch {
-      val w = authManager.getLoggedInWorker()
-      val balanceKey = floatPreferencesKey(PreferenceKeys.WORKER_BALANCE)
-      val data = datastore.data.first()
-      val workerBalance: Float = data[balanceKey] ?: 0f
-      val earnedLastWeek = assignmentRepository.getWeekCreditsEarned(w.id)
-      val totalEarned = assignmentRepository.getTotalCreditsEarned(w.id)
-      // TODO: This is a hack. Paid should be total of processed payments
-      val paid = totalEarned - workerBalance
-
-      _earningStatus.value = EarningStatus(earnedLastWeek, totalEarned, paid)
+      _earningStatus.value = paymentRepository.getWorkerEarnings()
     }
   }
 

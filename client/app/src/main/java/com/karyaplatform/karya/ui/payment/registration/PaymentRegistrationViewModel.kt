@@ -24,10 +24,8 @@ constructor(private val authManager: AuthManager, private val paymentRepository:
       val worker = authManager.getLoggedInWorker()
       val workerBalanceResponse =
         paymentRepository
-          .getWorkerBalance(worker.idToken!!, worker.id)
-          .catch { WorkerBalanceResponse(0.0f, 0.0f) }
-          .single()
-      _uiStateFlow.update { it.copy(amountEarned = workerBalanceResponse.workerBalance) }
+          .getWorkerEarnings()
+      _uiStateFlow.update { it.copy(amountEarned = workerBalanceResponse.totalEarned) }
     }
   }
 

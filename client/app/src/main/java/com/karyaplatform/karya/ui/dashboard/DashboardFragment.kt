@@ -19,6 +19,7 @@ import com.karyaplatform.karya.ui.base.SessionFragment
 import com.karyaplatform.karya.utils.extensions.*
 import com.karyaplatform.karya.BuildConfig
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.app_toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -162,6 +163,12 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
 
   private fun setupViews() {
 
+    toolbarBackBtn.visible()
+
+    toolbarBackBtn.setOnClickListener {
+      findNavController().popBackStack()
+    }
+
     with(binding) {
       tasksRv.apply {
         adapter = TaskListAdapter(emptyList(), ::onDashboardItemClick)
@@ -200,6 +207,14 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
     binding.syncCv.enable()
     data.apply {
       (binding.tasksRv.adapter as TaskListAdapter).updateList(taskInfoData)
+    }
+
+    // Check if worker is initialised in viewmodel
+    if (viewModel.workerAccessCode.value.isNotEmpty()) {
+      // Sync if no tasks are present
+      if (data.taskInfoData.isEmpty()) {
+        syncWithServer()
+      }
     }
 
     // Show a dialog box to sync with server if completed tasks and internet available
@@ -377,18 +392,7 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
           }
         }
 
-        if (task.taskInstruction == null) {
-          findNavController().navigate(action)
-        } else {
-          val builder = AlertDialog.Builder(requireContext())
-          val message = task.taskInstruction
-          builder.setMessage(message)
-          builder.setNeutralButton(R.string.okay) { _, _ ->
-            findNavController().navigate(action)
-          }
-          val dialog = builder.create()
-          dialog.show()
-        }
+        findNavController().navigate(action)
       }
     }
   }

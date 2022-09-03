@@ -77,6 +77,10 @@ constructor(
     MutableStateFlow(Triple(false, "", ""))
   val outsideTimeBound = _outsideTimeBound.asStateFlow()
 
+  protected fun isCurrentAssignmentInitialized(): Boolean {
+    return this::currentAssignment.isInitialized
+  }
+
   protected fun navigateBack() {
     viewModelScope.launch { _navigateBack.emit(true) }
   }
@@ -448,5 +452,21 @@ constructor(
   /** Reset existing microtask. Useful on activity restart. */
   protected fun resetMicrotask() {
     getAndSetupMicrotask()
+  }
+
+  /**
+   * Skip the microtask
+   */
+  fun skipTask() {
+    // log the state transition
+    val message = JsonObject()
+    message.addProperty("type", "o")
+    message.addProperty("button", "SKIPPED")
+    log(message)
+
+    viewModelScope.launch {
+      skipAndSaveCurrentMicrotask()
+      moveToNextMicrotask()
+    }
   }
 }

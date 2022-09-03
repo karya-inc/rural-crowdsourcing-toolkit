@@ -6,6 +6,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.karyaplatform.karya.R
@@ -14,6 +15,9 @@ import com.karyaplatform.karya.ui.scenarios.speechTranscription.SpeechTranscript
 import com.karyaplatform.karya.utils.extensions.observe
 import com.karyaplatform.karya.utils.extensions.viewLifecycleScope
 import com.google.android.material.button.MaterialButton
+import com.karyaplatform.karya.utils.extensions.observe
+import com.karyaplatform.karya.utils.extensions.viewLifecycleScope
+import com.potyvideo.library.globalInterfaces.AndExoPlayerListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.microtask_common_back_button.view.*
 import kotlinx.android.synthetic.main.microtask_common_next_button.view.*
@@ -55,7 +59,7 @@ class SpeechTranscriptionFragment : BaseMTRendererFragment(R.layout.microtask_sp
     nextBtnCv.setOnClickListener {
       // Check if user has entered the text
       if (transcriptionEt.text.isNullOrEmpty()) {
-        showErrorDialog(getString(R.string.no_transcription_error_msg))
+        skipTask(true, "", getString(R.string.skip_task_warning))
         return@setOnClickListener
       } else {
         val alertDialogBuilder = AlertDialog.Builder(requireContext())
@@ -75,6 +79,12 @@ class SpeechTranscriptionFragment : BaseMTRendererFragment(R.layout.microtask_sp
     }
 
     backBtnCv.setOnClickListener { viewModel.handleBackClick() }
+
+    audioPlayer.setAndExoPlayerListener(object : AndExoPlayerListener {
+      override fun onExoPlayerError(errorMessage: String?) {
+        viewModel.handleCorruptAudio(errorMessage)
+      }
+    })
   }
 
   private fun setupObservers() {
@@ -91,14 +101,22 @@ class SpeechTranscriptionFragment : BaseMTRendererFragment(R.layout.microtask_sp
         return@observe
       }
       for (word in words) {
-        val wordButton = MaterialButton(requireContext())
-        wordButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, R.dimen._14ssp.toFloat())
+        val wordButton = Button(requireContext())
         wordButton.text = word
         wordButton.setOnClickListener {
           transcriptionEt.setText(transcriptionEt.text.toString() + " " + word)
           transcriptionEt.setSelection(transcriptionEt.length())//placing cursor at the end of the text
         }
         assistanceFl.addView(wordButton)
+      }
+    }
+
+    viewModel.recordingFilePath.observe(
+      viewLifecycleOwner.lifecycle, viewLifecycleScope
+    ) { path ->
+      if (path.isNotEmpty()) {
+        audioPlayer.setSource(path)
+        audioPlayer.pausePlayer()
       }
     }
 

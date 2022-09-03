@@ -22,7 +22,10 @@ import kotlinx.coroutines.flow.collect
 @HiltViewModel
 class PaymentDashboardViewModel
 @Inject
-constructor(private val authManager: AuthManager, private val paymentRepository: PaymentRepository) : ViewModel() {
+constructor(
+  private val authManager: AuthManager,
+  private val paymentRepository: PaymentRepository
+) : ViewModel() {
 
   private val _uiStateFlow = MutableStateFlow(PaymentDashboardModel.initialModel())
   val uiStateFlow = _uiStateFlow.asStateFlow()
@@ -44,14 +47,13 @@ constructor(private val authManager: AuthManager, private val paymentRepository:
           }
 
       val currentAccountFlow = paymentRepository.getCurrentAccount(idToken)
-      val balanceFlow = paymentRepository.getWorkerBalance(idToken, worker.id)
+      val balanceFlow = paymentRepository.refreshWorkerEarnings(idToken)
       val transactionsFlow = paymentRepository.getTransactions(idToken, worker.id)
 
       val combinedFlow =
-        combine(currentAccountFlow, balanceFlow, transactionsFlow) {
-            paymentInfoResponse,
-            workerBalanceResponse,
-            transactions ->
+        combine(currentAccountFlow, balanceFlow, transactionsFlow) { paymentInfoResponse,
+                                                                     earningStatus,
+                                                                     transactions ->
           val transaction = transactions.first()
 
           val ifsc = paymentInfoResponse.meta?.account?.ifsc ?: ""
@@ -60,9 +62,11 @@ constructor(private val authManager: AuthManager, private val paymentRepository:
             UserAccountDetail(
               name = paymentInfoResponse.meta!!.name,
               id = idPrefix + paymentInfoResponse.meta.account.id,
+              accountType = "",
               ifsc = ifsc,
             )
-          val parsedDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+          val parsedDateFormat =
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
           val transactionDate = parsedDateFormat.parse(transaction.createdAt)
           val userDateFormat = SimpleDateFormat("dd-MM-yyyy")
           val userDate = userDateFormat.format(transactionDate)
@@ -76,8 +80,8 @@ constructor(private val authManager: AuthManager, private val paymentRepository:
             )
 
           PaymentDashboardModel(
-            balance = workerBalanceResponse.workerBalance,
-            transferred = workerBalanceResponse.totalSpent,
+            balance = earningStatus.totalEarned - earningStatus.totalPaid,
+            transferred = earningStatus.totalPaid,
             userAccountDetail = userAccountDetail,
             userTransactionDetail = userTransactionDetail,
             isLoading = false,
@@ -86,7 +90,14 @@ constructor(private val authManager: AuthManager, private val paymentRepository:
         }
 
       combinedFlow
-        .catch { e -> _uiStateFlow.update { it.copy(isLoading = false, errorMessage = "Some error occurred") } }
+        .catch { e ->
+          _uiStateFlow.update {
+            it.copy(
+              isLoading = false,
+              errorMessage = "Some error occurred"
+            )
+          }
+        }
         .collect { paymentDashboardModel ->
           Log.e("PAYMENT_DASHBOARD", "In Collect")
           _uiStateFlow.update { paymentDashboardModel }

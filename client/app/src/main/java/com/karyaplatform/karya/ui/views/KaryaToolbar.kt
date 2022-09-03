@@ -117,28 +117,13 @@ class KaryaToolbar : Toolbar {
       dialog.cancel()
     }
 
-    languageDialog.findViewById<Button>(R.id.languageBengali).setOnClickListener {
-      updateUserLanguage(LanguageType.BN)
+    languageDialog.findViewById<Button>(R.id.languageMarathi).setOnClickListener {
+      updateUserLanguage(LanguageType.MR)
       dialog.cancel()
     }
 
-    languageDialog.findViewById<Button>(R.id.languageMalayalam).setOnClickListener {
-      updateUserLanguage(LanguageType.ML)
-      dialog.cancel()
-    }
-
-    languageDialog.findViewById<Button>(R.id.languageBodo).setOnClickListener {
-      updateUserLanguage(LanguageType.BRX)
-      dialog.cancel()
-    }
-
-    languageDialog.findViewById<Button>(R.id.languageMeitei).setOnClickListener {
-      updateUserLanguage(LanguageType.MNI)
-      dialog.cancel()
-    }
-
-    languageDialog.findViewById<Button>(R.id.languageChokri).setOnClickListener {
-      updateUserLanguage(LanguageType.NRI)
+    languageDialog.findViewById<Button>(R.id.languageUrdu).setOnClickListener {
+      updateUserLanguage(LanguageType.UR)
       dialog.cancel()
     }
   }

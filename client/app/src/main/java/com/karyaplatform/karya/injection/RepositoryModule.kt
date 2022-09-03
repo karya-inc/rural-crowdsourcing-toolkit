@@ -10,6 +10,8 @@ import com.karyaplatform.karya.data.service.WorkerAPI
 import com.karyaplatform.karya.data.local.daos.PaymentAccountDao
 import com.karyaplatform.karya.data.service.PaymentAPI
 import com.karyaplatform.karya.data.local.daos.*
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -55,7 +57,7 @@ class RepositoryModule {
 
   @Provides
   @Singleton
-  fun providesPaymentRepository(paymentAPI: PaymentAPI, paymentAccountDao: PaymentAccountDao): PaymentRepository {
-    return PaymentRepository(paymentAPI, paymentAccountDao)
+  fun providesPaymentRepository(paymentAPI: PaymentAPI, paymentAccountDao: PaymentAccountDao, datastore: DataStore<Preferences>): PaymentRepository {
+    return PaymentRepository(paymentAPI, paymentAccountDao, datastore)
   }
 }
