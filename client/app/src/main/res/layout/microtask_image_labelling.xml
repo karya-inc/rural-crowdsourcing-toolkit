@@ -54,7 +54,6 @@
         android:layout_marginHorizontal="@dimen/_15sdp"
         android:layout_marginBottom="@dimen/_10sdp"
         app:flChildSpacing="auto"
-        app:flMaxRows="3"
         app:flMinChildSpacing="@dimen/_5sdp"
         app:flRowSpacing="@dimen/_10sdp"
         app:flow_verticalAlign="center"
