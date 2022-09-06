@@ -77,11 +77,13 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
 
   private fun setupSpotLight() {
 
+    val spotlightPadding = 20
+
     val targetsDataList = ArrayList<TargetData>()
     targetsDataList.add(
       TargetData(
         sentenceTv,
-        RoundedRectangle(sentenceTv.height.toFloat() + 20, sentenceTv.width.toFloat() + 20, 5F),
+        RoundedRectangle(sentenceTv.height.toFloat() + spotlightPadding, sentenceTv.width.toFloat() + spotlightPadding, 5F),
         R.layout.spotlight_target_temp,
         AssistantAudio.RECORD_SENTENCE,
       )
@@ -89,7 +91,7 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
     targetsDataList.add(
       TargetData(
         recordBtn,
-        Circle(((recordBtn.height) / 2).toFloat()),
+        Circle(((recordBtn.height + spotlightPadding) / 2).toFloat()),
         R.layout.spotlight_target_temp,
         AssistantAudio.RECORD_ACTION,
         uiCue = {
@@ -102,7 +104,7 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
     targetsDataList.add(
       TargetData(
         recordBtn,
-        Circle(((recordBtn.height) / 2).toFloat()),
+        Circle(((recordBtn.height + spotlightPadding) / 2).toFloat()),
         R.layout.spotlight_target_temp,
         AssistantAudio.STOP_ACTION,
         uiCue = {
@@ -114,7 +116,7 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
     targetsDataList.add(
       TargetData(
         playBtn,
-        Circle(((playBtn.height) / 2).toFloat()),
+        Circle(((playBtn.height + spotlightPadding) / 2).toFloat()),
         R.layout.spotlight_target_temp,
         AssistantAudio.LISTEN_ACTION,
         uiCue = {
@@ -129,7 +131,7 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
     targetsDataList.add(
       TargetData(
         recordBtn,
-        Circle(((recordBtn.height) / 2).toFloat()),
+        Circle(((recordBtn.height + spotlightPadding) / 2).toFloat()),
         R.layout.spotlight_target_temp,
         AssistantAudio.RERECORD_ACTION,
         uiCue = {
@@ -144,7 +146,7 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
     targetsDataList.add(
       TargetData(
         nextBtnCv,
-        Circle(((nextBtnCv.height) / 2).toFloat()),
+        Circle(((nextBtnCv.height + spotlightPadding) / 2).toFloat()),
         R.layout.spotlight_target_temp,
         AssistantAudio.NEXT_ACTION,
         uiCue = {
@@ -159,7 +161,7 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
     targetsDataList.add(
       TargetData(
         backBtn,
-        Circle(((backBtn.height) / 2).toFloat()),
+        Circle(((backBtn.height + spotlightPadding) / 2).toFloat()),
         R.layout.spotlight_target_temp,
         AssistantAudio.PREVIOUS_ACTION,
         uiCue = {

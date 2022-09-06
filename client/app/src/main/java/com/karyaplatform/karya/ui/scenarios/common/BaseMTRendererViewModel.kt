@@ -1,5 +1,9 @@
 package com.karyaplatform.karya.ui.scenarios.common
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -18,28 +22,34 @@ import com.karyaplatform.karya.utils.FileUtils
 import com.karyaplatform.karya.utils.MicrotaskAssignmentOutput
 import com.karyaplatform.karya.utils.MicrotaskInput
 import com.karyaplatform.karya.utils.extensions.getBlobPath
+import com.karyaplatform.karya.utils.PreferenceKeys
+import com.karyaplatform.karya.utils.extensions.getBlobPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
-abstract class BaseMTRendererViewModel
-constructor(
+abstract class BaseMTRendererViewModel(
   var assignmentRepository: AssignmentRepository,
   var taskRepository: TaskRepository,
   var microTaskRepository: MicroTaskRepository,
   var fileDirPath: String,
   var authManager: AuthManager,
+  val datastore: DataStore<Preferences>,
   val includeCompleted: Boolean = true
 ) : ViewModel() {
 
   private lateinit var taskId: String
+  // Is the fragment visited the first time?
+  var firstTimeActivityVisit: Boolean = true
+    private set
 
   // Initialising containers
   val assignmentOutputContainer = MicrotaskAssignmentOutput(fileDirPath)
@@ -76,6 +86,8 @@ constructor(
   private val _outsideTimeBound: MutableStateFlow<Triple<Boolean, String, String>> =
     MutableStateFlow(Triple(false, "", ""))
   val outsideTimeBound = _outsideTimeBound.asStateFlow()
+
+  open fun onFirstTimeVisit() {}
 
   protected fun isCurrentAssignmentInitialized(): Boolean {
     return this::currentAssignment.isInitialized
@@ -410,6 +422,20 @@ constructor(
 
       setupMicrotask()
       log("microtask setup complete")
+
+      // First visit logic
+      viewModelScope.launch {
+        val scenarioName = "${task.scenario_name.name}"
+        val firstRunKey = booleanPreferencesKey(scenarioName)
+
+        val data = datastore.data.first()
+        firstTimeActivityVisit = data[firstRunKey] ?: true
+        if (firstTimeActivityVisit) {
+          onFirstTimeVisit()
+        }
+        datastore.edit { prefs -> prefs[firstRunKey] = false }
+        firstTimeActivityVisit = false
+      }
     }
   }
 

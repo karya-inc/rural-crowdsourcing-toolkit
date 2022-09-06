@@ -15,6 +15,10 @@ import com.karyaplatform.karya.ui.base.BaseFragment
 import com.karyaplatform.karya.utils.extensions.dataStore
 import com.karyaplatform.karya.utils.extensions.disable
 import com.karyaplatform.karya.utils.extensions.enable
+import com.karyaplatform.karya.data.model.karya.enums.AssistantAudio
+import com.karyaplatform.karya.utils.extensions.dataStore
+import com.karyaplatform.karya.utils.extensions.disable
+import com.karyaplatform.karya.utils.extensions.enable
 import com.takusemba.spotlight.OnSpotlightListener
 import com.takusemba.spotlight.OnTargetListener
 import com.takusemba.spotlight.Spotlight
@@ -44,7 +48,8 @@ class SpotlightBuilderWrapper(
       val replayBtn = overlay.findViewById<View>(R.id.replayBtn)
 
       fun playAssistantAudio(uiCue: () -> Unit, onCompletionListener: (player: MediaPlayer) -> Unit = {}) {
-        fragment.assistant.playAssistantAudio(targetsData.audio,
+        fragment.assistant.playAssistantAudio(
+          targetsData.audio,
           uiCue = {
             nextBtn.disable()
             replayBtn.disable()
@@ -66,7 +71,10 @@ class SpotlightBuilderWrapper(
       replayBtn.disable()
 
       val targetObject = Target.Builder()
-        .setAnchor(targetsData.anchor)
+      with(targetsData) {
+        if (anchorView != null) targetObject.setAnchor(anchorView!!) else targetObject.setAnchor(anchorFloat!!)
+      }
+      targetObject
         .setShape(targetsData.shape)
         .setOverlay(overlay)
         .setOnTargetListener(object : OnTargetListener {
@@ -78,14 +86,13 @@ class SpotlightBuilderWrapper(
 
           }
         })
-        .build()
 
       // Set click listener on Replay Btn
       replayBtn.setOnClickListener {
         playAssistantAudio(targetsData.uiCue, targetsData.onCompletionListener)
       }
       // Return the target object
-      return@map targetObject
+      return@map targetObject.build()
     }
     spotlightObject = Spotlight.Builder(fragment.requireActivity())
       .setTargets(targets)

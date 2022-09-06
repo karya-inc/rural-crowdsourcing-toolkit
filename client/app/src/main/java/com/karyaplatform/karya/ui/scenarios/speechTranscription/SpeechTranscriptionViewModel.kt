@@ -2,6 +2,8 @@ package com.karyaplatform.karya.ui.scenarios.speechTranscription
 
 import android.media.MediaPlayer
 import androidx.annotation.StringRes
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
 import com.karyaplatform.karya.R
@@ -28,12 +30,14 @@ constructor(
   microTaskRepository: MicroTaskRepository,
   @FilesDir fileDirPath: String,
   authManager: AuthManager,
+  dataStore: DataStore<Preferences>
 ) : BaseMTRendererViewModel(
   assignmentRepository,
   taskRepository,
   microTaskRepository,
   fileDirPath,
-  authManager
+  authManager,
+  dataStore
 ) {
 
   /** UI button states */
@@ -97,6 +101,10 @@ constructor(
   private val _showErrorWithDialog: MutableStateFlow<String> = MutableStateFlow("")
   val showErrorWithDialog = _showErrorWithDialog.asStateFlow()
 
+  // Trigger Spotlight
+  private val _playRecordPromptTrigger: MutableStateFlow<Boolean> = MutableStateFlow(false)
+  val playRecordPromptTrigger = _playRecordPromptTrigger.asStateFlow()
+
   override fun setupMicrotask() {
     val recordingFileName =
       currentMicroTask.input.asJsonObject.getAsJsonObject("files").get("recording").asString
@@ -123,10 +131,10 @@ constructor(
       if (inputData.has("bow-assist")) {
         inputData.get("bow-assist").asBoolean
       } else {
-        false
+        true
       }
     } catch (e:Exception) {
-      false
+      true
     }
 
     // Initial transcript
@@ -157,6 +165,19 @@ constructor(
     }
 
     setActivityState(ActivityState.REVIEW_ENABLED)
+  }
+
+  override fun onFirstTimeVisit() {
+    super.onFirstTimeVisit()
+    onAssistantClick()
+  }
+
+  private fun playRecordPrompt() {
+    _playRecordPromptTrigger.value = true
+  }
+
+  private fun onAssistantClick() {
+    playRecordPrompt()
   }
 
   private fun showErrorWithDialogBox(msg: String) {

@@ -1,5 +1,7 @@
 package com.karyaplatform.karya.ui.scenarios.sentenceCorpus
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
 import com.karyaplatform.karya.data.manager.AuthManager
@@ -26,18 +28,24 @@ constructor(
   microTaskRepository: MicroTaskRepository,
   @FilesDir fileDirPath: String,
   authManager: AuthManager,
+  dataStore: DataStore<Preferences>
 ) : BaseMTRendererViewModel(
   assignmentRepository,
   taskRepository,
   microTaskRepository,
   fileDirPath,
-  authManager
+  authManager,
+  dataStore
 ) {
   private val _contextText: MutableStateFlow<String> = MutableStateFlow("")
   val contextText = _contextText.asStateFlow()
 
   private val _sentences: MutableStateFlow<ArrayList<String>> = MutableStateFlow(ArrayList())
   val sentences = _sentences.asStateFlow()
+
+  // Trigger Spotlight
+  private val _playRecordPromptTrigger: MutableStateFlow<Boolean> = MutableStateFlow(false)
+  val playRecordPromptTrigger = _playRecordPromptTrigger.asStateFlow()
 
   var limit by Delegates.notNull<Int>()
 
@@ -62,6 +70,19 @@ constructor(
     if (currentAssignment.status == MicrotaskAssignmentStatus.COMPLETED) {
       renderOutputData()
     }
+  }
+
+  override fun onFirstTimeVisit() {
+    super.onFirstTimeVisit()
+    onAssistantClick()
+  }
+
+  private fun playRecordPrompt() {
+    _playRecordPromptTrigger.value = true
+  }
+
+  private fun onAssistantClick() {
+    playRecordPrompt()
   }
 
   private fun renderOutputData() {
