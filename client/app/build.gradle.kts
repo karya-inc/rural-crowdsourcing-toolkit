@@ -80,6 +80,14 @@ android {
     create("standard") {
       dimension = "size"
     }
+    create("meenakshi") {
+      dimension = "size"
+      applicationIdSuffix = "meenakshi"
+    }
+    create("roshan") {
+      dimension = "size"
+      applicationIdSuffix = "roshan"
+    }
   }
 }
 
