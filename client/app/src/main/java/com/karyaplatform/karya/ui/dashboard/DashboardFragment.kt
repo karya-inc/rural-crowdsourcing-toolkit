@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -18,9 +20,12 @@ import com.karyaplatform.karya.databinding.FragmentDashboardBinding
 import com.karyaplatform.karya.ui.base.SessionFragment
 import com.karyaplatform.karya.utils.extensions.*
 import com.karyaplatform.karya.BuildConfig
+import com.karyaplatform.karya.utils.PreferenceKeys
+import com.karyaplatform.karya.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.app_toolbar.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -48,6 +53,20 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
     setupViews()
     setupWorkRequests()
     observeUi()
+    // Check if dashboard is visited the first time
+    viewLifecycleScope.launch {
+      val firstRunKey = booleanPreferencesKey(PreferenceKeys.IS_FIRST_DASHBOARD_VISIT)
+      val datastore = requireContext().dataStore
+      val data = datastore.data.first()
+      val isFirstTime = data[firstRunKey] ?: true
+      if (isFirstTime) onFirstTimeVisit()
+      datastore.edit { prefs -> prefs[firstRunKey] = false }
+    }
+  }
+
+  // Function is invoked when the fragment is run for the first time
+  private fun onFirstTimeVisit() {
+    syncWithServer()
   }
 
   private fun observeUi() {
@@ -207,14 +226,6 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
     binding.syncCv.enable()
     data.apply {
       (binding.tasksRv.adapter as TaskListAdapter).updateList(taskInfoData)
-    }
-
-    // Check if worker is initialised in viewmodel
-    if (viewModel.workerAccessCode.value.isNotEmpty()) {
-      // Sync if no tasks are present
-      if (data.taskInfoData.isEmpty()) {
-        syncWithServer()
-      }
     }
 
     // Show a dialog box to sync with server if completed tasks and internet available

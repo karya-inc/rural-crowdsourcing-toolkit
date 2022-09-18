@@ -2,6 +2,8 @@ package com.karyaplatform.karya.ui.dashboard
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karyaplatform.karya.data.manager.AuthManager
@@ -11,6 +13,7 @@ import com.karyaplatform.karya.data.repo.AssignmentRepository
 import com.karyaplatform.karya.data.repo.TaskRepository
 import com.karyaplatform.karya.utils.Result
 import com.karyaplatform.karya.utils.DateUtils
+import com.karyaplatform.karya.utils.PreferenceKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
