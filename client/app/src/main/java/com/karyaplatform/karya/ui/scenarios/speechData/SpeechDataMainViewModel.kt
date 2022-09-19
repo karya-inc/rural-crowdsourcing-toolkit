@@ -304,14 +304,14 @@ constructor(
         _hintAvailable.value = false
       }
     }
-
-    if (!firstTimeActivityVisit) {
-      moveToPrerecording()
-    }
   }
 
   override fun onFirstTimeVisit() {
     onAssistantClick()
+  }
+
+  override fun onSubsequentVisit() {
+    moveToPrerecording()
   }
 
   /** Handle record button click */
