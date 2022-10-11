@@ -36,6 +36,7 @@ import kotlinx.android.synthetic.main.microtask_speech_transcription.nextBtnCv
 import kotlinx.android.synthetic.main.microtask_speech_transcription.playBtn
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.ArrayList
 
 @AndroidEntryPoint
@@ -124,7 +125,7 @@ class SpeechTranscriptionFragment : BaseMTRendererFragment(R.layout.microtask_sp
     viewModel.recordingFilePath.observe(
       viewLifecycleOwner.lifecycle, viewLifecycleScope
     ) { path ->
-      if (path.isNotEmpty()) {
+      if (path.isNotEmpty() && File(path).exists()) {
         audioPlayer.setSource(path)
         audioPlayer.pausePlayer()
       }
