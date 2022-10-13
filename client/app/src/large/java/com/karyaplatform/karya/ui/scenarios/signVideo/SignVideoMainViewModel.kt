@@ -1,5 +1,7 @@
 package com.karyaplatform.karya.ui.scenarios.signVideo
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
 import com.karyaplatform.karya.data.manager.AuthManager
@@ -33,12 +35,14 @@ constructor(
   microTaskRepository: MicroTaskRepository,
   @FilesDir fileDirPath: String,
   authManager: AuthManager,
+  dataStore: DataStore<Preferences>
 ) : BaseMTRendererViewModel(
   assignmentRepository,
   taskRepository,
   microTaskRepository,
   fileDirPath,
   authManager,
+  dataStore,
   true
 ) {
 
@@ -297,7 +301,7 @@ constructor(
     }
   }
 
-  suspend fun skipTask() {
+  suspend fun skipLocalTask() {
     // log the state transition
     val message = JsonObject()
     message.addProperty("type", "o")

@@ -140,6 +140,7 @@ dependencies {
 
   implementation(Dependencies.AndroidX.Navigation.fragmentKtx)
   implementation(Dependencies.AndroidX.Navigation.uiKtx)
+  implementation("com.google.android.play:core-ktx:1.8.1")
 
   kapt(Dependencies.AndroidX.Room.roomCompiler)
 
@@ -195,7 +196,7 @@ dependencies {
   implementation("com.github.takusemba:spotlight:2.0.5")
 
   // Video data collection
-  implementation ("com.github.HamidrezaAmz:MagicalExoPlayer:2.0.6")
+  "largeImplementation" ("com.github.HamidrezaAmz:MagicalExoPlayer:2.0.6")
   "largeImplementation" ("com.google.android.gms:play-services-mlkit-face-detection:16.2.0")
   "largeImplementation" ("com.google.mlkit:face-detection:16.1.2")
   "largeImplementation" ("com.github.fishwjy:VideoCompressor:master-SNAPSHOT")

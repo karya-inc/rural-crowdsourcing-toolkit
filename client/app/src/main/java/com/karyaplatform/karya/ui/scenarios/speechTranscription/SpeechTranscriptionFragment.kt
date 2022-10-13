@@ -2,7 +2,6 @@ package com.karyaplatform.karya.ui.scenarios.speechTranscription
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +22,8 @@ import com.karyaplatform.karya.utils.extensions.viewLifecycleScope
 import com.karyaplatform.karya.utils.spotlight.SpotlightBuilderWrapper
 import com.karyaplatform.karya.utils.spotlight.TargetData
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.potyvideo.library.globalInterfaces.AndExoPlayerListener
+import com.karyaplatform.karya.utils.extensions.observe
+import com.karyaplatform.karya.utils.extensions.viewLifecycleScope
 import com.takusemba.spotlight.shape.Circle
 import com.takusemba.spotlight.shape.RoundedRectangle
 import dagger.hilt.android.AndroidEntryPoint
@@ -91,13 +91,6 @@ class SpeechTranscriptionFragment : BaseMTRendererFragment(R.layout.microtask_sp
     }
 
     backBtnCv.setOnClickListener { viewModel.handleBackClick() }
-
-    audioPlayer.setAndExoPlayerListener(object : AndExoPlayerListener {
-      override fun onExoPlayerError(errorMessage: String?) {
-        FirebaseCrashlytics.getInstance().recordException(Throwable("Audio error: $errorMessage"))
-        viewModel.handleCorruptAudio(errorMessage)
-      }
-    })
   }
 
   private fun setupObservers() {
@@ -121,15 +114,6 @@ class SpeechTranscriptionFragment : BaseMTRendererFragment(R.layout.microtask_sp
           transcriptionEt.setSelection(transcriptionEt.length())//placing cursor at the end of the text
         }
         assistanceFl.addView(wordButton)
-      }
-    }
-
-    viewModel.recordingFilePath.observe(
-      viewLifecycleOwner.lifecycle, viewLifecycleScope
-    ) { path ->
-      if (path.isNotEmpty() && File(path).exists()) {
-        audioPlayer.setSource(path)
-        audioPlayer.pausePlayer()
       }
     }
 
@@ -248,8 +232,8 @@ class SpeechTranscriptionFragment : BaseMTRendererFragment(R.layout.microtask_sp
     val targetsDataList = ArrayList<TargetData>()
     targetsDataList.add(
       TargetData(
-        audioPlayer,
-        RoundedRectangle(audioPlayer.measuredHeight.toFloat() + spotlightPadding, audioPlayer.measuredWidth.toFloat() + spotlightPadding, 5F),
+        playbackProgress,
+        RoundedRectangle(playbackProgress.measuredHeight.toFloat() + spotlightPadding, playbackProgress.measuredWidth.toFloat() + spotlightPadding, 5F),
         R.layout.spotlight_target_temp,
         AssistantAudio.SPEECH_TRANSCRIPTION_AUDIO_PLAYER,
       )

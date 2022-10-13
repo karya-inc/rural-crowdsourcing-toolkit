@@ -15,23 +15,88 @@ import com.karyaplatform.karya.ui.MainActivity
 import com.karyaplatform.karya.utils.extensions.observe
 import com.karyaplatform.karya.utils.extensions.viewLifecycle
 import com.karyaplatform.karya.utils.extensions.viewLifecycleScope
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE
+import com.google.android.play.core.install.model.UpdateAvailability
+import com.karyaplatform.karya.utils.extensions.observe
+import com.karyaplatform.karya.utils.extensions.viewLifecycle
+import com.karyaplatform.karya.utils.extensions.viewLifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SplashScreenFragment : Fragment(R.layout.fragment_splash_screen) {
 
+  private val UPDATE_REQUEST_CODE = 1
+
   private val viewModel by viewModels<SplashViewModel>()
   private lateinit var navController: NavController
+  private lateinit var appUpdateManager: AppUpdateManager
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    checkUpdates()
+  }
 
+  private fun checkUpdates() {
+    appUpdateManager = AppUpdateManagerFactory.create(requireContext())
+
+// Returns an intent object that you use to check for an update.
+    val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+
+// Checks that the platform will allow the specified type of update.
+    appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+      if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+      ) {
+        appUpdateManager.startUpdateFlowForResult(
+          // Pass the intent that is returned by 'getAppUpdateInfo()'.
+          appUpdateInfo,
+          // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
+          AppUpdateType.IMMEDIATE,
+          // The current activity making the update request.
+          requireActivity(),
+          // Include a request code to later monitor this update request.
+          UPDATE_REQUEST_CODE)
+      } else {
+        // If no updates available proceed
+        setupSplashScreen()
+      }
+    }
+
+  }
+
+  private fun setupSplashScreen() {
     navController = findNavController()
     handleNavigation()
     observeEffects()
 
     viewModel.navigate()
   }
+
+  // Checks that the update is not stalled during 'onResume()'.
+  // However, you should execute this check at all entry points into the app.
+  override fun onResume() {
+    super.onResume()
+
+    appUpdateManager
+      .appUpdateInfo
+      .addOnSuccessListener { appUpdateInfo ->
+        if (appUpdateInfo.updateAvailability()
+          == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
+        ) {
+          // If an in-app update is already running, resume the update.
+          appUpdateManager.startUpdateFlowForResult(
+            appUpdateInfo,
+            IMMEDIATE,
+            requireActivity(),
+            UPDATE_REQUEST_CODE
+          )
+        }
+      }
+  }
+
+
 
   private fun handleNavigation() {
     viewModel.splashDestination.observe(viewLifecycle, viewLifecycleScope) { destination ->
