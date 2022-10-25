@@ -12,7 +12,7 @@ plugins {
 }
 
 android {
-  compileSdkVersion(31)
+  compileSdkVersion(32)
   defaultConfig {
     applicationId = "com.karyaplatform.karya"
     minSdkVersion(24)
@@ -186,7 +186,7 @@ dependencies {
   // Android rating bar
   implementation("me.zhanghai.android.materialratingbar:library:1.3.1")
   // Custom aars
-  implementation(files("libs/zoomage-debug.aar"))
+//  implementation(files("libs/zoomage-debug.aar"))
 
   // Grid layout for lower API levels
   implementation ("androidx.gridlayout:gridlayout:1.0.0")
@@ -199,4 +199,7 @@ dependencies {
   "largeImplementation" ("com.google.android.gms:play-services-mlkit-face-detection:16.2.0")
   "largeImplementation" ("com.google.mlkit:face-detection:16.1.2")
   "largeImplementation" ("com.github.fishwjy:VideoCompressor:master-SNAPSHOT")
+
+  // Zoomage
+  implementation(project(":zoomage"))
 }

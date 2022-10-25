@@ -121,7 +121,9 @@ class ImageAnnotationFragment : BaseMTRendererFragment(R.layout.microtask_image_
     // Set listeners to add crop object
     addBoxButton.setOnClickListener { handleAddBoxClick() }
     // Set Listeners to remove box
-    removeBoxButton.setOnClickListener { sourceImageIv.removeCropObject(sourceImageIv.focusedCropObjectId) }
+    removeBoxButton.setOnClickListener {
+      sourceImageIv.removeCropObject(sourceImageIv.focusedCropObjectId)
+    }
 
     // Set Listener to lock a crop box
     lockCropBtn.setOnClickListener {
@@ -149,12 +151,6 @@ class ImageAnnotationFragment : BaseMTRendererFragment(R.layout.microtask_image_
       else lockCropBtn.setImageResource(R.drawable.ic_baseline_lock_open_24);
       spinner_item_color.setCardBackgroundColor(polygonData.color)
       labelTv.text = labels[colors.indexOf(polygonData.color)]
-    }
-
-
-    viewModel.viewModelScope.launch {
-      delay(500)
-      // viewModel.setInputAnnotations()
     }
   }
 
@@ -227,7 +223,6 @@ class ImageAnnotationFragment : BaseMTRendererFragment(R.layout.microtask_image_
         sourceImageIv.viewTreeObserver.addOnPreDrawListener(object: ViewTreeObserver.OnPreDrawListener {
           override fun onPreDraw(): Boolean {
             return try {
-              viewModel.imagePreDrawn = true
               viewModel.setInputAnnotations()
               true
             } finally {
@@ -240,16 +235,10 @@ class ImageAnnotationFragment : BaseMTRendererFragment(R.layout.microtask_image_
       }
       //TODO: Put an else condition to put a placeholder image
 
-//      for (key in inputAnnotationIds) {
-//        sourceImageIv.removeCropObject(key)
-//      }
-
-
 //      if (viewModel.rememberAnnotationState) {
 //        return@observe
 //      }
-
-      // Clear the existing boxes
+//
       val ids = sourceImageIv.allCropRectangleIds + sourceImageIv.allCropPolygonIds
       if (inputAnnotationIds.size > 0) {
         for (id in ids) {
@@ -258,16 +247,6 @@ class ImageAnnotationFragment : BaseMTRendererFragment(R.layout.microtask_image_
       }
 
       inputAnnotationIds.clear()
-
-    }
-
-    // Update rectangles
-    viewModel.updateRectangles.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { count ->
-      val rectangles = viewModel.rectangleCoors.value
-      for ((key, rect) in rectangles) {
-        sourceImageIv.addCropRectangle(key, colors[0], rect)
-        inputAnnotationIds.add(key)
-      }
     }
 
     sourceImageIv.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
@@ -288,10 +267,18 @@ class ImageAnnotationFragment : BaseMTRendererFragment(R.layout.microtask_image_
               )
             )
           }
-
         }
       }
     })
+
+    // Update rectangles
+    viewModel.updateRectangles.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { count ->
+      val rectangles = viewModel.rectangleCoors.value
+      for ((key, rect) in rectangles) {
+        sourceImageIv.addCropRectangle(key, colors[0], rect)
+        inputAnnotationIds.add(key)
+      }
+    }
 
     viewModel.playRecordPromptTrigger.observe(
       viewLifecycleOwner.lifecycle,

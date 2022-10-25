@@ -126,8 +126,6 @@ constructor(
 
   fun setInputAnnotations() {
     if (!isCurrentMicrotaskInitialized()) return
-    // if (inputAnnotationsSet) return
-    inputAnnotationsSet = true
 
     if (!currentMicroTask.input.asJsonObject.getAsJsonObject("data").has("annotations")) return
 
