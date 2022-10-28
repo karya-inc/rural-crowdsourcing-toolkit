@@ -9,6 +9,8 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonNull
 import com.karyaplatform.karya.data.model.karya.MicroTaskAssignmentRecord
 import com.karyaplatform.karya.data.model.karya.enums.MicrotaskAssignmentStatus
+import com.karyaplatform.karya.data.model.karya.modelsExtra.AssignmentReport
+import com.karyaplatform.karya.data.model.karya.modelsExtra.ScenarioReport
 
 @Dao
 interface MicrotaskAssignmentDaoExtra {
@@ -178,6 +180,24 @@ interface MicrotaskAssignmentDaoExtra {
     )
   ): Float?
 
+  /** Query to get the total amount earned so far */
+  @Query("SELECT SUM(credits) FROM microtask_assignment WHERE status=:status AND worker_id=:worker_id AND completed_at > :from")
+  suspend fun getWeekCreditsEarned(
+    worker_id: String,
+    from: String,
+    status: MicrotaskAssignmentStatus = MicrotaskAssignmentStatus.VERIFIED
+  ): Float?
+
+  @Query("SELECT SUM(max_base_credits) FROM microtask_assignment WHERE worker_id=:worker_id AND status IN (:statuses) AND completed_at > :from")
+  suspend fun getWeekBaseCreditsEarned(
+    worker_id: String,
+    from: String,
+    statuses: List<MicrotaskAssignmentStatus> = arrayListOf(
+      MicrotaskAssignmentStatus.SUBMITTED,
+      MicrotaskAssignmentStatus.VERIFIED
+    )
+  ): Float?
+
   /** Update all expired tasks **/
   @Query("UPDATE microtask_assignment SET status=:status WHERE worker_id=:worker_id AND status in (:currentStatus) AND deadline < :currentTime")
   suspend fun updateExpired(
@@ -207,4 +227,16 @@ interface MicrotaskAssignmentDaoExtra {
     task_id: String,
     status: MicrotaskAssignmentStatus = MicrotaskAssignmentStatus.VERIFIED
   ): List<JsonElement>
+
+  @Query("SELECT task_id, report FROM microtask_assignment WHERE worker_id=:worker_id and status=:status")
+  suspend fun getAssignmentReports(
+    worker_id: String,
+    status: MicrotaskAssignmentStatus = MicrotaskAssignmentStatus.VERIFIED
+  ): List<AssignmentReport>
+
+  @Query("SELECT task.scenario_name, microtask_assignment.report FROM microtask_assignment LEFT JOIN task ON microtask_assignment.task_id = task.id WHERE microtask_assignment.status=:status AND microtask_assignment.worker_id=:worker_id")
+  suspend fun getScenarioReports(
+    worker_id: String,
+    status: MicrotaskAssignmentStatus = MicrotaskAssignmentStatus.VERIFIED
+  ): List<ScenarioReport>
 }

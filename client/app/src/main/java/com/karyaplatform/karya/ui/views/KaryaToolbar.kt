@@ -9,12 +9,12 @@ import android.graphics.Bitmap
 import android.util.AttributeSet
 import android.widget.Button
 import androidx.appcompat.widget.Toolbar
-import com.karyaplatform.karya.BuildConfig
 import com.karyaplatform.karya.R
 import com.karyaplatform.karya.databinding.AppToolbarBinding
 import com.karyaplatform.karya.utils.extensions.gone
 import com.karyaplatform.karya.utils.extensions.visible
 import com.karyaplatform.karya.data.model.karya.enums.LanguageType
+import com.karyaplatform.karya.BuildConfig
 
 class KaryaToolbar : Toolbar {
 
@@ -117,13 +117,13 @@ class KaryaToolbar : Toolbar {
       dialog.cancel()
     }
 
-    languageDialog.findViewById<Button>(R.id.languageBengali).setOnClickListener {
-      updateUserLanguage(LanguageType.BN)
+    languageDialog.findViewById<Button>(R.id.languageMarathi).setOnClickListener {
+      updateUserLanguage(LanguageType.MR)
       dialog.cancel()
     }
 
-    languageDialog.findViewById<Button>(R.id.languageMalayalam).setOnClickListener {
-      updateUserLanguage(LanguageType.ML)
+    languageDialog.findViewById<Button>(R.id.languageUrdu).setOnClickListener {
+      updateUserLanguage(LanguageType.UR)
       dialog.cancel()
     }
   }

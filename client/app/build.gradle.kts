@@ -7,21 +7,23 @@ plugins {
   id("com.google.firebase.crashlytics")
   id("dagger.hilt.android.plugin")
   id("androidx.navigation.safeargs.kotlin")
-  id("com.ncorti.ktfmt.gradle") version "0.5.0"
+  id("com.ncorti.ktfmt.gradle") version "0.7.0"
   id("com.github.ben-manes.versions") version "0.38.0"
 }
 
 android {
-  compileSdkVersion(30)
+  compileSdkVersion(32)
   defaultConfig {
     applicationId = "com.karyaplatform.karya"
-    minSdkVersion(21)
+    minSdkVersion(24)
     targetSdkVersion(30)
     multiDexEnabled = true
     versionCode = 70
     versionName = "1"
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables.useSupportLibrary = true
+    // Build config field to enable or disable payments
+    buildConfigField("boolean", "PAYMENTS_ENABLED", "false")
   }
   buildTypes {
     named("release") {
@@ -40,6 +42,11 @@ android {
   }
   kotlinOptions {
     jvmTarget = "1.8"
+    kapt {
+      arguments {
+        arg("room.schemaLocation", "$projectDir/schemas")
+      }
+    }
   }
   lintOptions {
     isAbortOnError = false
@@ -67,18 +74,24 @@ android {
       enableSplit = false
     }
   }
-  flavorDimensions("size")
+  flavorDimensions("study")
   productFlavors {
     create ("mit") {
-      dimension = "size"
-      applicationIdSuffix = "mit2022"
+      dimension = "study"
+      applicationIdSuffix = ".mit2022"
+    }
+    create ("rani") {
+      dimension = "study"
+      applicationIdSuffix = ".rani"
+      buildConfigField("boolean", "PAYMENTS_ENABLED", "true")
     }
     create("large") {
-      dimension = "size"
-      applicationIdSuffix = "large"
+      dimension = "study"
+      applicationIdSuffix = ".large"
     }
     create("standard") {
-      dimension = "size"
+      dimension = "study"
+      buildConfigField("boolean", "PAYMENTS_ENABLED", "true")
     }
   }
 }
@@ -164,9 +177,6 @@ dependencies {
   implementation("com.intuit.ssp:ssp-android:1.0.6")
   implementation("com.intuit.sdp:sdp-android:1.0.6")
 
-  // Zoomable image
-  implementation("com.jsibbold:zoomage:1.3.1")
-
   // Themed button toggle group
   implementation("nl.bryanderidder:themed-toggle-button-group:1.3.4")
 
@@ -176,12 +186,17 @@ dependencies {
   // Android rating bar
   implementation("me.zhanghai.android.materialratingbar:library:1.3.1")
 
+  // Grid layout for lower API levels
+  implementation ("androidx.gridlayout:gridlayout:1.0.0")
+
+  // Splotlight
+  implementation("com.github.takusemba:spotlight:2.0.5")
+
   // Video data collection
-  "largeImplementation" ("com.github.HamidrezaAmz:MagicalExoPlayer:2.0.6")
+  implementation ("com.github.HamidrezaAmz:MagicalExoPlayer:2.0.6")
   "largeImplementation" ("com.google.android.gms:play-services-mlkit-face-detection:16.2.0")
   "largeImplementation" ("com.google.mlkit:face-detection:16.1.2")
   "largeImplementation" ("com.github.fishwjy:VideoCompressor:master-SNAPSHOT")
 
-  // Grid layout for lower APIs
-  implementation ("androidx.gridlayout:gridlayout:1.0.0")
+  implementation(project(":zoomage"))
 }

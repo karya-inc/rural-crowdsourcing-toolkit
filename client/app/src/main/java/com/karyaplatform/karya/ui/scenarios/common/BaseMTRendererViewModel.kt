@@ -1,5 +1,9 @@
 package com.karyaplatform.karya.ui.scenarios.common
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -18,28 +22,34 @@ import com.karyaplatform.karya.utils.FileUtils
 import com.karyaplatform.karya.utils.MicrotaskAssignmentOutput
 import com.karyaplatform.karya.utils.MicrotaskInput
 import com.karyaplatform.karya.utils.extensions.getBlobPath
+import com.karyaplatform.karya.utils.PreferenceKeys
+import com.karyaplatform.karya.utils.extensions.getBlobPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
-abstract class BaseMTRendererViewModel
-constructor(
+abstract class BaseMTRendererViewModel(
   var assignmentRepository: AssignmentRepository,
   var taskRepository: TaskRepository,
   var microTaskRepository: MicroTaskRepository,
   var fileDirPath: String,
   var authManager: AuthManager,
-  val includeCompleted: Boolean = false
+  val datastore: DataStore<Preferences>,
+  val includeCompleted: Boolean = true
 ) : ViewModel() {
 
   private lateinit var taskId: String
+  // Is the fragment visited the first time?
+  var firstTimeActivityVisit: Boolean = true
+    private set
 
   // Initialising containers
   val assignmentOutputContainer = MicrotaskAssignmentOutput(fileDirPath)
@@ -78,6 +88,18 @@ constructor(
     MutableStateFlow(TimeBound(false, "", "", ""))
   val outsideTimeBound = _outsideTimeBound.asStateFlow()
 
+  open fun onFirstTimeVisit() {}
+
+  open fun onSubsequentVisit() {}
+
+  protected fun isCurrentAssignmentInitialized(): Boolean {
+    return this::currentAssignment.isInitialized
+  }
+
+  protected fun isCurrentMicrotaskInitialized(): Boolean {
+    return this::currentMicroTask.isInitialized
+  }
+
   protected fun navigateBack() {
     viewModelScope.launch { _navigateBack.emit(true) }
   }
@@ -90,8 +112,17 @@ constructor(
     // TODO: Shift this to init once we move to viewmodel factory
     runBlocking {
       task = taskRepository.getById(taskId)
+
+      // Determine if we have to include completed assignments
+      if (includeCompleted) {
+        microtaskAssignmentIDs = assignmentRepository.getIDsForTask(
+            task.id,
+            arrayListOf(MicrotaskAssignmentStatus.COMPLETED)
+          )
+      }
+
       microtaskAssignmentIDs =
-        assignmentRepository.getIDsForTask(
+        microtaskAssignmentIDs + assignmentRepository.getIDsForTask(
           task.id,
           arrayListOf(MicrotaskAssignmentStatus.ASSIGNED)
         ) // TODO: Generalise the includeCompleted parameter (Can be done when we have viewModel factory)
@@ -102,15 +133,6 @@ constructor(
           task.id,
           arrayListOf(MicrotaskAssignmentStatus.SKIPPED)
       )
-
-      // Determine if we have to include completed assignments
-      if (includeCompleted) {
-        microtaskAssignmentIDs = microtaskAssignmentIDs +
-          assignmentRepository.getIDsForTask(
-            task.id,
-            arrayListOf(MicrotaskAssignmentStatus.COMPLETED)
-          )
-      }
 
       if (microtaskAssignmentIDs.isEmpty()) {
         navigateBack()
@@ -152,7 +174,7 @@ constructor(
     logs.add(logObj)
   }
 
-  /** Add a string message to the log */
+  /** Add a Json object to the log */
   protected fun log(obj: JsonObject) {
     val logObj = JsonObject()
     val currentTime = DateUtils.getCurrentDate()
@@ -179,8 +201,9 @@ constructor(
    * Mark the current microtask as complete with the [outputData], [outputFiles], and [logs]
    * attached to the current assignment's output field. Delete all scratch files.
    */
-  protected suspend fun completeAndSaveCurrentMicrotask() {
+  suspend fun completeAndSaveCurrentMicrotask() {
 
+    log("marking microtask complete")
     val output = buildOutputJsonObject()
     val logObj = JsonObject()
     logObj.add("logs", logs)
@@ -249,10 +272,11 @@ constructor(
   }
 
   /** Move to next microtask and setup. Returns false if there is no next microtask. Else true. */
-  protected fun moveToNextMicrotask() {
+  fun moveToNextMicrotask() {
     if (hasNextMicrotask()) {
       currentAssignmentIndex++
       getAndSetupMicrotask()
+      log("moved to next microtask")
     } else {
       navigateBack()
     }
@@ -266,6 +290,7 @@ constructor(
     if (hasPreviousMicrotask()) {
       currentAssignmentIndex--
       getAndSetupMicrotask()
+      log("moved to previous microtask")
     } else {
       navigateBack()
     }
@@ -281,7 +306,6 @@ constructor(
       currentAssignment = assignmentRepository.getAssignmentById(assignmentID)
       currentMicroTask = microTaskRepository.getById(currentAssignment.microtask_id)
 
-      // Check if the current microtask is expired
       if (!(currentAssignment.deadline).isNullOrEmpty()
         && (currentAssignment.deadline!!) < DateUtils.getCurrentDate()) {
         // Mark the microtask as expired
@@ -403,6 +427,23 @@ constructor(
         }
 
       setupMicrotask()
+      log("microtask setup complete")
+
+      // First visit logic
+      viewModelScope.launch {
+        val scenarioName = "${task.scenario_name.name}"
+        val firstRunKey = booleanPreferencesKey(scenarioName)
+
+        val data = datastore.data.first()
+        firstTimeActivityVisit = data[firstRunKey] ?: true
+        if (firstTimeActivityVisit) {
+          onFirstTimeVisit()
+        } else {
+          onSubsequentVisit()
+        }
+        datastore.edit { prefs -> prefs[firstRunKey] = false }
+        firstTimeActivityVisit = false
+      }
     }
   }
 
@@ -445,5 +486,21 @@ constructor(
   /** Reset existing microtask. Useful on activity restart. */
   protected fun resetMicrotask() {
     getAndSetupMicrotask()
+  }
+
+  /**
+   * Skip the microtask
+   */
+  fun skipTask() {
+    // log the state transition
+    val message = JsonObject()
+    message.addProperty("type", "o")
+    message.addProperty("button", "SKIPPED")
+    log(message)
+
+    viewModelScope.launch {
+      skipAndSaveCurrentMicrotask()
+      moveToNextMicrotask()
+    }
   }
 }

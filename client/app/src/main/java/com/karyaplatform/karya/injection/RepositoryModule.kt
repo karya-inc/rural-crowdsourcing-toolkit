@@ -7,6 +7,11 @@ import com.karyaplatform.karya.data.local.daosExtra.MicrotaskDaoExtra
 import com.karyaplatform.karya.data.repo.*
 import com.karyaplatform.karya.data.service.LanguageAPI
 import com.karyaplatform.karya.data.service.WorkerAPI
+import com.karyaplatform.karya.data.local.daos.PaymentAccountDao
+import com.karyaplatform.karya.data.service.PaymentAPI
+import com.karyaplatform.karya.data.local.daos.*
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,8 +39,8 @@ class RepositoryModule {
 
   @Provides
   @Singleton
-  fun provideWorkerRepository(workerAPI: WorkerAPI, workerDao: WorkerDao): WorkerRepository {
-    return WorkerRepository(workerAPI, workerDao)
+  fun provideWorkerRepository(workerAPI: WorkerAPI, workerDao: WorkerDao, leaderboardDao: LeaderboardDao): WorkerRepository {
+    return WorkerRepository(workerAPI, workerDao, leaderboardDao)
   }
 
   @Provides
@@ -48,5 +53,11 @@ class RepositoryModule {
   @Singleton
   fun provideAuthRepository(workerDao: WorkerDao): AuthRepository {
     return AuthRepository(workerDao)
+  }
+
+  @Provides
+  @Singleton
+  fun providesPaymentRepository(paymentAPI: PaymentAPI, paymentAccountDao: PaymentAccountDao, datastore: DataStore<Preferences>): PaymentRepository {
+    return PaymentRepository(paymentAPI, paymentAccountDao, datastore)
   }
 }

@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.karyaplatform.karya.R
 import com.karyaplatform.karya.data.model.karya.enums.AssistantAudio
@@ -19,6 +18,11 @@ import com.karyaplatform.karya.utils.extensions.invisible
 import com.karyaplatform.karya.utils.extensions.observe
 import com.karyaplatform.karya.utils.extensions.viewLifecycleScope
 import com.karyaplatform.karya.utils.extensions.visible
+import com.karyaplatform.karya.utils.extensions.*
+import com.karyaplatform.karya.utils.spotlight.SpotlightBuilderWrapper
+import com.karyaplatform.karya.utils.spotlight.TargetData
+import com.takusemba.spotlight.shape.Circle
+import com.takusemba.spotlight.shape.RoundedRectangle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.microtask_common_back_button.view.*
 import kotlinx.android.synthetic.main.microtask_common_next_button.view.*
@@ -67,13 +71,120 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
     recordBtn.setOnClickListener { viewModel.handleRecordClick() }
     playBtn.setOnClickListener { viewModel.handlePlayClick() }
     nextBtnCv.setOnClickListener { viewModel.handleNextClick() }
-    backBtnCv.setOnClickListener { viewModel.handleBackClick() }
+    backBtn.setOnClickListener { viewModel.handleBackClick() }
+    hintAudioBtn.setOnClickListener { viewModel.handleHintAudioBtnClick() }
+  }
+
+  private fun setupSpotLight() {
+
+    val spotlightPadding = 20
+
+    val targetsDataList = ArrayList<TargetData>()
+    targetsDataList.add(
+      TargetData(
+        sentenceTv,
+        RoundedRectangle(sentenceTv.height.toFloat() + spotlightPadding, sentenceTv.width.toFloat() + spotlightPadding, 5F),
+        R.layout.spotlight_target_temp,
+        AssistantAudio.RECORD_SENTENCE,
+      )
+    )
+    targetsDataList.add(
+      TargetData(
+        recordBtn,
+        Circle(((recordBtn.height + spotlightPadding) / 2).toFloat()),
+        R.layout.spotlight_target_temp,
+        AssistantAudio.RECORD_ACTION,
+        uiCue = {
+          recordBtn.setBackgroundResource(R.drawable.ic_mic_enabled)
+          recordBtn.setBackgroundResource(R.drawable.ic_mic_active)
+        }
+      )
+    )
+
+    targetsDataList.add(
+      TargetData(
+        recordBtn,
+        Circle(((recordBtn.height + spotlightPadding) / 2).toFloat()),
+        R.layout.spotlight_target_temp,
+        AssistantAudio.STOP_ACTION,
+        uiCue = {
+          recordBtn.setBackgroundResource(R.drawable.ic_mic_disabled)
+        }
+      )
+    )
+
+    targetsDataList.add(
+      TargetData(
+        playBtn,
+        Circle(((playBtn.height + spotlightPadding) / 2).toFloat()),
+        R.layout.spotlight_target_temp,
+        AssistantAudio.LISTEN_ACTION,
+        uiCue = {
+          playBtn.setBackgroundResource(R.drawable.ic_speaker_active)
+        },
+        onCompletionListener = {
+          playBtn.setBackgroundResource(R.drawable.ic_speaker_disabled)
+        },
+      )
+    )
+
+    targetsDataList.add(
+      TargetData(
+        recordBtn,
+        Circle(((recordBtn.height + spotlightPadding) / 2).toFloat()),
+        R.layout.spotlight_target_temp,
+        AssistantAudio.RERECORD_ACTION,
+        uiCue = {
+          recordBtn.setBackgroundResource(R.drawable.ic_mic_enabled)
+        },
+        onCompletionListener = {
+          recordBtn.setBackgroundResource(R.drawable.ic_mic_disabled)
+        },
+      )
+    )
+
+    targetsDataList.add(
+      TargetData(
+        nextBtnCv,
+        Circle(((nextBtnCv.height + spotlightPadding) / 2).toFloat()),
+        R.layout.spotlight_target_temp,
+        AssistantAudio.NEXT_ACTION,
+        uiCue = {
+          nextBtnCv.nextIv.setBackgroundResource(R.drawable.ic_next_enabled)
+        },
+        onCompletionListener = {
+          nextBtnCv.nextIv.setBackgroundResource(R.drawable.ic_next_disabled)
+        },
+      )
+    )
+
+    targetsDataList.add(
+      TargetData(
+        backBtn,
+        Circle(((backBtn.height + spotlightPadding) / 2).toFloat()),
+        R.layout.spotlight_target_temp,
+        AssistantAudio.PREVIOUS_ACTION,
+        uiCue = {
+          backBtn.backIv.setBackgroundResource(R.drawable.ic_back_enabled)
+        },
+        onCompletionListener = {
+          backBtn.backIv.setBackgroundResource(R.drawable.ic_back_disabled)
+        },
+      )
+    )
+
+    val builderWrapper = SpotlightBuilderWrapper(this, targetsDataList, onCompletionListener = {
+      viewModel.moveToPrerecording()
+    })
+
+    builderWrapper.start()
+
   }
 
   private fun setupObservers() {
     viewModel.backBtnState.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { state ->
-      backBtnCv.isClickable = state != DISABLED
-      backBtnCv.backIv.setBackgroundResource(
+      backBtn.isClickable = state != DISABLED
+      backBtn.backIv.setBackgroundResource(
         when (state) {
           DISABLED -> R.drawable.ic_back_disabled
           ENABLED -> R.drawable.ic_back_enabled
@@ -113,6 +224,26 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
           ACTIVE -> R.drawable.ic_next_enabled
         }
       )
+    }
+
+    viewModel.playHintBtnState.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { state ->
+      if (state) {
+        hintAudioBtn.isClickable = true
+        hintAudioBtn.enable()
+        hintAudioBtn.setTextColor(resources.getColor(R.color.c_black))
+      } else {
+        hintAudioBtn.setTextColor(resources.getColor(R.color.c_white))
+        hintAudioBtn.isClickable = false
+        hintAudioBtn.disable()
+      }
+    }
+
+    viewModel.hintAvailable.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { state ->
+      if (state) {
+        hintAudioBtn.visible()
+      } else {
+        hintAudioBtn.gone()
+      }
     }
 
     // Set microtask instruction if available
@@ -159,7 +290,7 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
       viewLifecycleScope
     ) { play ->
       if (play) {
-        playRecordPrompt()
+        setupSpotLight()
       }
     }
 
@@ -338,11 +469,11 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
       AssistantAudio.PREVIOUS_ACTION,
       uiCue = {
         backPointerIv.visible()
-        backBtnCv.backIv.setBackgroundResource(R.drawable.ic_back_enabled)
+        backBtn.backIv.setBackgroundResource(R.drawable.ic_back_enabled)
       },
       onCompletionListener = {
         lifecycleScope.launch {
-          backBtnCv.backIv.setBackgroundResource(R.drawable.ic_back_disabled)
+          backBtn.backIv.setBackgroundResource(R.drawable.ic_back_disabled)
           backPointerIv.invisible()
           delay(500)
           viewModel.moveToPrerecording()

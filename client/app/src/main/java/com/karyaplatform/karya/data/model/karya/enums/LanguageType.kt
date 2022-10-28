@@ -16,6 +16,7 @@ enum class LanguageType {
   MNI,
   MR,
   NE,
+  NRI,
   PA,
   OR,
   SA,

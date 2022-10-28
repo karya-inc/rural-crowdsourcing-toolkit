@@ -1,5 +1,7 @@
 package com.karyaplatform.karya.ui.scenarios.imageTranscription
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.karyaplatform.karya.data.manager.AuthManager
 import com.karyaplatform.karya.data.repo.AssignmentRepository
@@ -8,10 +10,10 @@ import com.karyaplatform.karya.data.repo.TaskRepository
 import com.karyaplatform.karya.injection.qualifier.FilesDir
 import com.karyaplatform.karya.ui.scenarios.common.BaseMTRendererViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class ImageTranscriptionViewModel
@@ -22,21 +24,21 @@ constructor(
   microTaskRepository: MicroTaskRepository,
   @FilesDir fileDirPath: String,
   authManager: AuthManager,
+  dataStore: DataStore<Preferences>
 ) : BaseMTRendererViewModel(
   assignmentRepository,
   taskRepository,
   microTaskRepository,
   fileDirPath,
-  authManager
+  authManager,
+  dataStore
 ) {
 
   // Image to be shown
   private val _imageFilePath: MutableStateFlow<String> = MutableStateFlow("")
   val imageFilePath = _imageFilePath.asStateFlow()
 
-  /**
-   * Complete microtask and move to next
-   */
+  /** Complete microtask and move to next */
   fun completeTranscription(transcription: String) {
     // Add output transcription
     outputData.addProperty("transcription", transcription)
@@ -46,17 +48,15 @@ constructor(
     }
   }
 
-  /**
-   * Setup image transcription microtask
-   */
+  /** Setup image transcription microtask */
   override fun setupMicrotask() {
     // Get and set the image file
-    _imageFilePath.value = try {
-      val imageFileName =
-        currentMicroTask.input.asJsonObject.getAsJsonObject("files").get("image").asString
-      microtaskInputContainer.getMicrotaskInputFilePath(currentMicroTask.id, imageFileName)
-    } catch (e: Exception) {
-      ""
-    }
+    _imageFilePath.value =
+      try {
+        val imageFileName = currentMicroTask.input.asJsonObject.getAsJsonObject("files").get("image").asString
+        microtaskInputContainer.getMicrotaskInputFilePath(currentMicroTask.id, imageFileName)
+      } catch (e: Exception) {
+        ""
+      }
   }
 }

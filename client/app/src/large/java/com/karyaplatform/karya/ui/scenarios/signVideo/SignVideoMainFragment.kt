@@ -22,6 +22,10 @@ import com.karyaplatform.karya.utils.extensions.viewLifecycleScope
 import com.karyaplatform.karya.utils.extensions.visible
 import com.potyvideo.library.globalInterfaces.AndExoPlayerListener
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.large.microtask_sign_video_data.*
+import kotlinx.android.synthetic.large.microtask_sign_video_data.instructionTv
+import kotlinx.android.synthetic.large.microtask_sign_video_data.nextBtnCv
+import kotlinx.android.synthetic.main.microtask_common_back_button.*
 import kotlinx.android.synthetic.main.microtask_common_back_button.view.*
 import kotlinx.android.synthetic.main.microtask_common_next_button.view.*
 import kotlinx.android.synthetic.large.microtask_sign_video_data.*
@@ -74,8 +78,8 @@ class SignVideoMainFragment : BaseMTRendererFragment(R.layout.microtask_sign_vid
     }
 
     viewModel.backBtnState.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { state ->
-      backBtnCv.isClickable = state != DISABLED
-      backBtnCv.backIv.setBackgroundResource(
+      backBtn.isClickable = state != DISABLED
+      backBtn.backIv.setBackgroundResource(
         when (state) {
           DISABLED -> R.drawable.ic_back_disabled
           ENABLED -> R.drawable.ic_back_enabled

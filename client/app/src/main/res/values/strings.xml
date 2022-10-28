@@ -4,6 +4,7 @@
     <!-- Errors -->
     <string name="unknown_error">Some unknown error occurred. Please contact your coordinator.</string>
     <string name="invalid_access_code">The access code you have entered is not valid. Please contact your coordinator.</string>
+    <string name="access_code">Access Code</string>
 
     <!-- Consent Form Page -->
     <string name="consent_form_title">Consent Form</string>
@@ -164,8 +165,6 @@
  ]]>
     </string>
 
-    <string name="access_code">Access Code</string>
-
     <!-- Phone Number -->
     <string name="phone_number_title">Phone Number</string>
     <string name="phone_number_prompt">To use Karya, you need to register with our application using your phone number. Please enter your phone number below.</string>
@@ -179,8 +178,27 @@
     <string name="change_phone_number">Change Phone Number</string>
     <string name="invalid_otp">You have entered an invalid OTP.</string>
 
+    <!-- Home Screen -->
+    <string name="home_screen_title">Home Screen</string>
+    <string name="task_summary_label">Task Summary</string>
+    <string name="click_to_do_tasks">Click Here To Do Tasks!</string>
+    <string name="performance_label">Performance</string>
+    <string name="recording_task_label">Recording</string>
+    <string name="typing_task_label">Typing</string>
+    <string name="image_task_label">Image Annotation</string>
+    <string name="transcription_task_label">Transcription</string>
+    <string name="earning_label">Earnings</string>
+    <string name="earned_week_label">Last Week</string>
+    <string name="earned_total_label">Total Earned</string>
+    <string name="paid_total_label">Total Paid</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_screen_title">Your Profile</string>
+    <string name="submit_profile">Submit Profile</string>
+    <string name="back_to_home">Back to Home</string>
+
     <!-- Dashboard -->
-    <string name="dashboard_title">Dashboard</string>
+    <string name="dashboard_title">Task List</string>
     <string name="sync_prompt">Submit Tasks / Get New Tasks</string>
     <string name="tasks_available">available</string>
     <string name="tasks_completed">completed</string>
@@ -188,6 +206,11 @@
     <string name="tasks_verified">verified</string>
     <string name="tasks_skipped">skipped</string>
     <string name="tasks_expired">expired</string>
+
+    <!-- Leaderboard -->
+    <string name="leaderboard_title">Leaderboard</string>
+    <string name="leaderboard_points">points</string>
+    <string name="leaderboard_empty">There is no one on the leaderboard now. Complete tasks and be the first to get on the leaderboard!</string>
 
 
     <string name="sync_prompt_message">You have completed tasks that can be submitted to the server. Do you want to submit the tasks now?</string>
@@ -204,6 +227,26 @@
     <string name="receive_db_error">Error while receiving tasks. Please contact your coordinator.</string>
     <string name="download_file_error">Error while downloading files. Please contact your coordinator.</string>
     <string name="received_verified_error">Error while receiving validations. Please contact your coordinator.</string>
+
+    <!-- Payment screens -->
+    <string name="payment_dashboard_title">Payment Dashboard</string>
+    <string name="payment_mode">Payment Mode</string>
+    <string name="account_id_label">Account ID</string>
+
+    <string name="payment_registration_title">Payment Registration</string>
+    <string name="bank_account_label">Bank Account Number</string>
+    <string name="upi_label">UPI</string>
+
+    <string name="payment_registration_description">Do you want to get paid via your bank account or your UPI ID?</string>
+    <string name="bank_account_details_title">Bank Account Details</string>
+    <string name="upi_details_title">UPI Details</string>
+
+    <string name="payment_info_verification_title">Account Verification</string>
+    <string name="verification_request_processing">We are checking your payment information. Please check again in a few hours. If you still see this message one day after submitting your payment information, contact your coordinator.</string>
+    <string name="verification_request_processed">To verify your payment information, we have sent you ₹2. Please confirm if you have received the amount by clicking the appropriate button.</string>
+    <string name="verification_loading">Checking the status of your payment verification. Please wait.</string>
+    <string name="received_verification_amount">Yes. I have received ₹2 in my account</string>
+    <string name="not_received_verification_amount">No. I have not received ₹2 in my account</string>
 
     <!-- Speech verification strings -->
     <string name="speech_verification_instruction">Verify the recording below</string>
@@ -249,6 +292,9 @@
     <!-- Image data collection strings -->
     <string name="image_data_collection_instruction">Take a picture of the front cover. Move to a random page. Take pictures of # continuous pages from the random page</string>
 
+    <!-- Image annotation strings -->
+    <string name="image_annotation_instruction">Annotation instruction goes here</string>
+
     <!-- Sentence validation strings -->
     <string name="sentence_validation_instruction">Is the sentence below correct?</string>
     <string name="grammar_question">Is the above sentence grammatically correct?</string>
@@ -263,6 +309,54 @@
     <!-- Image alt texts -->
     <string name="karya_logo">Project Karya Logo</string>
     <string name="next">next</string>
+    <string name="replay">replay</string>
     <string name="back">back</string>
     <string name="skip_task_warning">Are you sure you want to skip the task?</string>
+    <string name="no_transcription_error_msg">Please enter the transcription</string>
+    <string name="speech_transcription_instruction">Transcribe the audio below</string>
+    <string name="proceed_text">Proceed</string>
+    <string name="cancel_text">Cancel</string>
+    <string name="no_annotation_box_annotation_message_text">No boxes are drawn to the screen. Do you want to proceed?</string>
+    <string name="no_annotation_box_dialog_title_text">No Box Drawn</string>
+    <string name="select_image_annotation_label_dialog_instruction">Select Label</string>
+    <string name="image_annotation_edit_label">Select new label</string>
+    <string name="profile_picture">profile picture</string>
+    <string name="rotate_right">rotate</string>
+
+    <string name="submit">Submit</string>
+    <string name="name">Name</string>
+    <string name="account_number">Account Number</string>
+    <string name="ifsc_code">IFSC Code</string>
+    <string name="re_enter_account_number">Re-enter Account Number</string>
+    <string name="upi_id">UPI ID</string>
+    <string name="re_enter_upi_id">Re-enter UPI ID</string>
+    <string name="rs_float">₹%.2f</string>
+    <string name="balance">Balance</string>
+    <string name="transferred">Transferred</string>
+    <string name="last_payment_details">Last Payment Details</string>
+    <string name="amount_rs_2f">Amount: ₹%.2f</string>
+    <string name="utr_s">UTR: %s</string>
+    <string name="date_s">Date: %s</string>
+    <string name="status_s">Status: %s</string>
+    <string name="all_transactions">All Transactions</string>
+    <string name="account_details">Account Details</string>
+    <string name="name_s">Name: %s</string>
+    <string name="id_s">ID: %s</string>
+    <string name="ifsc_s">IFSC: %s</string>
+    <string name="update_account_details">Update Account Details</string>
+    <string name="no_internet">No internet available</string>
+    <string name="image_annotation_verification_instruction">Verification instruction goes here</string>
+    <string name="img_annotation_verification_good">good</string>
+    <string name="img_annotation_verification_ok">ok</string>
+    <string name="img_annotation_verification_bad">bad</string>
+    <string name="no_image_validation_score_selected">Please select a score for the annotation</string>
+    <string name="sentence_corpus_verification_valid">VALID</string>
+    <string name="sentence_corpus_verification_errors">ERRORS</string>
+    <string name="sentence_corpus_verification_invalid">INVALID</string>
+    <string name="profile_name_label">Name</string>
+    <string name="profile_gender_label">Gender</string>
+    <string name="profile_yob_label">Year Of Birth</string>
+    <string name="profile_missing_field_error_msg">Please fill all the fields</string>
+    <string name="profile_gender_male_label">Male</string>
+    <string name="profile_gender_female_label">Female</string>
 </resources>

@@ -5,10 +5,9 @@ import java.util.*
 
 object DateUtils {
 
-  fun getCurrentDate(): String {
-    val date = Date()
-    val simpleDateTimeFormatter =
-      SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+  fun getCurrentDate(offset: Int = 0): String {
+    val date = Date(Date().time + offset * 24 * 60 * 60 * 1000)
+    val simpleDateTimeFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
     SimpleDateFormat.getDateTimeInstance()
     simpleDateTimeFormatter.timeZone = TimeZone.getTimeZone("UTC")
     return simpleDateTimeFormatter.format(date)

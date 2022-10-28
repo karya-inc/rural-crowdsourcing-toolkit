@@ -1,5 +1,7 @@
 package com.karyaplatform.karya.ui.scenarios.sentenceValidation
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.karyaplatform.karya.data.manager.AuthManager
 import com.karyaplatform.karya.data.repo.AssignmentRepository
@@ -22,12 +24,14 @@ constructor(
   microTaskRepository: MicroTaskRepository,
   @FilesDir fileDirPath: String,
   authManager: AuthManager,
+  dataStore: DataStore<Preferences>
 ): BaseMTRendererViewModel(
   assignmentRepository,
   taskRepository,
   microTaskRepository,
   fileDirPath,
-  authManager
+  authManager,
+  dataStore
 )
 {
   // UI elements controlled by the view model

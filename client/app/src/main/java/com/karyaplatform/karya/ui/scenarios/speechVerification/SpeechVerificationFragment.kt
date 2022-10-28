@@ -15,6 +15,7 @@ import com.karyaplatform.karya.utils.extensions.disable
 import com.karyaplatform.karya.utils.extensions.enable
 import com.karyaplatform.karya.utils.extensions.observe
 import com.karyaplatform.karya.utils.extensions.viewLifecycleScope
+import com.karyaplatform.karya.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.microtask_common_back_button.view.*
 import kotlinx.android.synthetic.main.microtask_common_next_button.view.*
@@ -142,6 +143,18 @@ class SpeechVerificationFragment : BaseMTRendererFragment(R.layout.microtask_spe
       viewLifecycleOwner.lifecycle, viewLifecycleScope
     ) { states ->
       flushButtonStates(states.first, states.second, states.third)
+    }
+
+    viewModel.rateOnlyAccuracy.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { rateOnlyAccuracy ->
+      if (rateOnlyAccuracy) {
+        qualityCl.invisible()
+        volumeCl.invisible()
+        fluencyCl.invisible()
+      } else {
+        qualityCl.visible()
+        volumeCl.visible()
+        fluencyCl.visible()
+      }
     }
 
     viewModel.accuracyRating.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { value ->
@@ -274,7 +287,7 @@ class SpeechVerificationFragment : BaseMTRendererFragment(R.layout.microtask_spe
     nextBtnState: ButtonState
   ) {
     playBtn.isClickable = playBtnState != ButtonState.DISABLED
-    backBtnCv.isClickable = backBtnState != ButtonState.DISABLED
+    backBtn.isClickable = backBtnState != ButtonState.DISABLED
     nextBtnCv.isClickable = nextBtnState != ButtonState.DISABLED
 
     playBtn.setBackgroundResource(
@@ -293,7 +306,7 @@ class SpeechVerificationFragment : BaseMTRendererFragment(R.layout.microtask_spe
       }
     )
 
-    backBtnCv.backIv.setBackgroundResource(
+    backBtn.backIv.setBackgroundResource(
       when (backBtnState) {
         ButtonState.DISABLED -> R.drawable.ic_back_disabled
         ButtonState.ENABLED -> R.drawable.ic_back_enabled

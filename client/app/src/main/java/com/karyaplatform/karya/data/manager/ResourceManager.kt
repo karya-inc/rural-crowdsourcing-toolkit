@@ -3,15 +3,15 @@ package com.karyaplatform.karya.data.manager
 import android.util.Log
 import com.karyaplatform.karya.data.repo.LanguageRepository
 import com.karyaplatform.karya.utils.Result
+import com.karyaplatform.karya.utils.FileUtils
+import java.io.File
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.withContext
-import java.io.File
-import javax.inject.Inject
-import com.karyaplatform.karya.utils.FileUtils
 
 class ResourceManager
 @Inject
@@ -49,15 +49,13 @@ constructor(
         .singleOrNull()
         ?: return@flow
 
-    runCatching {
-      withContext(Dispatchers.IO) {
-        FileUtils.downloadFileToLocalPath(responseBody, getTarballPath(language))
-        FileUtils.extractGZippedTarBallIntoDirectory(
-          getTarballPath(language),
-          getAudioFolderPath(language)
-        )
+    kotlin
+      .runCatching {
+        withContext(Dispatchers.IO) {
+          FileUtils.downloadFileToLocalPath(responseBody, getTarballPath(language))
+          FileUtils.extractGZippedTarBallIntoDirectory(getTarballPath(language), getAudioFolderPath(language))
+        }
       }
-    }
       .onSuccess { emit(Result.Success(Unit)) }
       .onFailure {
         it.printStackTrace()

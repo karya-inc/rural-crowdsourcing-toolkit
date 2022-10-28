@@ -17,72 +17,72 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/key2"
         style="@style/numericKey"
-        app:layout_columnWeight="1"
-        android:text="2" />
+        android:text="2"
+        app:layout_columnWeight="1" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/key3"
         style="@style/numericKey"
-        app:layout_columnWeight="1"
-        android:text="3" />
+        android:text="3"
+        app:layout_columnWeight="1" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/key4"
         style="@style/numericKey"
-        app:layout_columnWeight="1"
-        android:text="4" />
+        android:text="4"
+        app:layout_columnWeight="1" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/key5"
         style="@style/numericKey"
-        app:layout_columnWeight="1"
-        android:text="5" />
+        android:text="5"
+        app:layout_columnWeight="1" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/key6"
         style="@style/numericKey"
-        app:layout_columnWeight="1"
-        android:text="6" />
+        android:text="6"
+        app:layout_columnWeight="1" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/key7"
         style="@style/numericKey"
-        app:layout_columnWeight="1"
-        android:text="7" />
+        android:text="7"
+        app:layout_columnWeight="1" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/key8"
         style="@style/numericKey"
-        app:layout_columnWeight="1"
-        android:text="8" />
+        android:text="8"
+        app:layout_columnWeight="1" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/key9"
         style="@style/numericKey"
-        app:layout_columnWeight="1"
-        android:text="9" />
+        android:text="9"
+        app:layout_columnWeight="1" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/keyDelete"
         style="@style/numericKey"
-        app:layout_columnWeight="1"
         android:text=""
         app:icon="@drawable/ic_backspace_key"
         app:iconGravity="textStart"
-        app:iconTint="?numPadTextColor" />
+        app:iconTint="?numPadTextColor"
+        app:layout_columnWeight="1" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/key0"
         style="@style/numericKey"
-        app:layout_columnWeight="1"
-        android:text="0" />
+        android:text="0"
+        app:layout_columnWeight="1" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/keyDone"
         style="@style/numericKey"
-        app:layout_columnWeight="1"
         app:icon="@drawable/ic_next_key"
         app:iconGravity="textEnd"
-        app:iconTint="?colorPrimary" />
+        app:iconTint="?colorPrimary"
+        app:layout_columnWeight="1" />
 
 </androidx.gridlayout.widget.GridLayout>

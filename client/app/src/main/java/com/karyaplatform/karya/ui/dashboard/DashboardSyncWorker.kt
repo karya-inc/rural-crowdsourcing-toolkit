@@ -20,11 +20,21 @@ import com.karyaplatform.karya.utils.FileUtils
 import com.karyaplatform.karya.utils.MicrotaskAssignmentOutput
 import com.karyaplatform.karya.utils.MicrotaskInput
 import com.karyaplatform.karya.utils.extensions.getBlobPath
+import com.karyaplatform.karya.data.repo.PaymentRepository
+import com.karyaplatform.karya.utils.PreferenceKeys
+import com.karyaplatform.karya.data.remote.response.WorkerBalanceResponse
+import com.karyaplatform.karya.data.repo.WorkerRepository
+import com.karyaplatform.karya.utils.extensions.getBlobPath
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.single
+import com.karyaplatform.karya.utils.extensions.getBlobPath
 import kotlinx.coroutines.flow.collect
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
+import java.lang.Error
 
 private const val MAX_UPLOAD_PROGRESS = 25
 private const val MAX_SEND_DB_UPDATES_PROGRESS = 40
@@ -39,6 +49,8 @@ class DashboardSyncWorker(
   private val assignmentRepository: AssignmentRepository,
   private val karyaFileRepository: KaryaFileRepository,
   private val microTaskRepository: MicroTaskRepository,
+  private val paymentRepository: PaymentRepository,
+  private val workerRepository: WorkerRepository,
   @FilesDir private val fileDirPath: String,
   private val authManager: AuthManager,
 ) : CoroutineWorker(appContext, workerParams) {
@@ -214,6 +226,18 @@ class DashboardSyncWorker(
     assignmentRepository //TODO: IMPLEMENT .CATCH BEFORE .COLLECT AND SEND ERROR
       .getNewAssignments(worker.idToken, from)
       .collect()
+
+    // Get Worker Balance
+    try {
+        paymentRepository.refreshWorkerEarnings(worker.idToken).collect()
+    } catch (e: Error) {
+      FirebaseCrashlytics.getInstance().recordException(e)
+      warningMsg = "Cannot update payment information"
+    }
+    // Get Leaderboard data
+    workerRepository
+      .updateLeaderboard(worker.idToken)
+      .collect()
   }
 
   /**
@@ -297,7 +321,7 @@ class DashboardSyncWorker(
     val microtaskIds = microTaskRepository.getSubmittedMicrotasksWithInputFiles()
     for (id in microtaskIds) {
       // input tarball
-      val tarBallPath = microtaskOutputContainer.getBlobPath(id)
+      val tarBallPath = microtaskInputContainer.getBlobPath(id)
       val tarBall = File(tarBallPath)
       if (tarBall.exists()) {
         tarBall.delete()

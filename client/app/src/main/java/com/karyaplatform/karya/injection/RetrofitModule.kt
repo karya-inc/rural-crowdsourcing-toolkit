@@ -13,6 +13,7 @@ import com.karyaplatform.karya.data.service.MicroTaskAssignmentAPI
 import com.karyaplatform.karya.data.service.WorkerAPI
 import com.karyaplatform.karya.injection.qualifier.BaseUrl
 import com.karyaplatform.karya.injection.qualifier.KaryaOkHttpClient
+import com.karyaplatform.karya.data.service.PaymentAPI
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -128,5 +129,11 @@ class RetrofitModule {
   @Reusable
   fun provideKaryaFileAPIService(retrofit: Retrofit): KaryaFileAPI {
     return retrofit.create(KaryaFileAPI::class.java)
+  }
+
+  @Provides
+  @Reusable
+  fun providePaymentAPIService(retrofit: Retrofit): PaymentAPI {
+    return retrofit.create(PaymentAPI::class.java)
   }
 }

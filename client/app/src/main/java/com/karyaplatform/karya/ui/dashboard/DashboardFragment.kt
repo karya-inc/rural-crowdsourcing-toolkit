@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -18,11 +20,14 @@ import com.karyaplatform.karya.databinding.FragmentDashboardBinding
 import com.karyaplatform.karya.ui.base.SessionFragment
 import com.karyaplatform.karya.utils.extensions.*
 import com.karyaplatform.karya.BuildConfig
+import com.karyaplatform.karya.utils.PreferenceKeys
+import com.karyaplatform.karya.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.app_toolbar.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
 
 private const val UNIQUE_SYNC_WORK_NAME = "syncWork"
 
@@ -48,6 +53,20 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
     setupViews()
     setupWorkRequests()
     observeUi()
+    // Check if dashboard is visited the first time
+    viewLifecycleScope.launch {
+      val firstRunKey = booleanPreferencesKey(PreferenceKeys.IS_FIRST_DASHBOARD_VISIT)
+      val datastore = requireContext().dataStore
+      val data = datastore.data.first()
+      val isFirstTime = data[firstRunKey] ?: true
+      if (isFirstTime) onFirstTimeVisit()
+      datastore.edit { prefs -> prefs[firstRunKey] = false }
+    }
+  }
+
+  // Function is invoked when the fragment is run for the first time
+  private fun onFirstTimeVisit() {
+    syncWithServer()
   }
 
   private fun observeUi() {
@@ -94,50 +113,50 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
 
     viewModel.progress.observe(lifecycle, lifecycleScope) { i ->
       binding.syncProgressBar.progress = i
-    }
+      viewModel.progress.observe(lifecycle, lifecycleScope) { i -> binding.syncProgressBar.progress = i }
 
-    WorkManager.getInstance(requireContext())
-      .getWorkInfosForUniqueWorkLiveData(UNIQUE_SYNC_WORK_NAME)
-      .observe(viewLifecycleOwner, { workInfos ->
-        if (workInfos.size == 0) return@observe // Return if the workInfo List is empty
-        val workInfo = workInfos[0] // Picking the first workInfo
-        if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-          lifecycleScope.launch {
-            val warningMsg = workInfo.outputData.getString("warningMsg")
-            if (warningMsg != null) { // Check if there are any warning messages set by Workmanager
-              showErrorUi(Throwable(warningMsg), ERROR_TYPE.SYNC_ERROR, ERROR_LVL.WARNING)
-            }
-            viewModel.setProgress(100)
-            viewModel.refreshList()
-          }
-        }
-        if (workInfo != null && workInfo.state == WorkInfo.State.ENQUEUED) {
-          viewModel.setProgress(0)
-          viewModel.setLoading()
-        }
-        if (workInfo != null && workInfo.state == WorkInfo.State.RUNNING) {
-          // Check if the current work's state is "successfully finished"
-          val progress: Int = workInfo.progress.getInt("progress", 0)
-          viewModel.setProgress(progress)
-          viewModel.setLoading()
-          // refresh the UI to show microtasks
-          if (progress == 100)
-            viewLifecycleScope.launch {
+      WorkManager.getInstance(requireContext())
+        .getWorkInfosForUniqueWorkLiveData(UNIQUE_SYNC_WORK_NAME)
+        .observe(viewLifecycleOwner) { workInfos ->
+          if (workInfos.size == 0) return@observe // Return if the workInfo List is empty
+          val workInfo = workInfos[0] // Picking the first workInfo
+          if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
+            lifecycleScope.launch {
+              val warningMsg = workInfo.outputData.getString("warningMsg")
+              if (warningMsg != null) { // Check if there are any warning messages set by Workmanager
+                showErrorUi(Throwable(warningMsg), ERROR_TYPE.SYNC_ERROR, ERROR_LVL.WARNING)
+              }
+              viewModel.setProgress(100)
               viewModel.refreshList()
             }
-        }
-        if (workInfo != null && workInfo.state == WorkInfo.State.FAILED) {
-          lifecycleScope.launch {
-            showErrorUi(
-              Throwable(workInfo.outputData.getString("errorMsg")),
-              ERROR_TYPE.SYNC_ERROR,
-              ERROR_LVL.ERROR
-            )
-            viewModel.refreshList()
+          }
+          if (workInfo != null && workInfo.state == WorkInfo.State.ENQUEUED) {
+            viewModel.setProgress(0)
+            viewModel.setLoading()
+          }
+          if (workInfo != null && workInfo.state == WorkInfo.State.RUNNING) {
+            // Check if the current work's state is "successfully finished"
+            val progress: Int = workInfo.progress.getInt("progress", 0)
+            viewModel.setProgress(progress)
+            viewModel.setLoading()
+            // refresh the UI to show microtasks
+            if (progress == 100)
+              viewLifecycleScope.launch {
+                viewModel.refreshList()
+              }
+          }
+          if (workInfo != null && workInfo.state == WorkInfo.State.FAILED) {
+            lifecycleScope.launch {
+              showErrorUi(
+                Throwable(workInfo.outputData.getString("errorMsg")),
+                ERROR_TYPE.SYNC_ERROR,
+                ERROR_LVL.ERROR
+              )
+              viewModel.refreshList()
+            }
           }
         }
-      })
-
+    }
   }
 
   override fun onSessionExpired() {
@@ -162,6 +181,12 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
   }
 
   private fun setupViews() {
+
+    toolbarBackBtn.visible()
+
+    toolbarBackBtn.setOnClickListener {
+      findNavController().popBackStack()
+    }
 
     with(binding) {
       tasksRv.apply {
@@ -201,13 +226,6 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
     binding.syncCv.enable()
     data.apply {
       (binding.tasksRv.adapter as TaskListAdapter).updateList(taskInfoData)
-      // Show total credits if it is greater than 0
-      if (totalCreditsEarned > 0.0f) {
-        binding.rupeesEarnedCl.visible()
-        binding.rupeesEarnedTv.text = "%.2f".format(Locale.ENGLISH, totalCreditsEarned)
-      } else {
-        binding.rupeesEarnedCl.gone()
-      }
     }
 
     // Show a dialog box to sync with server if completed tasks and internet available
@@ -325,9 +343,34 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
             completed,
             total
           )
+          ScenarioType.IMAGE_ANNOTATION, ScenarioType.VIDEO_ANNOTATION -> actionDashboardActivityToImageAnnotationFragment(
+            taskId,
+            completed,
+            total
+          )
           ScenarioType.QUIZ -> actionDashboardActivityToQuiz(taskId, completed, total)
           ScenarioType.IMAGE_DATA -> actionDashboardActivityToImageData(taskId, completed, total)
           ScenarioType.SENTENCE_VALIDATION -> actionDashboardActivityToSentenceValidation(
+            taskId,
+            completed,
+            total
+          )
+          ScenarioType.SPEECH_TRANSCRIPTION -> actionDashboardActivityToSpeechTranscriptionFragment(
+            taskId,
+            completed,
+            total
+          )
+          ScenarioType.SENTENCE_CORPUS -> actionDashboardActivityToSentenceCorpusFragment(
+            taskId,
+            completed,
+            total
+          )
+          ScenarioType.IMAGE_ANNOTATION_VALIDATION -> actionDashboardActivityToImageAnnotationVerificationFragment(
+            taskId,
+            completed,
+            total
+          )
+          ScenarioType.SENTENCE_CORPUS_VERIFICATION -> actionDashboardActivityToSentenceCorpusVerificationFragment(
             taskId,
             completed,
             total
@@ -351,7 +394,6 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
         }
       }
       if (action != null) {
-
         // Check if user is in center
         if (viewModel.workFromCenterUser.value) {
           viewModel.checkWorkFromCenterUserAuth()
@@ -370,9 +412,9 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
           builder.setNeutralButton(R.string.okay) { _, _ ->
             findNavController().navigate(action)
           }
-          val dialog = builder.create()
-          dialog.show()
         }
+
+        findNavController().navigate(action)
       }
     }
   }

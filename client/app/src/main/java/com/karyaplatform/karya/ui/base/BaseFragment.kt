@@ -17,6 +17,7 @@ import com.karyaplatform.karya.ui.views.KaryaToolbar
 import com.karyaplatform.karya.utils.extensions.finish
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

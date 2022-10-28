@@ -1,5 +1,8 @@
 package com.karyaplatform.karya.ui.scenarios.imageLabelling
 
+import android.service.autofill.Validators.not
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
 import com.karyaplatform.karya.data.manager.AuthManager
@@ -9,10 +12,10 @@ import com.karyaplatform.karya.data.repo.TaskRepository
 import com.karyaplatform.karya.injection.qualifier.FilesDir
 import com.karyaplatform.karya.ui.scenarios.common.BaseMTRendererViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class ImageLabellingViewModel
@@ -23,12 +26,14 @@ constructor(
   microTaskRepository: MicroTaskRepository,
   @FilesDir fileDirPath: String,
   authManager: AuthManager,
+  dataStore: DataStore<Preferences>
 ) : BaseMTRendererViewModel(
   assignmentRepository,
   taskRepository,
   microTaskRepository,
   fileDirPath,
-  authManager
+  authManager,
+  dataStore
 ) {
 
   // Image to be shown
@@ -39,9 +44,7 @@ constructor(
   private val _labelState: MutableStateFlow<MutableMap<String, Boolean>> = MutableStateFlow(mutableMapOf())
   val labelState = _labelState.asStateFlow()
 
-  /**
-   * Complete microtask and move to next
-   */
+  /** Complete microtask and move to next */
   fun completeLabelling() {
     // Add all labels to the outputData
     val labels = JsonObject()
@@ -54,41 +57,36 @@ constructor(
     }
   }
 
-  /**
-   * Setup image transcription microtask
-   */
+  /** Setup image transcription microtask */
   override fun setupMicrotask() {
     // Get and set the image file
-    _imageFilePath.value = try {
-      val imageFileName =
-        currentMicroTask.input.asJsonObject.getAsJsonObject("files").get("image").asString
-      microtaskInputContainer.getMicrotaskInputFilePath(currentMicroTask.id, imageFileName)
-    } catch (e: Exception) {
-      ""
-    }
+    _imageFilePath.value =
+      try {
+        val imageFileName = currentMicroTask.input.asJsonObject.getAsJsonObject("files").get("image").asString
+        microtaskInputContainer.getMicrotaskInputFilePath(currentMicroTask.id, imageFileName)
+      } catch (e: Exception) {
+        ""
+      }
 
     // Set up the labels
-    val labels = try {
-      task.params.asJsonObject.get("labels").asJsonArray.map { it.asString }
-    } catch (e: Exception) {
-      arrayListOf()
-    }
+    val labels =
+      try {
+        task.params.asJsonObject.get("labels").asJsonArray.map { it.asString }
+      } catch (e: Exception) {
+        arrayListOf()
+      }
     labels.forEach { _labelState.value[it] = false }
-
   }
 
-  /**
-   * Flip the state of a label
-   */
+  /** Flip the state of a label */
   fun flipState(label: String) {
     val newState: MutableMap<String, Boolean> = mutableMapOf()
-    _labelState.value.forEach { (s, b) ->  newState[s] = b}
+    _labelState.value.forEach { (s, b) -> newState[s] = b }
     if (newState.containsKey(label)) {
       newState[label] = !newState[label]!!
     } else {
       newState[label] = true
     }
     _labelState.value = newState
-
   }
 }

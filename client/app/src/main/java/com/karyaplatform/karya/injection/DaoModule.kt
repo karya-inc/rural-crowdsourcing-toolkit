@@ -55,4 +55,16 @@ class DaoModule {
   fun provideMicroTaskDaoExtra(karyaDatabase: KaryaDatabase): MicrotaskDaoExtra {
     return karyaDatabase.microtaskDaoExtra()
   }
+
+  @Provides
+  @Reusable
+  fun providePaymentAccountDao(karyaDatabase: KaryaDatabase): PaymentAccountDao {
+    return karyaDatabase.paymentAccountDao()
+  }
+
+  @Provides
+  @Reusable
+  fun provideLeaderboardDao(karyaDatabase: KaryaDatabase): LeaderboardDao {
+    return karyaDatabase.leaderboardDao()
+  }
 }

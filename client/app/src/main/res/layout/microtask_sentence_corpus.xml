@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/microtaskTb"
+        layout="@layout/microtask_common_header" />
+
+    <TextView
+        android:id="@+id/instructionTv"
+        style="@style/MicrotaskInstructionText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        android:text="@string/text_transliteration_desc"
+        app:layout_constraintTop_toBottomOf="@id/microtaskTb" />
+
+    <TextView
+        android:id="@+id/contextTv"
+        style="@style/MicrotaskInputText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        android:textSize="@dimen/_16ssp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/instructionTv"
+        tools:text="HOWDY" />
+
+    <ImageButton
+        android:id="@+id/nextBtn"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_margin="@dimen/_8sdp"
+        android:background="@drawable/ic_next_enabled"
+        android:contentDescription="@string/back"
+        android:soundEffectsEnabled="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <ImageButton
+        android:id="@+id/backBtn"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_margin="@dimen/_8sdp"
+        android:background="@drawable/ic_back_enabled"
+        android:contentDescription="@string/back"
+        android:soundEffectsEnabled="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+
+    <EditText
+        android:id="@+id/sentenceEt"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:background="@drawable/background_microtask_input_text"
+        android:hint="@string/transliteration_hint"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        android:scrollbars="vertical"
+        android:scrollHorizontally="false"
+        android:textColor="#000000"
+        android:textSize="@dimen/_16ssp"
+        app:layout_constraintLeft_toLeftOf="@id/contextTv"
+        app:layout_constraintRight_toLeftOf="@id/addBtn"
+        app:layout_constraintTop_toBottomOf="@id/contextTv"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/errorTv"
+        style="@style/errorText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/_8sdp"
+        android:textSize="@dimen/_12ssp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="@id/sentenceEt"
+        app:layout_constraintRight_toRightOf="@id/addBtn"
+        app:layout_constraintTop_toBottomOf="@id/sentenceEt"
+        tools:text="THIS IS AN ERROR MESSAGE" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/sentenceRv"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="0dp"
+        android:layout_marginVertical="@dimen/_8sdp"
+        app:layout_constraintBottom_toTopOf="@id/nextBtn"
+        app:layout_constraintLeft_toLeftOf="@id/sentenceEt"
+        app:layout_constraintRight_toRightOf="@id/addBtn"
+        app:layout_constraintTop_toBottomOf="@id/errorTv" />
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addBtn"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_margin="@dimen/_8sdp"
+        android:contentDescription="@string/next"
+        android:src="@drawable/ic_check"
+        app:layout_constraintBottom_toBottomOf="@id/sentenceEt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/sentenceEt" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

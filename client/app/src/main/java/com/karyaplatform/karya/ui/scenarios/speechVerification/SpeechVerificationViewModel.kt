@@ -2,6 +2,8 @@ package com.karyaplatform.karya.ui.scenarios.speechVerification
 
 import android.media.MediaPlayer
 import androidx.annotation.StringRes
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
 import com.karyaplatform.karya.R
@@ -27,12 +29,14 @@ constructor(
   microTaskRepository: MicroTaskRepository,
   @FilesDir fileDirPath: String,
   authManager: AuthManager,
+  dataStore: DataStore<Preferences>
 ) : BaseMTRendererViewModel(
   assignmentRepository,
   taskRepository,
   microTaskRepository,
   fileDirPath,
-  authManager
+  authManager,
+  dataStore
 ) {
 
   /** UI button states */
@@ -63,6 +67,10 @@ constructor(
   private var playBtnState: ButtonState = ButtonState.DISABLED
   private var nextBtnState: ButtonState = ButtonState.DISABLED
   private var backBtnState: ButtonState = ButtonState.DISABLED
+
+  // Rate only accuracy
+  private var _rateOnlyAccuracy: MutableStateFlow<Boolean> = MutableStateFlow(false)
+  val rateOnlyAccuracy = _rateOnlyAccuracy.asStateFlow()
 
   /** Verification status */
   private var _accuracyRating: MutableStateFlow<Int> = MutableStateFlow(R.string.rating_undefined)
@@ -116,6 +124,13 @@ constructor(
   val showErrorWithDialog = _showErrorWithDialog.asStateFlow()
 
   override fun setupMicrotask() {
+    // Check if only accuracy has to be rated
+    _rateOnlyAccuracy.value = try {
+      task.params.asJsonObject.get("onlyAccuracy").asBoolean
+    } catch (e: Exception) {
+      false
+    }
+
     _accuracyRating.value = R.string.rating_undefined
     _qualityRating.value = R.string.rating_undefined
     _volumeRating.value = R.string.rating_undefined

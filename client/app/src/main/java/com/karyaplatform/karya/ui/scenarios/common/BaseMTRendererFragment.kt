@@ -7,12 +7,14 @@ import android.view.View
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.karyaplatform.karya.ui.base.BaseFragment
 import com.karyaplatform.karya.utils.extensions.observe
 import com.karyaplatform.karya.R
 import com.karyaplatform.karya.utils.DateUtils
 import kotlinx.android.synthetic.main.microtask_common_header.*
+import kotlinx.coroutines.launch
 
 abstract class BaseMTRendererFragment(@LayoutRes contentLayoutId: Int) :
   BaseFragment(contentLayoutId) {
@@ -119,4 +121,41 @@ abstract class BaseMTRendererFragment(@LayoutRes contentLayoutId: Int) :
       }
     }
   }
+
+  fun skipTask(showAlertBox: Boolean, title: String, msg: String) {
+
+    if (!showAlertBox) {
+      viewModel.skipTask()
+      return
+    }
+
+    val alertDialog: AlertDialog? = activity?.let {
+      val builder = AlertDialog.Builder(it)
+      builder.apply {
+        setPositiveButton(
+          getString(R.string.okay)
+        ) { _, _ ->
+          viewModel.skipTask()
+        }
+        setNeutralButton("No Label") { _, _ ->
+          viewModel.viewModelScope.launch {
+            viewModel.completeAndSaveCurrentMicrotask()
+            viewModel.moveToNextMicrotask()
+          }
+        }
+        setNegativeButton(
+          getString(R.string.cancel_text)
+        ) { _, _ ->
+          // User cancelled the dialog
+        }
+      }
+
+      builder.setMessage(msg)
+        .setTitle(title)
+      // Create the AlertDialog
+      builder.create()
+    }
+    alertDialog!!.show()
+  }
+
 }

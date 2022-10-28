@@ -23,11 +23,9 @@ class ConsentFormFragment : BaseFragment(R.layout.fragment_consent_form) {
   private val binding by viewBinding(FragmentConsentFormBinding::bind)
   private val viewModel by viewModels<ConsentFormViewModel>()
 
-  @Inject
-  lateinit var resourceManager: ResourceManager
+  @Inject lateinit var resourceManager: ResourceManager
 
-  @Inject
-  lateinit var authManager: AuthManager
+  @Inject lateinit var authManager: AuthManager
 
   // TODO: add assistant
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -59,7 +57,6 @@ class ConsentFormFragment : BaseFragment(R.layout.fragment_consent_form) {
       consentFormTv.movementMethod = ScrollingMovementMethod()
 
       agreeBtn.setOnClickListener { viewModel.updateConsentFormStatus(true) }
-
       disagreeBtn.setOnClickListener { requireActivity().finish() }
     }
   }
