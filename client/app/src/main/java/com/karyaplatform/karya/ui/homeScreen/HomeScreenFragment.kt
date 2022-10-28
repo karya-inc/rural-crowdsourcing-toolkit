@@ -63,14 +63,16 @@ class HomeScreenFragment : BaseFragment(R.layout.fragment_home_screen) {
       }
 
       // Move to payments flow on earning card click
-      earningCv.setOnClickListener {
-        viewModel.setEarningSummary()
-        val workerBalance = viewModel.earningStatus.value.totalEarned
-        // Navigate only if worker total earning is greater than 2 rs.
-        if (workerBalance > 2.0f) {
-          viewModel.navigatePayment()
-        } else {
-          Toast.makeText(requireContext(), "Please earn at least Rs 2", Toast.LENGTH_LONG).show()
+      if (BuildConfig.PAYMENTS_ENABLED) {
+        earningCv.setOnClickListener {
+          viewModel.setEarningSummary()
+          val workerBalance = viewModel.earningStatus.value.totalEarned
+          // Navigate only if worker total earning is greater than 2 rs.
+          if (workerBalance > 2.0f) {
+            viewModel.navigatePayment()
+          } else {
+            Toast.makeText(requireContext(), "Please earn at least Rs 2", Toast.LENGTH_LONG).show()
+          }
         }
       }
     }
@@ -146,7 +148,7 @@ class HomeScreenFragment : BaseFragment(R.layout.fragment_home_screen) {
 
       try {
         findNavController().navigate(action)
-      } catch (e:Exception) {
+      } catch (e: Exception) {
         Log.e("DASHBOARD_NAV_ERROR", e.toString())
       }
     }
