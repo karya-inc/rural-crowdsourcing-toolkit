@@ -8,6 +8,15 @@ import com.karyaplatform.karya.data.service.WorkerAPI
 import com.google.gson.JsonObject
 import com.karyaplatform.karya.data.local.daos.LeaderboardDao
 import com.karyaplatform.karya.data.model.karya.LeaderboardRecord
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import com.karyaplatform.karya.data.exceptions.*
+import com.karyaplatform.karya.data.model.karya.TaskRecord
+import com.karyaplatform.karya.data.model.karya.modelsExtra.EarningStatus
+import com.karyaplatform.karya.utils.PreferenceKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -16,7 +25,8 @@ import javax.inject.Inject
 class WorkerRepository @Inject constructor(
   private val workerAPI: WorkerAPI,
   private val workerDao: WorkerDao,
-  private val leaderboardDao: LeaderboardDao
+  private val leaderboardDao: LeaderboardDao,
+  private val datastore: DataStore<Preferences>
 ) {
 
   fun getOTP(
@@ -214,6 +224,28 @@ class WorkerRepository @Inject constructor(
       emit(leaderboardRecords)
     } else {
       error("Request failed, response body was null")
+    }
+  }
+
+  /**
+   * Get Worker's Working Week and Day
+   */
+  fun getWorkerWorkingWeekAndDay(idToken: String) = flow {
+    val response = workerAPI.getWorkerWorkingWeekAndDay(idToken)
+    val weekResponse = response.body()
+
+    if (!response.isSuccessful) {
+      error("Failed to add account")
+    }
+
+    if (weekResponse != null) {
+      val weekKey = intPreferencesKey(PreferenceKeys.CURRENT_WEEK)
+      val dayKey = intPreferencesKey(PreferenceKeys.CURRENT_DAY)
+      datastore.edit { prefs -> prefs[weekKey] = weekResponse.week }
+      datastore.edit { prefs -> prefs[dayKey] = weekResponse.day }
+      emit(weekResponse)
+    } else {
+      error("Failed to add account")
     }
   }
 

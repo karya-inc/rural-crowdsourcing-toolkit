@@ -234,6 +234,10 @@ class DashboardSyncWorker(
       FirebaseCrashlytics.getInstance().recordException(e)
       warningMsg = "Cannot update payment information"
     }
+    // Get Worker Week and day
+    workerRepository
+      .getWorkerWorkingWeekAndDay(worker.idToken)
+      .collect()
     // Get Leaderboard data
     workerRepository
       .updateLeaderboard(worker.idToken)
