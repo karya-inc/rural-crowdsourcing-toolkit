@@ -14,9 +14,11 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.karyaplatform.karya.data.exceptions.*
+import com.karyaplatform.karya.utils.PreferenceKeys
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.karyaplatform.karya.data.exceptions.*
 import com.karyaplatform.karya.data.model.karya.TaskRecord
 import com.karyaplatform.karya.data.model.karya.modelsExtra.EarningStatus
-import com.karyaplatform.karya.utils.PreferenceKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -239,8 +241,10 @@ class WorkerRepository @Inject constructor(
     }
 
     if (weekResponse != null) {
+      val regTimeKey = stringPreferencesKey(PreferenceKeys.REG_TIME)
       val weekKey = intPreferencesKey(PreferenceKeys.CURRENT_WEEK)
       val dayKey = intPreferencesKey(PreferenceKeys.CURRENT_DAY)
+      datastore.edit { prefs -> prefs[regTimeKey] = weekResponse.regTime.toString() }
       datastore.edit { prefs -> prefs[weekKey] = weekResponse.week }
       datastore.edit { prefs -> prefs[dayKey] = weekResponse.day }
       emit(weekResponse)
