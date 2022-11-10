@@ -113,11 +113,8 @@ Registration প্রক্রিয়ার জন্য আপনাকে �
     <string name="sync_prompt">কাজটি জমা করুণ /ন্তুন কাজ সংগ্রহ করুন</string>
     <string name="tasks_available">উপলব্ধ</string>
     <string name="tasks_completed">সম্পন্ন</string>
-    <string name="tasks_submitted">জমা</string>
-    <string name="tasks_verified">যাচাই</string>
-    <string name="tasks_skipped">এড়িয়ে গেছে</string>
-    <string name="tasks_expired">এক্সপিরড</string>
-
+    <string name="tasks_submitted">সম্পন্ন</string>
+    <string name="tasks_verified">সম্পন্ন</string>
     <string name="sync_prompt_message">
         সার্ভারকে জমা করার জন্য আপনি কাজটি সম্পন্ন করেছেন। আপনি কি কাজটি এখন জমা করতে চান?
     </string>
@@ -171,4 +168,30 @@ Registration প্রক্রিয়ার জন্য আপনাকে �
     <string name="back">পেছনে</string>
     <string name="okay">ঠিক আছে</string>
     <string name="task_outside_time_bound">আপনি এই কাজ টি করতে পারেন শুধু মাত্র _START_TIME_ টা থেকে _END_TIME_ টার মধ্যে</string>
+
+    <!-- Home Screen -->
+    <string name="home_screen_title"> হোম স্ক্রিন </string>
+    <string name="task_summary_label"> কাজ এর রিপোর্ট </string>
+    <string name="click_to_do_tasks">টাস্ক করতে এখানে ক্লিক করুন!</string>
+    <string name="performance_label">পারফরমেন্স</string>
+    <string name="recording_task_label">রেকর্ডিং</string>
+    <string name="typing_task_label">টাইপিং</string>
+    <string name="image_task_label">ছবি চিহ্নিত করা </string>
+    <string name="transcription_task_label">ট্রান্সক্রিপশন </string>
+    <string name="earning_label">উপার্জন </string>
+    <string name="earned_week_label">আগের সপ্তাহে</string>
+    <string name="earned_total_label">টোটাল উপার্জন </string>
+    <string name="paid_total_label">টোটাল পেমেন্ট </string>
+
+    <!-- Profile Screen -->
+    <string name="profile_screen_title">আপনার ব্যাপারে </string>
+    <string name="submit_profile">প্রোফাইল টি সাবমিট করুন </string>
+    <string name="back_to_home">হোম এ ফায়ার যান </string>
+
+
+    <string name="profile_gender_label">লিঙ্গ</string>
+    <string name="profile_yob_label">জন্মসাল</string>
+    <string name="profile_missing_field_error_msg">সব ক্ষেত্র পূরণ করুন</string>
+    <string name="profile_gender_male_label">পুরুষ</string>
+    <string name="profile_gender_female_label">মহিলা</string>
 </resources>
