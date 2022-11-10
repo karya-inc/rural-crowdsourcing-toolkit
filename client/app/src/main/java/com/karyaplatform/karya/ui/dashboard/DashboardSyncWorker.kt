@@ -235,9 +235,9 @@ class DashboardSyncWorker(
       warningMsg = "Cannot update payment information"
     }
     // Get Leaderboard data
-    workerRepository
-      .updateLeaderboard(worker.idToken)
-      .collect()
+//    workerRepository
+//      .updateLeaderboard(worker.idToken)
+//      .collect()
   }
 
   /**
