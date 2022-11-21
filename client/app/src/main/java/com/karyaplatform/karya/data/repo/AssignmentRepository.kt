@@ -334,7 +334,7 @@ constructor(
 
       val summary = when (scenarioName) {
         ScenarioType.SPEECH_DATA ->
-          reduceTaskReports(reports, arrayListOf("accuracy", "volume", "quality"), 2.5f)
+          reduceTaskReports(reports, arrayListOf("accuracy"), 5f)
         ScenarioType.IMAGE_ANNOTATION ->
           reduceTaskReports(reports, arrayListOf("accuracy"), 5f)
         ScenarioType.SENTENCE_CORPUS ->
