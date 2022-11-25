@@ -1,7 +1,5 @@
 package com.karyaplatform.karya.ui.homeScreen
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karyaplatform.karya.data.manager.AuthManager
@@ -16,12 +14,12 @@ import com.karyaplatform.karya.data.repo.TaskRepository
 import com.karyaplatform.karya.data.repo.WorkerRepository
 import com.karyaplatform.karya.ui.payment.PaymentFlowNavigation
 import com.karyaplatform.karya.utils.PreferenceKeys
+import com.karyaplatform.karya.data.model.karya.enums.AccountRecordStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -163,17 +161,20 @@ constructor(
     }
   }
 
-  fun navigatePayment() {
-    viewModelScope.launch {
-      val workerId = authManager.getLoggedInWorker().id
-      val status = paymentRepository.getPaymentRecordStatus(workerId)
-      when (status.getNavigationDestination()) {
-        PaymentFlowNavigation.DASHBOARD -> _navigationFlow.emit(HomeScreenNavigation.PAYMENT_DASHBOARD)
-        PaymentFlowNavigation.FAILURE -> _navigationFlow.emit(HomeScreenNavigation.PAYMENT_FAILURE)
-        PaymentFlowNavigation.REGISTRATION -> _navigationFlow.emit(HomeScreenNavigation.PAYMENT_REGISTRATION)
-        PaymentFlowNavigation.VERIFICATION -> _navigationFlow.emit(HomeScreenNavigation.PAYMENT_VERIFICATION)
-        else -> {}
+  suspend fun navigatePayment() {
+      try {
+        val worker = authManager.getLoggedInWorker()
+        val status = paymentRepository.getPaymentRecordStatus(worker.id, worker.idToken!!)
+        if (status == AccountRecordStatus.CANNOT_UPDATE) throw Error("Cannot fetch payment account information")
+        when (status.getNavigationDestination()) {
+          PaymentFlowNavigation.DASHBOARD -> _navigationFlow.emit(HomeScreenNavigation.PAYMENT_DASHBOARD)
+          PaymentFlowNavigation.FAILURE -> _navigationFlow.emit(HomeScreenNavigation.PAYMENT_FAILURE)
+          PaymentFlowNavigation.REGISTRATION -> _navigationFlow.emit(HomeScreenNavigation.PAYMENT_REGISTRATION)
+          PaymentFlowNavigation.VERIFICATION -> _navigationFlow.emit(HomeScreenNavigation.PAYMENT_VERIFICATION)
+          else -> {}
+        }
+      } catch (e: Error) {
+        throw e
       }
-    }
   }
 }
