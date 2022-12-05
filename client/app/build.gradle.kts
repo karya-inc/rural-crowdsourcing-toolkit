@@ -15,10 +15,10 @@ android {
   compileSdkVersion(32)
   defaultConfig {
     applicationId = "com.karyaplatform.karya"
-    minSdkVersion(24)
-    targetSdkVersion(30)
+    minSdkVersion(23)
+    targetSdkVersion(32)
     multiDexEnabled = true
-    versionCode = 72
+    versionCode = 73
     versionName = "1"
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables.useSupportLibrary = true
