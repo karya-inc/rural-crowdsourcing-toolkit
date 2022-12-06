@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.karyaplatform.karya.R
 import com.karyaplatform.karya.data.manager.AuthManager
 import com.karyaplatform.karya.data.model.karya.MicroTaskAssignmentRecord
 import com.karyaplatform.karya.data.model.karya.MicroTaskRecord
@@ -60,7 +61,7 @@ abstract class BaseMTRendererViewModel(
   protected var currentAssignmentIndex: Int = 0
 
   lateinit var currentMicroTask: MicroTaskRecord
-  protected lateinit var currentAssignment: MicroTaskAssignmentRecord
+  lateinit var currentAssignment: MicroTaskAssignmentRecord
 
   // Microtask group id -- track this to move back to dashboard on group boundaries
   private var groupId: String? = null
@@ -86,6 +87,9 @@ abstract class BaseMTRendererViewModel(
   private val _outsideTimeBound: MutableStateFlow<Triple<Boolean, String, String>> =
     MutableStateFlow(Triple(false, "", ""))
   val outsideTimeBound = _outsideTimeBound.asStateFlow()
+
+  private val _holidayMessage = MutableStateFlow(Pair(false, R.string.sunday_message))
+  val holidayMessage = _holidayMessage.asStateFlow()
 
   open fun onFirstTimeVisit() {}
 
@@ -357,8 +361,9 @@ abstract class BaseMTRendererViewModel(
       taskStartTime = if (taskStartTime == "") null else taskStartTime
       taskEndTime = if (taskEndTime == "") null else taskEndTime
 
+      val currentTime = Calendar.getInstance()
+
       if (taskStartTime != null && taskEndTime != null) {
-        val currentTime = Calendar.getInstance()
         val hour = currentTime.get(Calendar.HOUR_OF_DAY)
         val minutes = currentTime.get(Calendar.MINUTE)
         val now = String.format(Locale.US, "%02d:%02d", hour, minutes)
@@ -367,6 +372,21 @@ abstract class BaseMTRendererViewModel(
           _outsideTimeBound.emit(Triple(true, taskStartTime, taskEndTime))
           return@launch
         }
+      }
+
+      // Check for sundays
+      val dayOfWeek = currentTime.get(Calendar.DAY_OF_WEEK)
+      if (dayOfWeek == Calendar.SUNDAY) {
+        _holidayMessage.emit(Pair(true, R.string.sunday_message))
+        return@launch
+      }
+
+      // Check for diwali
+      val month = currentTime.get(Calendar.MONTH)
+      val day = currentTime.get(Calendar.DAY_OF_MONTH)
+      if (month == Calendar.OCTOBER && day >= 24 && day <= 26) {
+        _holidayMessage.emit(Pair(true, R.string.diwali_message))
+        return@launch
       }
 
       // Check if we are crossing group boundaries
@@ -399,7 +419,11 @@ abstract class BaseMTRendererViewModel(
         }
       }
 
-      if (_inputFileDoesNotExist.value) return@launch
+      if (_inputFileDoesNotExist.value) {
+        // Dialog saying input file does not exist?
+        navigateBack()
+        return@launch
+      }
 
       outputData =
         if (!currentAssignment.output.isJsonNull && currentAssignment.output.asJsonObject.has("data")) {

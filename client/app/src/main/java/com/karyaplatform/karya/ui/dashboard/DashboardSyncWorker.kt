@@ -234,6 +234,10 @@ class DashboardSyncWorker(
       FirebaseCrashlytics.getInstance().recordException(e)
       warningMsg = "Cannot update payment information"
     }
+    // Get Worker Week and day
+    workerRepository
+      .getWorkerWorkingWeekAndDay(worker.idToken)
+      .collect()
     // Get Leaderboard data
     workerRepository
       .updateLeaderboard(worker.idToken)
@@ -321,7 +325,7 @@ class DashboardSyncWorker(
     val microtaskIds = microTaskRepository.getSubmittedMicrotasksWithInputFiles()
     for (id in microtaskIds) {
       // input tarball
-      val tarBallPath = microtaskOutputContainer.getBlobPath(id)
+      val tarBallPath = microtaskInputContainer.getBlobPath(id)
       val tarBall = File(tarBallPath)
       if (tarBall.exists()) {
         tarBall.delete()

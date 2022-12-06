@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <resources>
     <string name="language_name">मराठी</string>
 
@@ -207,6 +208,8 @@
     <string name="sync_prompt_message">तुम्ही सर्व्हरवर सबमिट करता येणारी कार्ये पूर्ण केली आहेत. तर आता तुम्हाला तुमचे काम सबमिट करायचे आहे का?</string>
     <string name="yes">होय</string>
     <string name="no">नहीं</string>
+    <string name="week_label">आठवडा</string>
+    <string name="day_label">दिवस</string>
 
     <!-- Sync -->
     <string name="reset_assignment_warning">काही आउटपुट फाइल्स उपलब्ध नाही आहेत.</string>
@@ -334,4 +337,3 @@
     <string name="profile_gender_male_label">पुरुष</string>
     <string name="profile_gender_female_label">स्त्री</string>
 </resources>
-
