@@ -1,8 +1,8 @@
 package com.karyaplatform.karya.ui.payment.failure
 
 import androidx.lifecycle.ViewModel
-import com.microsoft.research.karya.data.manager.AuthManager
-import com.microsoft.research.karya.data.repo.PaymentRepository
+import com.karyaplatform.karya.data.manager.AuthManager
+import com.karyaplatform.karya.data.repo.PaymentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
