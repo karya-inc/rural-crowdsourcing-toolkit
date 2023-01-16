@@ -15,6 +15,9 @@ import { catchAll, httpRequestLogger, setupDbConnection, mainLogger as logger } 
 import { createBlobContainers, createLocalFolders, setupBlobStore } from '@karya/common';
 import { envGetNumber, envGetString } from '@karya/misc-utils';
 
+// enable this next line in case you are facing issue : "UNABLE_TO_FIND_LOCAL_ISSUER_CERTIFICATE" while registering into application
+// process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+
 // Setup Koa application
 const app = new Koa();
 
