@@ -49,10 +49,13 @@ constructor(
   // score
   private val _validationScore: MutableStateFlow<Int> = MutableStateFlow(R.string.rating_undefined)
   val validationScore = _validationScore.asStateFlow()
+
   // Annotation type
   var annotationType = CropObjectType.RECTANGLE;
+
   // Number of sides
   var numberOfSides = 4;
+
   /**
    * Setup image annotation microtask
    */
@@ -73,7 +76,7 @@ constructor(
     }
 
     annotationType = if (annotationTypeString == "POLYGON") CropObjectType.POLYGON
-      else CropObjectType.RECTANGLE
+    else CropObjectType.RECTANGLE
 
     // Get number of sides
     numberOfSides = try {
@@ -86,17 +89,16 @@ constructor(
     if (currentAssignment.status == MicrotaskAssignmentStatus.COMPLETED) {
       renderOutputData()
     }
-
   }
 
   private fun renderOutputData() {
     val outputData = currentAssignment.output.asJsonObject.getAsJsonObject("data")
     val score = outputData.get("score").asInt
 
-    when(score) {
-        1 -> _validationScore.value = R.string.img_annotation_verification_ok
-        2 -> _validationScore.value = R.string.img_annotation_verification_good
-        else -> _validationScore.value = R.string.img_annotation_verification_bad
+    when (score) {
+      1 -> _validationScore.value = R.string.img_annotation_verification_ok
+      2 -> _validationScore.value = R.string.img_annotation_verification_good
+      else -> _validationScore.value = R.string.img_annotation_verification_bad
     }
   }
 
@@ -105,7 +107,7 @@ constructor(
    */
   fun handleNextCLick() {
 
-    val score = when(_validationScore.value) {
+    val score = when (_validationScore.value) {
       R.string.img_annotation_verification_ok -> 1
       R.string.img_annotation_verification_good -> 2
       else -> 0
@@ -129,30 +131,37 @@ constructor(
     _validationScore.value = resId
   }
 
-//  TODO: Generalise this method as it only works for single polygon crop object
+  //  TODO: Generalise this method as it only works for single polygon crop object
   fun setCoordinatesForBox() {
+    if (!isCurrentMicrotaskInitialized())
+      return
+
     val annotations = try {
       currentMicroTask.input.asJsonObject.getAsJsonObject("data").getAsJsonObject("annotations")
     } catch (e: Exception) {
-      JsonObject()
+      return
     }
 
-    // taking first label for now TODO: Generalise for all labels
-    val label = annotations.keySet().elementAt(0)
-    // Get coordinates with respect to a label for the first crop object
-    val coorsJsonArray = annotations.getAsJsonArray(label).get(0).asJsonArray
-    val coors = Array<PointF>(coorsJsonArray.size()) { PointF(0F, 0F)}
+    try {
+      // taking first label for now TODO: Generalise for all labels
+      val label = annotations.keySet().elementAt(0)
+      // Get coordinates with respect to a label for the first crop object
+      val coorsJsonArray = annotations.getAsJsonArray(label).get(0).asJsonArray
+      val coors = Array<PointF>(coorsJsonArray.size()) { PointF(0F, 0F) }
 
-    for (i in coors.indices) {
-      val ele = coorsJsonArray.get(i)
-      val x = ele.asJsonArray.get(0).asFloat
-      val y = ele.asJsonArray.get(1).asFloat
-      coors[i] = PointF(x, y)
+      for (i in coors.indices) {
+        val ele = coorsJsonArray.get(i)
+        val x = ele.asJsonArray.get(0).asFloat
+        val y = ele.asJsonArray.get(1).asFloat
+        coors[i] = PointF(x, y)
+      }
+      _polygonCoors.value = coors
+
+      // Reset validation score
+      _validationScore.value = R.string.rating_undefined
+    } catch (e: Exception) {
+      // Ignore
     }
-    _polygonCoors.value = coors
-
-    // Reset validation score
-    _validationScore.value = R.string.rating_undefined
   }
 
 }
