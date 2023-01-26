@@ -199,7 +199,8 @@
 
     <!-- Dashboard -->
     <string name="dashboard_title">टास्क सूची</string>
-    <string name="sync_prompt">कार्य सबमिट करें / नए कार्य प्राप्त करें</string>
+    <string name="sync_prompt">कार्य
+        सबमिट करें / नए कार्य प्राप्त करें</string>
     <string name="tasks_available">उपलब्ध</string>
     <string name="tasks_completed">पूरा हुआ</string>
     <string name="tasks_submitted">प्रस्तुत</string>
