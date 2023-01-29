@@ -7,7 +7,7 @@ export { knex, setupDbConnection } from './Client';
 // Export table create/delete functions
 export * as ServerDbFunctions from './auto/ServerTableFunctions';
 export * as BoxDbFunctions from './auto/BoxTableFunctions';
-
+export * as DataMigrationFunctions from './auto/DataMigrationFunctions';
 // Export basic models
 export * as BasicModel from './models/BasicModel';
 export * as MicrotaskModel from './models/MicrotaskModel';

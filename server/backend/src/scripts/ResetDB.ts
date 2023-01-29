@@ -10,6 +10,7 @@ dotenv.config();
 
 import { Promise as BBPromise } from 'bluebird';
 import { knex, setupDbConnection, ServerDbFunctions, mainLogger as logger, BasicModel } from '@karya/common';
+import { DataMigrationFunctions } from '@karya/common';
 import { bootstrapAuth } from './AuthBootstrap';
 import { createAllMatViews } from '../models/MatViewModel';
 import * as KeycloakUtils from '../utils/auth/KeycloakUtils';
@@ -22,6 +23,7 @@ async function recreateAllTables() {
   logger.info(`Recreating all tables`);
   await ServerDbFunctions.dropAllTables();
   await ServerDbFunctions.createAllTables();
+  await DataMigrationFunctions.alterTableColumns();
   logger.info(`Tables recreated`);
 }
 
