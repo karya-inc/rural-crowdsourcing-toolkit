@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>      
+    <string name="language_name">ब्रज</string>
+    <string name="unknown_error">कोई अंजान गन्ती है गई एै। कृपिआ करिकि अपए कॉर्डिनेटर ति बात करौ।</string>
+    <string name="consent_form_title">सैमती पत्र</string>
+    <string name="consent_form_agree">सैमती हैबौ</string>
+    <string name="consent_form_disagree">मैं हिस्सा नां लैबौ चांतु।</string>
+    <string name="phone_number_title">फ़ोन नंबर</string>
+    <string name="phone_number_prompt">कार्या पै पंजीकरण करिबे के लएैं कृपिआ करिकि नीचि अपऔ फोन नंबर लिखौ</string>
+    <string name="unable_to_generate_otp">हम जा फ़ोन नंबर ए लएैं ओटीपी जनरेट नां कस्सक। कृपिआ करिकि नंबर जांचौ या बादि मिं फिर प्रयास करौ।</string>
+    <string name="access_code_already_used">एक्सिस कोडु पैले ति ई काऊ दूसरे फ़ोन नंबर पै पंजीकृत एै। नए एक्सिस कोड ए लएैं कृपा करिकि कॉर्डिनेटर ति संपर्क करौ।</string>
+    <string name="otp_title">ओ टी पी</string>
+    <string name="otp_prompt">हमनि 0000000000 पै एसएमएस ए माध्धिम ति 6 अंकन औ ओ टी पी भेजौ एै। कृपिआ करिकि नीचि ओ टी पी डारौ।</string>
+    <string name="resend_otp">ओ टी पी फित्ति भेजौ।</string>
+    <string name="change_phone_number">फ़ोन नंबर बदलौ।</string>
+    <string name="invalid_otp">तुमनि एक अबैध ओ टी पी डारौ एै।</string>
+    <string name="dashboard_title">डैसबोडु</string>
+    <string name="sync_prompt">काम जमा करौ। / नए काम लेऔ।</string>
+    <string name="tasks_available">उपलब्ध</string>
+    <string name="tasks_completed">पूरौ करौ भऔ।</string>
+    <string name="tasks_submitted">जमा करौ भऔ।</string>
+    <string name="tasks_verified">जांचौ करौ भऔ।</string>
+    <string name="sync_prompt_message">तुमनि ऐसे काम पूरे कल्लए एैं जिनै सर्बर पै जमा करौ जाइ सकतु एै। का तुम कामनि एै अबैई जमा करिबौ चाइ रएैं?</string>
+    <string name="yes">हां</string>
+    <string name="no">नईं</string>
+    <string name="reset_assignment_warning">कछू आउटपुट फ़ाइलें नां हती।</string>
+    <string name="upload_file_error">फ़ाइलें अपलोड कत्त समै गन्ती। कृपिआ करिकि अपए कॉर्डिनेटर ति बात करौ।</string>
+    <string name="send_db_error">काम भेजत समै गड़बड़ी भई। कृपिआ करिकि अपए कॉर्डिनेटर ति बात करौ।</string>
+    <string name="receive_db_error">काम लेत समै गन्ती। कृपिआ अपए कॉर्डिनेटर ति बात करौ।</string>
+    <string name="download_file_error">फ़ाइलें डाउनलोड कत्त समै गन्ती। कृपिआ अपए कॉर्डिनेटर ति बात करौ।</string>
+    <string name="received_verified_error">जांच लेत समै गन्ती। कृपिआ अपए कॉर्डिनेटर ति बात करौ।</string>
+    <string name="app_name">कार्या</string>
+    
+</resources>

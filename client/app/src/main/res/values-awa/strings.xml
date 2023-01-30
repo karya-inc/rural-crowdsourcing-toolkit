@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>      
+    <string name="language_name">अवधी</string>
+    <string name="unknown_error">कोनव अनजानी गलती होय गय अहै। किरपा कय के कोर्डिनेटर से संपर्क करयं।</string>
+    <string name="consent_form_title">सहमत पत्र</string>
+    <string name="consent_form_agree">राजी अही/सहमत अही</string>
+    <string name="consent_form_disagree">हम हिस्सा नहीं लिया चाहित</string>
+    <string name="phone_number_title">फोन नंबर</string>
+    <string name="phone_number_prompt">कार्या पै पंजीकरण करय के खातिर किरपा कय के आपन फोन नंबर लिखयं</string>
+    <string name="unable_to_generate_otp">हम यह फोन नंबर के बरे ओ टी पी जनरेट नहीं कय पाइन। किरपा कयके नंबर कय जांच करय या बाद मा कोशिश करयं।</string>
+    <string name="access_code_already_used">एक्सेस कोड पहिले से दुसरे नंबर पै पंजीकृत अहै । नवा एक्सेस कोड के बरे किरपा कय के कोर्डिनेटर से संपर्क करयं।</string>
+    <string name="otp_title">ओ टी पी</string>
+    <string name="otp_prompt">हम 0000000000 पै एसएमएम के द्वारा छ: अंक कय ओ टी पी भेजे अही । किरपा कय के ओ टी पी नीचे डालयं।</string>
+    <string name="resend_otp">फिर से ओ टी पी भेजयं।</string>
+    <string name="change_phone_number">फोन नंबर बदलयं।</string>
+    <string name="invalid_otp">आप गलत ओटीपी डाल देहे अहैं ।</string>
+    <string name="dashboard_title">डैशबोर्ड/नियंत्रण पट्ट</string>
+    <string name="sync_prompt">काम जमा करयं/ नवा काम पावयं।</string>
+    <string name="tasks_available">उपलब्ध अहै ।</string>
+    <string name="tasks_completed">पूरा होय गा ।</string>
+    <string name="tasks_submitted">जमा होय गा ।</string>
+    <string name="tasks_verified">जांच होय गय अहै ।</string>
+    <string name="sync_prompt_message">आप उ काम पूरा कय लेहे अहैं जौन सर्बर पय जमा कीन जाय सकत है । का अब आप काम जमा करा चाहा थीं ?</string>
+    <string name="yes">हाँ</string>
+    <string name="no">नाही</string>
+    <string name="reset_assignment_warning">कुछ आउटपुट फाइल गायब रहीं ।</string>
+    <string name="upload_file_error">फ़ाइल अपलोड करत के समय त्रुटि देखावत अहै । किरपा कय के अपने कोर्डिनेटर का संपर्क करयं।</string>
+    <string name="send_db_error">काम जमा करत कईं त्रुटि देखावत अहै ।किरपा कय के अपने कोर्डिनेटर का संपर्क करयं।</string>
+    <string name="receive_db_error">काम मिलय के समय त्रुटि देखावत अहै। किरपा कय के अपने कोर्डिनेटर का संपर्क करयं।</string>
+    <string name="download_file_error">फ़ाइल डाऊनलोड करत कई त्रुटि देखावत अहै । किरपा कय के अपने कोर्डिनेटर का संपर्क करयं।</string>
+    <string name="received_verified_error">सत्यापन प्राप्त होय के समय त्रुटि देखावत अहै । किरपा कय के अपने कोर्डिनेटर का संपर्क करयं।</string>
+    <string name="app_name">कार्या</string>
+    
+</resources>

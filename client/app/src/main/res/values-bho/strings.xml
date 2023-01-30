@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>      
+    <string name="language_name">भोजपुरी </string>
+    <string name="unknown_error">कौनो अंजान गल्ती भइल बाटे। कृपया आपन कोर्डिनेटर ले पुछीं।</string>
+    <string name="consent_form_title">अनुमति पत्र।</string>
+    <string name="consent_form_agree">सहमत बानी।</string>
+    <string name="consent_form_disagree">हम भाग ना लेवे के चाह तनी।</string>
+    <string name="phone_number_title">फोन नम्बर।</string>
+    <string name="phone_number_prompt">कार्या पर पंजीकरण करे लागी आपन फोन नम्बर निचे लिखीं।</string>
+    <string name="unable_to_generate_otp">ई फोन नम्बर लागी ओ टी पी ना बन सकत बा। कृपया नम्बर के जांच करीं अउर फिरु प्रयास करीं।</string>
+    <string name="access_code_already_used">ई एक्सिस कोड कौनो दुसर फोन नम्बर पर पहिले से दर्ज बाटे। कृपया नया एक्सिस कोड लागी कोर्डिनेटर ले सम्पर्क करीं।</string>
+    <string name="otp_title">ओ टी पी</string>
+    <string name="otp_prompt">6 अंक के ओ टी पी एस एम एस ले 000000000 पर भेजल गइल बा। कृपया उ ओ टी पी के नीचे लिखीं।</string>
+    <string name="resend_otp"></string>
+    <string name="change_phone_number">फोन नम्बर के बदलीं।</string>
+    <string name="invalid_otp">रउआ गलत ओ टी पी डाल्ले बानी।</string>
+    <string name="dashboard_title">डैश्बोर्ड</string>
+    <string name="sync_prompt">काम जमा करीं / नया काम लीं।</string>
+    <string name="tasks_available">मौजूद बा।</string>
+    <string name="tasks_completed">पूरा भइल।</string>
+    <string name="tasks_submitted">जमा भइल।</string>
+    <string name="tasks_verified">जांच भइल।</string>
+    <string name="sync_prompt_message">राउर काम पूरा कर होगइल बा, जेकरा सर्वर पर जमा करल जा सकेला। का ओकरा के अखनी जमा करे के चाहतनी ?</string>
+    <string name="yes">हां।</string>
+    <string name="no">ना।</string>
+    <string name="reset_assignment_warning">कुछ आउटपुट फाइल सब गायब रहे।</string>
+    <string name="upload_file_error">फाइल अपलोड करे समय कौनो गडबड़ी होता। कृपया आपन कोर्डिनेटर ले संपर्क करीं।</string>
+    <string name="send_db_error">फाइल भेजे समय कौनो गडबड़ी होता। कृपया आपन कोर्डिनेटर ले संपर्क करीं।</string>
+    <string name="receive_db_error">फाइल लेवे समय कौनो गड़बड़ी होता। कृपया आपन कोर्डिनेटर ले संपर्क करीं।</string>
+    <string name="download_file_error">फाइल डाउनलोड करे समय कौनो गड़बड़ी होता। कृपया आपन कोर्डिनेटर ले संपर्क करीं।</string>
+    <string name="received_verified_error">फाइल जांच करे समय कौनो गड़बड़ी होता। कृपया आपन कोर्डिनेटर ले संपर्क करीं।</string>
+    <string name="app_name">कार्या</string>
+    
+</resources>
