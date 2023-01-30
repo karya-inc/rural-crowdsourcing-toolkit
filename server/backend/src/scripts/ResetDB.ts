@@ -23,7 +23,7 @@ async function recreateAllTables() {
   logger.info(`Recreating all tables`);
   await ServerDbFunctions.dropAllTables();
   await ServerDbFunctions.createAllTables();
-  await DataMigrationFunctions.alterTableColumns();
+  await DataMigrationFunctions.createAllMigrations();
   logger.info(`Tables recreated`);
 }
 
