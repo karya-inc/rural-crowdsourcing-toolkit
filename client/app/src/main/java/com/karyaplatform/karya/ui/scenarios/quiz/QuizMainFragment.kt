@@ -5,6 +5,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -76,11 +77,13 @@ class QuizMainFragment: BaseMTRendererFragment(R.layout.microtask_quiz) {
 
           question.options?.forEach { option ->
             val button = ThemedButton(requireContext())
+            val params = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT)
+            params.setMargins(10, 0, 10, 20)
             button.text = option
-            button.tvText.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(ssp.dimen._20ssp))
-            button.tvSelectedText.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(ssp.dimen._20ssp))
+            // button.tvText.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(ssp.dimen._20ssp))
+            // button.tvSelectedText.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(ssp.dimen._20ssp))
             button.selectedBgColor = R.color.c_dark_green
-            mcqResponseGroup.addView(button, ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+            mcqResponseGroup.addView(button, params)
           }
 
           mcqResponseGroup.selectableAmount = if (question.multiple == false) 1 else question.options!!.size
