@@ -45,7 +45,7 @@ export function knexTableSpecAddColumn<T extends string, S extends string, O ext
         const knexColSpecs = extraColumns.map((column) => knexColumnSpec(column));
         return extraColumns?.length ? `
         export async function alterTableColumns${name}() {
-        await knex.schema.alterTable('${name}', async (table) => {
+        return knex.schema.alterTable('${name}', async (table) => {
           ${knexColSpecs.join('\n')}
         });
       }` : ""
