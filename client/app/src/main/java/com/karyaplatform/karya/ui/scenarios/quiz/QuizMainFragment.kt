@@ -9,6 +9,8 @@ import android.widget.RelativeLayout
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipDrawable
 import com.karyaplatform.karya.R
 import com.karyaplatform.karya.ui.scenarios.common.BaseMTRendererFragment
 import com.karyaplatform.karya.utils.extensions.gone
@@ -18,11 +20,10 @@ import com.karyaplatform.karya.utils.extensions.viewLifecycleScope
 import com.karyaplatform.karya.utils.extensions.visible
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.microtask_quiz.*
-import nl.bryanderidder.themedtogglebuttongroup.ThemedButton
 import com.intuit.ssp.R as ssp
 
 @AndroidEntryPoint
-class QuizMainFragment: BaseMTRendererFragment(R.layout.microtask_quiz) {
+class QuizMainFragment : BaseMTRendererFragment(R.layout.microtask_quiz) {
   override val viewModel: QuizViewModel by viewModels()
   private val args: QuizMainFragmentArgs by navArgs()
 
@@ -59,11 +60,11 @@ class QuizMainFragment: BaseMTRendererFragment(R.layout.microtask_quiz) {
       when (question.type) {
         QuestionType.invalid -> {
           textResponseEt.invisible()
-          mcqResponseGroup.invisible()
+          mcqChipGroup.invisible()
         }
 
         QuestionType.text -> {
-          mcqResponseGroup.gone()
+          mcqChipGroup.gone()
           textResponseEt.visible()
           textResponseEt.minLines = if (question.long == true) 3 else 1
         }
@@ -71,22 +72,33 @@ class QuizMainFragment: BaseMTRendererFragment(R.layout.microtask_quiz) {
         QuestionType.mcq -> {
           textResponseEt.invisible()
           textResponseEt.minLines = 2
-          mcqResponseGroup.visible()
+          mcqChipGroup.removeAllViews()
+          mcqChipGroup.visible()
 
-          mcqResponseGroup.removeAllViews()
+          mcqChipGroup.isSingleSelection = question.multiple == false
+          val chipStyle =
+            if (question.multiple == true) R.style.Widget_MaterialComponents_Chip_Filter else R.style.Widget_MaterialComponents_Chip_Choice
 
           question.options?.forEach { option ->
-            val button = ThemedButton(requireContext())
-            val params = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT)
-            params.setMargins(10, 0, 10, 20)
-            button.text = option
-            // button.tvText.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(ssp.dimen._20ssp))
-            // button.tvSelectedText.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(ssp.dimen._20ssp))
-            button.selectedBgColor = R.color.c_dark_green
-            mcqResponseGroup.addView(button, params)
-          }
 
-          mcqResponseGroup.selectableAmount = if (question.multiple == false) 1 else question.options!!.size
+            val chip = Chip(requireContext())
+            val chipDrawable = ChipDrawable.createFromAttributes(
+              requireContext(),
+              null,
+              0,
+              chipStyle
+            )
+            chip.setChipDrawable(chipDrawable)
+            chip.text = option
+            chip.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(ssp.dimen._14ssp))
+            mcqChipGroup.addView(
+              chip,
+              RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            )
+            chip.setOnCheckedChangeListener { compoundButton, checked ->
+              viewModel.updateMCQResponse(option, checked)
+            }
+          }
         }
       }
     }
@@ -100,10 +112,6 @@ class QuizMainFragment: BaseMTRendererFragment(R.layout.microtask_quiz) {
 
     textResponseEt.doAfterTextChanged {
       viewModel.updateTextResponse(textResponseEt.text.toString())
-    }
-
-    mcqResponseGroup.setOnSelectListener { button ->
-      viewModel.updateMCQResponse(button.text)
     }
   }
 }

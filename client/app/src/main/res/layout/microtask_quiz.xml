@@ -41,17 +41,15 @@
         android:paddingVertical="@dimen/_20sdp"
         app:layout_constraintTop_toBottomOf="@id/inputFrame">
 
-        <nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup
-            android:id="@+id/mcqResponseGroup"
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/mcqChipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:flexWrap="wrap"
-            app:justifyContent="space_between"
             app:layout_constraintBottom_toTopOf="@id/textResponseEt"
-            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent">
-        </nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup>
+
+        </com.google.android.material.chip.ChipGroup>
 
         <EditText
             android:id="@+id/textResponseEt"
@@ -61,7 +59,7 @@
             android:layout_marginHorizontal="@dimen/_10sdp"
             app:layout_constraintEnd_toStartOf="@id/nextBtn"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/mcqResponseGroup"
+            app:layout_constraintTop_toBottomOf="@id/mcqChipGroup"
             tools:text="My Name" />
 
         <include

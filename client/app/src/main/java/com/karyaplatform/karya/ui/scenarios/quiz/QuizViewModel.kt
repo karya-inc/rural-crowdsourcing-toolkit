@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.karyaplatform.karya.data.manager.AuthManager
 import com.karyaplatform.karya.data.repo.AssignmentRepository
 import com.karyaplatform.karya.data.repo.MicroTaskRepository
@@ -26,7 +27,7 @@ constructor(
   @FilesDir fileDirPath: String,
   authManager: AuthManager,
   dataStore: DataStore<Preferences>
-): BaseMTRendererViewModel(
+) : BaseMTRendererViewModel(
   assignmentRepository,
   taskRepository,
   microTaskRepository,
@@ -46,7 +47,7 @@ constructor(
   private val _textResponse: MutableStateFlow<String> = MutableStateFlow("")
 
   // MCQ response
-  private val _mcqResponse: MutableStateFlow<String> = MutableStateFlow("")
+  private val _mcqResponse: MutableStateFlow<List<String>> = MutableStateFlow(listOf())
 
   /**
    * Setup quiz microtask
@@ -67,8 +68,11 @@ constructor(
   /**
    * Update mcq response
    */
-  fun updateMCQResponse(value: String) {
-    _mcqResponse.value = value
+  fun updateMCQResponse(value: String, checked: Boolean) {
+    val current: MutableList<String> = mutableListOf()
+    current.addAll(_mcqResponse.value.filter { v -> v != value })
+    if (checked) current.add(value)
+    _mcqResponse.value = current.toList()
   }
 
   /**
@@ -76,16 +80,21 @@ constructor(
    */
   fun submitResponse() {
     val key = _question.value.key
-    val res = when (_question.value.type) {
-      QuestionType.text -> _textResponse.value
-      QuestionType.mcq -> _mcqResponse.value
+    when (_question.value.type) {
+      QuestionType.text -> {
+        outputData.addProperty(key, _textResponse.value)
+      }
+      QuestionType.mcq -> {
+        val result = JsonArray()
+        _mcqResponse.value.forEach { v -> result.add(v) }
+        outputData.add(key, result)
+      }
       else -> "invalid"
     }
-    outputData.addProperty(key, res)
 
     // Clear out response
     _textResponse.value = ""
-    _mcqResponse.value = ""
+    _mcqResponse.value = listOf()
 
     viewModelScope.launch {
       completeAndSaveCurrentMicrotask()
