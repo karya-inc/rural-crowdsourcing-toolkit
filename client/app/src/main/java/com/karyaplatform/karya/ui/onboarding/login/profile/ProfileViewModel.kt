@@ -47,7 +47,7 @@ constructor(
         val name = worker.profile!!.asJsonObject.get("name").asString
         val genderString = worker.profile!!.asJsonObject.get("gender").asString
         val gender = if (genderString == "MALE") Gender.MALE else Gender.FEMALE
-        val yob = worker.profile!!.asJsonObject.get("yob").asString
+        val yob = "0"
         _profileUiState.value = ProfileUiState.Initial(
           ProfileData(
             name,
@@ -64,8 +64,7 @@ constructor(
       _profileUiState.value = ProfileUiState.Loading
       // If either of the fields are empty
       if (profileData.name.isNullOrEmpty() ||
-        profileData.gender == null ||
-        profileData.yob.isNullOrEmpty()) {
+        profileData.gender == null) {
         _profileUiState.value = ProfileUiState.Error(Throwable())
         return@launch
       }
@@ -73,12 +72,15 @@ constructor(
       val profile = JsonObject()
       profile.addProperty("name", profileData.name)
       profile.addProperty("gender", profileData.gender.toString())
-      profile.addProperty("yob", profileData.yob)
+      profile.addProperty("yob", "0")
+      profile.addProperty("device-model", android.os.Build.MODEL)
+      profile.addProperty("device-name", android.os.Build.DEVICE)
+      profile.addProperty("manufacturer", android.os.Build.MANUFACTURER)
 
       // Send the profile to server
       workerRepository.updateWorkerProfile(worker.idToken!!, profile)
         .onEach { workerResponse ->
-          workerRepository.upsertWorker(worker.copy(profile=workerResponse.profile))
+          workerRepository.upsertWorker(worker.copy(profile = workerResponse.profile))
           _profileUiState.value = ProfileUiState.Success
           handleNavigation()
         }

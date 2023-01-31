@@ -10,7 +10,11 @@ sealed class ProfileUiState {
   object Success : ProfileUiState()
 }
 
-data class ProfileData(val name: String?, val gender: Gender?, val yob: String?)
+data class ProfileData(
+  val name: String?,
+  val gender: Gender?,
+  val yob: String?
+)
 
 enum class Gender {
   MALE,

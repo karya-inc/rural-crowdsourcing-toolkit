@@ -164,8 +164,7 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
     with(binding) {
       val nameEmpty = nameInputEt.text.isNullOrEmpty()
       val noGender = genderRg.checkedButtonId == -1
-      val yobEmpty = yobInputEt.text.isNullOrEmpty()
-      if (nameEmpty || noGender || yobEmpty) {
+      if (nameEmpty || noGender) {
         disableSubmit()
       } else {
         enableSubmit()
