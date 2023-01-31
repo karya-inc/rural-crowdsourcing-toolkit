@@ -11,6 +11,8 @@ data class Question(
   val question: String = "",
   val key: String = "",
   val long: Boolean? = false,
+  val numeric: Boolean? = false,
+  val range: ArrayList<Int>? = arrayListOf(),
   val options: ArrayList<String>? = arrayListOf(),
   val multiple: Boolean? = false
 )
