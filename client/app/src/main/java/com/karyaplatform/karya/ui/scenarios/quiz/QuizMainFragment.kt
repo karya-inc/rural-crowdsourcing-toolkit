@@ -1,11 +1,13 @@
 package com.karyaplatform.karya.ui.scenarios.quiz
 
 import android.os.Bundle
+import android.text.InputType
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -66,7 +68,13 @@ class QuizMainFragment : BaseMTRendererFragment(R.layout.microtask_quiz) {
         QuestionType.text -> {
           mcqChipGroup.gone()
           textResponseEt.visible()
-          textResponseEt.minLines = if (question.long == true) 3 else 1
+          if (question.numeric == true) {
+            textResponseEt.inputType = InputType.TYPE_CLASS_NUMBER
+            textResponseEt.setLines(1)
+          } else {
+            textResponseEt.inputType = InputType.TYPE_CLASS_TEXT
+            textResponseEt.minLines = if (question.long == true) 3 else 1
+          }
         }
 
         QuestionType.mcq -> {
@@ -106,6 +114,20 @@ class QuizMainFragment : BaseMTRendererFragment(R.layout.microtask_quiz) {
 
   private fun setupListeners() {
     nextBtn.setOnClickListener {
+
+      // Check for input is in range when question is of type numeric and range is given
+      if (viewModel.question.value.type == QuestionType.text) {
+        if (viewModel.question.value.numeric == true) {
+          val value = Integer.parseInt(textResponseEt.text.toString())
+          val range = viewModel.question.value.range
+          if (range != null && range.isNotEmpty() && value !in range[0]..range[1]) {
+            Toast.makeText(requireContext(), "Value should be in range ${range[0]} - ${range[1]}", Toast.LENGTH_SHORT)
+              .show()
+            return@setOnClickListener
+          }
+        }
+      }
+
       viewModel.submitResponse()
       textResponseEt.setText("")
     }
