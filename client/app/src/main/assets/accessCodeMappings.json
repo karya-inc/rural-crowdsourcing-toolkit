@@ -10,7 +10,8 @@
     "https://karyabox006.eastus.cloudapp.azure.com",
     "https://karyabox007.eastus.cloudapp.azure.com",
     "https://karyabox008.eastus.cloudapp.azure.com",
-    "https://karyabox009.eastus.cloudapp.azure.com"
+    "https://karyabox009.eastus.cloudapp.azure.com",
+    "https://karyanltmbox.centralindia.cloudapp.azure.com"
   ],
   "templates": []
 }
