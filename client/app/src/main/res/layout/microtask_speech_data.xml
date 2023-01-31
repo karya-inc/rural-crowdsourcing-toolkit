@@ -17,10 +17,19 @@
         app:layout_constraintTop_toBottomOf="@id/microtaskTb"
         tools:text="@string/speech_recording_instruction" />
 
+    <com.jsibbold.zoomage.ZoomageView
+        android:id="@+id/promptImage"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/hintAudioBtn"
+        app:layout_constraintTop_toBottomOf="@id/instructionTv" />
+
     <FrameLayout
         android:id="@+id/inputFrame"
         style="@style/MicrotaskInputFrame"
-        android:layout_marginVertical="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
         app:layout_constraintBottom_toTopOf="@id/hintAudioBtn"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/instructionTv">
@@ -50,14 +59,13 @@
         android:id="@+id/hintAudioBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/c_light_grey"
+        android:text="Play Hint Audio"
+        android:textColor="@color/c_black"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/recordLengthLL"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:backgroundTint="@color/c_light_grey"
-        android:textColor="@color/c_black"
-        android:text="Play Hint Audio"
-        android:visibility="gone"
-        />
+        app:layout_constraintRight_toRightOf="parent" />
 
     <LinearLayout
         android:id="@+id/recordLengthLL"

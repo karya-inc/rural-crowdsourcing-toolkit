@@ -142,6 +142,9 @@ constructor(
   private val _hintAvailable: MutableStateFlow<Boolean> = MutableStateFlow(false)
   val hintAvailable = _hintAvailable.asStateFlow()
 
+  private val _promptImagePath: MutableStateFlow<String?> = MutableStateFlow(null)
+  val promptImagePath = _promptImagePath.asStateFlow()
+
   private val _playRecordPromptTrigger: MutableStateFlow<Boolean> = MutableStateFlow(false)
   val playRecordPromptTrigger = _playRecordPromptTrigger.asStateFlow()
 
@@ -303,11 +306,19 @@ constructor(
       } else {
         _hintAvailable.value = false
       }
+
+      if (inputFiles.has("prompt_image")) {
+        val promptImageName = inputFiles.get("prompt_image").asString
+        _promptImagePath.value = microtaskInputContainer.getMicrotaskInputFilePath(currentMicroTask.id, promptImageName)
+      } else {
+        _promptImagePath.value = null
+      }
     }
   }
 
   override fun onFirstTimeVisit() {
-    onAssistantClick()
+    moveToPrerecording()
+    // onAssistantClick()
   }
 
   override fun onSubsequentVisit() {

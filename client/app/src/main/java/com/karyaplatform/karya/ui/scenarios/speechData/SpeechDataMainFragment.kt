@@ -1,6 +1,8 @@
 package com.karyaplatform.karya.ui.scenarios.speechData
 
 import android.app.AlertDialog
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -243,6 +245,18 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
         hintAudioBtn.visible()
       } else {
         hintAudioBtn.gone()
+      }
+    }
+
+    viewModel.promptImagePath.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { path ->
+      if (path != null) {
+        inputFrame.invisible()
+        promptImage.visible()
+        val image: Bitmap = BitmapFactory.decodeFile(path)
+        promptImage.setImageBitmap(image)
+      } else {
+        promptImage.invisible()
+        inputFrame.visible()
       }
     }
 
