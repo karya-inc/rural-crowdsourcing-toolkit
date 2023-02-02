@@ -72,6 +72,9 @@ constructor(
   private var _rateOnlyAccuracy: MutableStateFlow<Boolean> = MutableStateFlow(false)
   val rateOnlyAccuracy = _rateOnlyAccuracy.asStateFlow()
 
+  private val _promptImagePath: MutableStateFlow<String?> = MutableStateFlow(null)
+  val promptImagePath = _promptImagePath.asStateFlow()
+
   /** Verification status */
   private var _accuracyRating: MutableStateFlow<Int> = MutableStateFlow(R.string.rating_undefined)
   val accuracyRating = _accuracyRating.asStateFlow()
@@ -139,6 +142,17 @@ constructor(
       currentMicroTask.input.asJsonObject.getAsJsonObject("files").get("recording").asString
     val recordingFile =
       microtaskInputContainer.getMicrotaskInputFilePath(currentMicroTask.id, recordingFileName)
+
+    if (currentMicroTask.input.asJsonObject.has("files")) {
+      val inputFiles = currentMicroTask.input.asJsonObject.getAsJsonObject("files")
+      if (inputFiles.has("prompt_image")) {
+        val promptImageName = inputFiles.get("prompt_image").asString
+        _promptImagePath.value = microtaskInputContainer.getMicrotaskInputFilePath(currentMicroTask.id, promptImageName)
+      } else {
+        _promptImagePath.value = null
+      }
+    }
+
 
     _sentenceTvText.value = sentence
 

@@ -16,6 +16,15 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/microtaskTb" />
 
+    <com.jsibbold.zoomage.ZoomageView
+        android:id="@+id/promptImage"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/playbackProgress"
+        app:layout_constraintTop_toBottomOf="@id/instructionTv" />
+
     <FrameLayout
         android:id="@+id/inputFrame"
         style="@style/MicrotaskInputFrame"
@@ -169,6 +178,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/_10sdp"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/buttonGroup">
 
         <TextView

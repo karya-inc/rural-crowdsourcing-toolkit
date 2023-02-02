@@ -1,6 +1,8 @@
 package com.karyaplatform.karya.ui.scenarios.speechVerification
 
 import android.app.AlertDialog
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,7 +22,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.microtask_common_back_button.view.*
 import kotlinx.android.synthetic.main.microtask_common_next_button.view.*
 import kotlinx.android.synthetic.main.microtask_common_playback_progress.view.*
+import kotlinx.android.synthetic.main.microtask_speech_data.*
 import kotlinx.android.synthetic.main.microtask_speech_verification.*
+import kotlinx.android.synthetic.main.microtask_speech_verification.backBtn
+import kotlinx.android.synthetic.main.microtask_speech_verification.inputFrame
+import kotlinx.android.synthetic.main.microtask_speech_verification.nextBtnCv
+import kotlinx.android.synthetic.main.microtask_speech_verification.playBtn
+import kotlinx.android.synthetic.main.microtask_speech_verification.promptImage
+import kotlinx.android.synthetic.main.microtask_speech_verification.sentenceTv
 
 @AndroidEntryPoint
 class SpeechVerificationFragment : BaseMTRendererFragment(R.layout.microtask_speech_verification) {
@@ -193,7 +202,17 @@ class SpeechVerificationFragment : BaseMTRendererFragment(R.layout.microtask_spe
       }
     }
 
-
+    viewModel.promptImagePath.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { path ->
+      if (path != null) {
+        inputFrame.invisible()
+        promptImage.visible()
+        val image: Bitmap = BitmapFactory.decodeFile(path)
+        promptImage.setImageBitmap(image)
+      } else {
+        promptImage.invisible()
+        inputFrame.visible()
+      }
+    }
   }
 
   private fun showErrorDialog(msg: String) {
