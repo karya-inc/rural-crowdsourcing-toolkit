@@ -279,6 +279,10 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
       (binding.tasksRv.adapter as TaskListAdapter).updateList(taskInfoData)
     }
 
+    viewLifecycleScope.launch {
+      checkToShowTaskCompletionMessage(data.taskInfoData)
+    }
+
     // Show a dialog box to sync with server if completed tasks and internet available
     if (requireContext().isNetworkAvailable()) {
       for (taskInfo in data.taskInfoData) {
