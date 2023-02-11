@@ -85,7 +85,11 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
     targetsDataList.add(
       TargetData(
         sentenceTv,
-        RoundedRectangle(sentenceTv.height.toFloat() + spotlightPadding, sentenceTv.width.toFloat() + spotlightPadding, 5F),
+        RoundedRectangle(
+          sentenceTv.height.toFloat() + spotlightPadding,
+          sentenceTv.width.toFloat() + spotlightPadding,
+          5F
+        ),
         R.layout.spotlight_target_temp,
         AssistantAudio.RECORD_SENTENCE,
       )
@@ -323,6 +327,30 @@ class SpeechDataMainFragment : BaseMTRendererFragment(R.layout.microtask_speech_
           viewModel.setSkipTaskAlertTrigger(false)
           viewModel.moveToPrerecording()
         }
+        val dialog = builder.create()
+        dialog.show()
+      }
+    }
+
+    viewModel.maxRecordingLengthExceeded.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { count ->
+      if (count > 0) {
+        val builder = AlertDialog.Builder(requireContext())
+        val message =
+          getString(R.string.max_recordring_length_exceeded).replace("_N_", viewModel.maxRecordingLength.toString())
+        builder.setMessage(message)
+        builder.setNeutralButton(R.string.okay) { _, _ -> }
+        val dialog = builder.create()
+        dialog.show()
+      }
+    }
+
+    viewModel.minRecordingLengthNotExceeded.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { count ->
+      if (count > 0) {
+        val builder = AlertDialog.Builder(requireContext())
+        val message =
+          getString(R.string.min_recordring_length_not_exceeded).replace("_N_", viewModel.minRecordingLength.toString())
+        builder.setMessage(message)
+        builder.setNeutralButton(R.string.okay) { _, _ -> }
         val dialog = builder.create()
         dialog.show()
       }

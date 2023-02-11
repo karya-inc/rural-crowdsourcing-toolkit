@@ -17,11 +17,8 @@ import com.karyaplatform.karya.data.repo.TaskRepository
 import com.karyaplatform.karya.injection.qualifier.FilesDir
 import com.karyaplatform.karya.ui.scenarios.common.BaseMTRendererViewModel
 import com.karyaplatform.karya.ui.scenarios.speechData.SpeechDataMainViewModel.ButtonState.*
-import com.karyaplatform.karya.utils.PreferenceKeys
 import com.karyaplatform.karya.utils.RawToAACEncoder
-import com.karyaplatform.karya.ui.scenarios.speechData.SpeechDataMainViewModel.ButtonState.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.android.synthetic.main.microtask_speech_data.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -122,7 +119,7 @@ constructor(
   /** UI State */
   @JvmField
   var activityState: ActivityState = ActivityState.INIT
-  var previousActivityState: ActivityState = ActivityState.INIT
+  private var previousActivityState: ActivityState = ActivityState.INIT
 
   private val _recordBtnState: MutableStateFlow<ButtonState> = MutableStateFlow(DISABLED)
   val recordBtnState = _recordBtnState.asStateFlow()
@@ -151,6 +148,12 @@ constructor(
   private val _skipTaskAlertTrigger: MutableStateFlow<Boolean> = MutableStateFlow(false)
   val skipTaskAlertTrigger = _skipTaskAlertTrigger.asStateFlow()
 
+  private val _maxRecordingLengthExceeded = MutableStateFlow(0)
+  val maxRecordingLengthExceeded = _maxRecordingLengthExceeded.asStateFlow()
+
+  private val _minRecordingLengthNotExceeded = MutableStateFlow(0)
+  val minRecordingLengthNotExceeded = _minRecordingLengthNotExceeded.asStateFlow()
+
   private val _microTaskInstruction: MutableStateFlow<String> = MutableStateFlow("")
   val microTaskInstruction = _microTaskInstruction.asStateFlow()
 
@@ -174,13 +177,16 @@ constructor(
 
   /** Microtask config */
   private var allowSkipping: Boolean = false
+  var maxRecordingLength: Int = 10000
+  var minRecordingLength: Int = 0
 
-  private var preRecordBuffer: Array<ByteArray>
-  var preRecordBufferConsumed: Array<Int> = Array(2) { 0 }
+  private var preRecordBuffer: Array<ByteArray> = Array(2) { ByteArray(maxPreRecordBytes) }
+  private var preRecordBufferConsumed: Array<Int> = Array(2) { 0 }
   private var currentPreRecordBufferIndex = 0
   private var totalRecordedBytes = 0
-  var preRecordingJob: Job? = null
+  private var preRecordingJob: Job? = null
   private var recordingLength: Float = 0.0f
+  private var recordingLengthMs: Int = 0
 
   private var recordBuffers: ArrayList<ByteArray> = arrayListOf()
   private var currentRecordBufferConsumed = 0
@@ -203,11 +209,6 @@ constructor(
   /** Playback progress thread */
   private var playbackProgressThread: Thread? = null
 
-  init {
-    /** setup [preRecordBuffer] */
-    preRecordBuffer = Array(2) { ByteArray(maxPreRecordBytes) }
-  }
-
   /**
    * Initialize speech data collection parameters
    */
@@ -219,20 +220,18 @@ constructor(
     }
 
     samplingRate = try {
-      val rate = task.params.asJsonObject.get("sampling_rate").asString
-      when (rate) {
+      when (task.params.asJsonObject.get("sampling_rate").asString) {
         "8k" -> 8000
         "16k" -> 16000
         "44k" -> 44100
         else -> 44100
       }
     } catch (e: Exception) {
-      44100
+      16000
     }
 
     audioEncoding = try {
-      val bitwidth = task.params.asJsonObject.get("bitwidth").asString
-      when (bitwidth) {
+      when (task.params.asJsonObject.get("bitwidth").asString) {
         "8" -> AudioFormat.ENCODING_PCM_8BIT
         "16" -> AudioFormat.ENCODING_PCM_16BIT
         else -> AudioFormat.ENCODING_PCM_16BIT
@@ -295,6 +294,20 @@ constructor(
       task.params.asJsonObject.get("allowSkipping").asBoolean
     } catch (e: Exception) {
       false
+    }
+
+    /** Get max recording length */
+    maxRecordingLength = try {
+      task.params.asJsonObject.get("maxRecordingLength").asInt
+    } catch (e: Exception) {
+      10000
+    }
+
+    /** Get min recording length */
+    minRecordingLength = try {
+      task.params.asJsonObject.get("minRecordingLength").asInt
+    } catch (e: Exception) {
+      0
     }
 
     // Check if there is hint audio available
@@ -686,7 +699,7 @@ constructor(
   }
 
   /** Set the state of the activity to the target state */
-  fun setActivityState(targetState: ActivityState) {
+  private fun setActivityState(targetState: ActivityState) {
     // log the state transition
     val message = JsonObject()
     message.addProperty("type", "->")
@@ -1078,6 +1091,7 @@ constructor(
       val milliseconds = duration ?: samplesToTime(totalRecordedBytes / 2)
       val centiSeconds = (milliseconds / 10) % 100
       val seconds = milliseconds / 1000
+      recordingLengthMs = milliseconds
       recordingLength = milliseconds.toFloat() / 1000
       _recordSecondsTvText.value = seconds.toString()
       _recordCentiSecondsTvText.value = "%02d".format(Locale.ENGLISH, centiSeconds)
@@ -1245,7 +1259,17 @@ constructor(
       CoroutineScope(Dispatchers.IO).launch {
         audioFileFlushJob!!.join()
         if (activityState == ActivityState.RECORDED) {
-          if (noForcedReplay) {
+          if (recordingLengthMs > maxRecordingLength * 1000) {
+            setActivityState(ActivityState.INIT)
+            setupMicrotask()
+            moveToPrerecording()
+            _maxRecordingLengthExceeded.value = _maxRecordingLengthExceeded.value + 1
+          } else if (recordingLengthMs < minRecordingLength * 1000) {
+            setActivityState(ActivityState.INIT)
+            setupMicrotask()
+            moveToPrerecording()
+            _minRecordingLengthNotExceeded.value = _minRecordingLengthNotExceeded.value + 1
+          } else if (noForcedReplay) {
             setButtonStates(ENABLED, ENABLED, ENABLED, ENABLED, true)
             setActivityState(ActivityState.COMPLETED)
           } else {
