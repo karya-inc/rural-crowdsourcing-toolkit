@@ -280,8 +280,8 @@
 
     <!-- Speech recording strings -->
     <string name="speech_recording_instruction">Record the sentence below</string>
-    <string name="max_recordring_length_exceeded">Recording cannot be longer than _N_ seconds</string>
-    <string name="min_recordring_length_not_exceeded">Recording cannot be shorter than _N_ seconds</string>
+    <string name="max_recordring_length_exceeded">Recording cannot be longer than _N_ seconds. Please record again.</string>
+    <string name="min_recordring_length_not_exceeded">Recording cannot be shorter than _N_ seconds. Please record again.</string>
 
     <!-- Image transcription strings -->
     <string name="image_transcription_instruction">Type what you see in the image below</string>

@@ -292,6 +292,8 @@
 
     <!-- Speech recording strings -->
     <string name="speech_recording_instruction">नीचे दिए गए वाक्य को रिकॉर्ड करें</string>
+    <string name="max_recordring_length_exceeded">रिकॉर्डिंग _N_ सेकंड से अधिक नहीं हो सकती। कृपया फिर से रिकॉर्ड करें।</string>
+    <string name="min_recordring_length_not_exceeded">रिकॉर्डिंग _N_ सेकंड से कम नहीं हो सकती। कृपया फिर से रिकॉर्ड करें।</string>
 
     <!-- Image transcription strings -->
     <string name="image_transcription_instruction">नीचे इमेज में आपको जो दिख रहा है उसे टाइप करें</string>
