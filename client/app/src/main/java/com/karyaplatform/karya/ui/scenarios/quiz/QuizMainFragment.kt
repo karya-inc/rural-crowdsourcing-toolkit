@@ -116,14 +116,17 @@ class QuizMainFragment : BaseMTRendererFragment(R.layout.microtask_quiz) {
     nextBtn.setOnClickListener {
 
       // Check for input is in range when question is of type numeric and range is given
-      if (viewModel.question.value.type == QuestionType.text) {
-        if (viewModel.question.value.numeric == true) {
-          val value = Integer.parseInt(textResponseEt.text.toString())
-          val range = viewModel.question.value.range
-          if (range != null && range.isNotEmpty() && value !in range[0]..range[1]) {
-            Toast.makeText(requireContext(), "Value should be in range ${range[0]} - ${range[1]}", Toast.LENGTH_SHORT)
-              .show()
-            return@setOnClickListener
+      val question = viewModel.question.value
+      if (question.required != null && question.required) {
+        if (question.type == QuestionType.text) {
+          if (question.numeric == true) {
+            val value = try { Integer.parseInt(textResponseEt.text.toString()) } catch (e: Exception) { 0 }
+            val range = viewModel.question.value.range
+            if (range != null && range.isNotEmpty() && value !in range[0]..range[1]) {
+              Toast.makeText(requireContext(), "Value should be in range ${range[0]} - ${range[1]}", Toast.LENGTH_SHORT)
+                .show()
+              return@setOnClickListener
+            }
           }
         }
       }

@@ -14,5 +14,6 @@ data class Question(
   val numeric: Boolean? = false,
   val range: ArrayList<Int>? = arrayListOf(),
   val options: ArrayList<String>? = arrayListOf(),
-  val multiple: Boolean? = false
+  val multiple: Boolean? = false,
+  val required: Boolean? = true
 )
