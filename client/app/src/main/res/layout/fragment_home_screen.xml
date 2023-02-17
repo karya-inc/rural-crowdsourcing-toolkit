@@ -327,6 +327,7 @@
 
             </androidx.cardview.widget.CardView>
 
+            <!--
             <androidx.cardview.widget.CardView
                 android:id="@+id/performanceCv"
                 android:layout_width="match_parent"
@@ -460,6 +461,7 @@
 
 
             </androidx.cardview.widget.CardView>
+            -->
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/earningCv"

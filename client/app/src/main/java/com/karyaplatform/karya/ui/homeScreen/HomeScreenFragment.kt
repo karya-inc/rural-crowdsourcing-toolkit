@@ -114,10 +114,12 @@ class HomeScreenFragment : BaseFragment(R.layout.fragment_home_screen) {
     // Performance summary
     viewModel.performanceSummary.observe(viewLifecycleOwner.lifecycle, lifecycleScope) { perf ->
       with(binding) {
+        /*
         recordingScore.rating = perf.recordingAccuracy
         transcriptionScore.rating = perf.transcriptionAccuracy
         typingScore.rating = perf.typingAccuracy
         imageTaskScore.rating = perf.imageAnnotationAccuracy
+        */
       }
     }
 
