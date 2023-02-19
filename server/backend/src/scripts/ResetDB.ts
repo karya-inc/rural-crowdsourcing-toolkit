@@ -23,17 +23,21 @@ async function recreateAllTables() {
   logger.info(`Recreating all tables`);
   await ServerDbFunctions.dropAllTables();
   await ServerDbFunctions.createAllTables();
-  await DataMigrationFunctions.createAllMigrations();
   logger.info(`Tables recreated`);
 }
 
+async function migrateDB() {
+  await DataMigrationFunctions.createAllMigrationsOfDropColumns();
+  await DataMigrationFunctions.createAllMigrationsOfAddColumns();
+  logger.info(`All Column Migrations Done`);
+}
+
 /** Script sequence */
-let scriptSequence = ['recreate-tables', 'auth-bootstrap'];
+let scriptSequence = ['recreate-tables', 'migrate-db', 'auth-bootstrap'];
 
 /** Main Script to reset the DB */
 (async () => {
   logger.info(`Starting reset script DB`);
-
   const option = process.argv[2] || 'all';
   if (option !== 'all') {
     if (!scriptSequence.includes(option)) {
@@ -55,6 +59,9 @@ let scriptSequence = ['recreate-tables', 'auth-bootstrap'];
     switch (action) {
       case 'recreate-tables':
         await recreateAllTables();
+        break;
+      case 'migrate-db':
+        await migrateDB();
         break;
       case 'auth-bootstrap':
         const cc = await bootstrapAuth();
