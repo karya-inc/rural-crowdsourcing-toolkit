@@ -220,12 +220,14 @@ class DashboardSyncWorker(
     val worker = authManager.getLoggedInWorker()
     checkNotNull(worker.idToken) { "Worker's idToken was null" }
 
-    val from = assignmentRepository.getNewAssignmentsFromTime(worker.id)
+    if (assignmentRepository.getIncompleteAssignments().isEmpty()) {
+      val from = assignmentRepository.getNewAssignmentsFromTime(worker.id)
 
-    // Get Assignment DB updates
-    assignmentRepository //TODO: IMPLEMENT .CATCH BEFORE .COLLECT AND SEND ERROR
-      .getNewAssignments(worker.idToken, from)
-      .collect()
+      // Get Assignment DB updates
+      assignmentRepository //TODO: IMPLEMENT .CATCH BEFORE .COLLECT AND SEND ERROR
+        .getNewAssignments(worker.idToken, from)
+        .collect()
+    }
 
     // Get Worker Balance
     try {

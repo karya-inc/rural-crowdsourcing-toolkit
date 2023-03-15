@@ -92,8 +92,8 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
     val regTime = (data[regTimeKey] ?: "0").toLong()
     val currentTime = System.currentTimeMillis()
     val diff = currentTime - regTime
-    val ngWeek = (diff / 1000 / 60 / 60 / 24 / 7) + 1
-    val ngDay = ((diff / 1000 / 60 / 60 / 24) % 7) + 1
+    val ngWeek = if (regTime == 0L) 0 else (diff / 1000 / 60 / 60 / 24 / 7) + 1
+    val ngDay = if (regTime == 0L) 0 else ((diff / 1000 / 60 / 60 / 24) % 7) + 1
 
     return Triple(ngWeek, ngDay, regTime)
   }
@@ -190,6 +190,24 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
     }
   }
 
+  private suspend fun checkToShowTaskCompletionMessage(taskInfoData: List<TaskInfo>) {
+    var totalMicrotaskCount = 0
+    taskInfoData.forEach { taskInfo ->
+      val taskMicrotaskCount =  with(taskInfo.taskStatus) {completedMicrotasks + expiredMicrotasks + skippedMicrotasks + submittedMicrotasks}
+      totalMicrotaskCount += taskMicrotaskCount
+    }
+    val weekTriple = getWorkerWeekAndDay()
+    val week = weekTriple.first
+    when(week) {
+      1L -> if (totalMicrotaskCount >= 2604) showDialogueForTaskCompletion(R.string.week_task_completed_msg)
+      2L -> if (totalMicrotaskCount >= 5883) showDialogueForTaskCompletion(R.string.week_task_completed_msg)
+      3L -> if (totalMicrotaskCount >= 9162) showDialogueForTaskCompletion(R.string.week_task_completed_msg)
+      4L -> if (totalMicrotaskCount >= 12441) showDialogueForTaskCompletion(R.string.week_task_completed_msg)
+      5L -> if (totalMicrotaskCount >= 15520) showDialogueForTaskCompletion(R.string.week_task_completed_msg)
+      else -> if (totalMicrotaskCount >= 15520) showDialogueForTaskCompletion(R.string.study_completed_msg)
+    }
+  }
+
   override fun onSessionExpired() {
     WorkManager.getInstance(requireContext()).cancelAllWork()
     super.onSessionExpired()
@@ -258,17 +276,11 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
       })
     binding.syncCv.enable()
     data.apply {
-      var totalAssignedTasks = 0
-      taskInfoData.forEach { taskInfo: TaskInfo -> totalAssignedTasks += taskInfo.taskStatus.assignedMicrotasks }
-      if (taskInfoData.isNotEmpty() && totalAssignedTasks == 0) {
-        viewLifecycleScope.launch {
-          val weekDayTriple = getWorkerWeekAndDay()
-          val week = weekDayTriple.first
-          if (week >= 5) showDialogueForTaskCompletion(R.string.study_completed_msg)
-          else if (week < 5) showDialogueForTaskCompletion(R.string.week_task_completed_msg)
-        }
-      }
       (binding.tasksRv.adapter as TaskListAdapter).updateList(taskInfoData)
+    }
+
+    viewLifecycleScope.launch {
+      checkToShowTaskCompletionMessage(data.taskInfoData)
     }
 
     // Show a dialog box to sync with server if completed tasks and internet available
@@ -461,7 +473,7 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
         viewLifecycleScope.launch {
           // Check if user is in center
           if (viewModel.workFromCenterUser.value) {
-            if (!viewModel.checkWorkFromCenterUserAuth()) {
+            if (!arrayOf("70", "71", "72", "73").contains(taskId)  && !viewModel.checkWorkFromCenterUserAuth()) {
               binding.centerCode.requestFocus()
               return@launch
             }

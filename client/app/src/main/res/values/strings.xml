@@ -216,12 +216,10 @@
 
 
     <string name="sync_prompt_message">You have completed tasks that can be submitted to the server. Do you want to submit the tasks now?</string>
-    <string name="week_tasks_completed_msg">"Congratulations! Aapka pehla Rani ka project complete ho gaya hai. Yeh ek research project tha jo complete hua hai. Agar koi aur projects aate hai, jisme aapko aur lambe samay tak job milsakta hai, hum aapko directly contact karenge. Aap Rani helpline number:+91 85913 45837
- Save kar liyega. Issi se call aayega.
-
-Hum aapko aapke performance ke hisaab se certificate denge jab aapke ghar pe hum ek survey karne aayenge.
-
-Hume asha hai ki aapko yeh Rani pe kaam ke dauran kuch naya seekhne ko mila aur aap aur kaam karna chahenge. Myna Mahila Foundation auroton ke kaam aur sehat pe kaam karti hai aur hamesha aap ko support karegi."</string>
+    <string name="study_completed_msg">Congratulations! Aapka pehla Rani ka project complete ho gaya hai. Yeh ek research project tha jo complete hua hai. Agar koi aur projects aate hai, jisme aapko aur lambe samay tak job milsakta hai, hum aapko directly contact karenge. Aap Rani helpline number:+91 85913 45837
+    Save kar liyega. Issi se call aayega.Hum aapko aapke performance ke hisaab se certificate denge jab aapke ghar pe hum ek survey karne aayenge.
+    Hume asha hai ki aapko yeh Rani pe kaam ke dauran kuch naya seekhne ko mila aur aap aur kaam karna chahenge. Myna Mahila Foundation auroton ke kaam aur sehat pe kaam karti hai aur hamesha aap ko support karegi.</string>
+    <string name="week_task_completed_msg">Congratulations! You have completed this week\'s task. You will get more tasks next week!</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
@@ -275,6 +273,7 @@ Hume asha hai ki aapko yeh Rani pe kaam ke dauran kuch naya seekhne ko mila aur 
     <string name="verification_request_processing">We are checking your payment information. Please check again in a few hours. If you still see this message one day after submitting your payment information, contact your coordinator.</string>
     <string name="verification_request_processed">To verify your payment information, we have sent you ₹2. Please confirm if you have received the amount by clicking the appropriate button.</string>
     <string name="verification_loading">Checking the status of your payment verification. Please wait.</string>
+    <string name="wait">Please wait. We are collecting details.</string>
     <string name="received_verification_amount">Yes. I have received ₹2 in my account</string>
     <string name="not_received_verification_amount">No. I have not received ₹2 in my account</string>
 
