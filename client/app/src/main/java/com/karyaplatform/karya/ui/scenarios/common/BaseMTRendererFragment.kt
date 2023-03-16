@@ -3,21 +3,36 @@ package com.karyaplatform.karya.ui.scenarios.common
 import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat.checkSelfPermission
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.karyaplatform.karya.ui.base.BaseFragment
 import com.karyaplatform.karya.utils.extensions.observe
 import com.karyaplatform.karya.R
 import com.karyaplatform.karya.utils.DateUtils
+import com.karyaplatform.karya.ui.MainActivity
+import com.karyaplatform.karya.utils.Constants
+import com.karyaplatform.karya.utils.PreferenceKeys
+import com.karyaplatform.karya.utils.extensions.dataStore
+import com.karyaplatform.karya.utils.extensions.observe
+import com.karyaplatform.karya.utils.extensions.viewLifecycleScope
 import kotlinx.android.synthetic.main.microtask_common_header.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 abstract class BaseMTRendererFragment(@LayoutRes contentLayoutId: Int) :
   BaseFragment(contentLayoutId) {
 
   abstract val viewModel: BaseMTRendererViewModel
+  private lateinit var userInteractionListener: UserInteractionListener
 
   companion object {
     /** Code to request necessary permissions */
@@ -53,6 +68,65 @@ abstract class BaseMTRendererFragment(@LayoutRes contentLayoutId: Int) :
 
     if (hasAllPermissions) {
       viewModel.getAndSetupMicrotask()
+    }
+
+
+    userInteractionListener = UserInteractionListener(
+      lifecycleOwner = viewLifecycleOwner,
+      inactivityTimeout = Constants.TIMEOUT_DURATION_MILLIS,
+      onInactivityTimeout = { viewLifecycleScope.launch { handleInactivityTimeout(it) } }
+    )
+    (requireActivity() as MainActivity).setUserInteractionCallback { userInteractionListener.restartTimeout() }
+  }
+
+  private suspend fun handleInactivityTimeout(inactivityCount: Int) {
+    val worker = authManagerBase.getLoggedInWorker()
+    val tags = worker.params!!.asJsonObject.getAsJsonArray("tags")
+    val workerTags = tags.map { it.asString }
+    if (!workerTags.contains("_handle_inactivity_")) return
+    if (inactivityCount <= Constants.MAX_ALLOWED_TIMEOUTS) {
+      var dialogTimeoutJob: Job? = null
+      val dialogBuilder = AlertDialog.Builder(requireContext())
+        .setTitle(getString(R.string.inactivity_timeout_title, (Constants.TIMEOUT_DURATION_MILLIS / 1000)))
+        .setMessage(R.string.inactivity_timeout_message)
+        .setNegativeButton(R.string.cancel_text) { _, _ ->
+          // if dialog is shown, then we're sure that userInteractionListener is initialised so it is safe to directly use restartTimeout()
+          userInteractionListener.restartTimeout()
+          // cancel the dialog timeout
+          dialogTimeoutJob?.cancel()
+        }
+        .setPositiveButton(R.string.okay) { _, _ ->
+          userInteractionListener.restartTimeout()
+          dialogTimeoutJob?.cancel()
+        }
+        .create()
+      dialogBuilder.show()
+
+      // Create a timer to auto dismiss the dialog after 30s
+      // if the dialog is dismissed manually, the job should get cancelled
+      var dialogTimer = 30
+      dialogTimeoutJob = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+        while (isActive && dialogTimer > 0) {
+          delay(1000)
+          dialogTimer--
+          Log.d("BaseMTRendererFragment::handleInactivityTimeout", "Dialog will automatically dismiss in: $dialogTimer")
+        }
+        dialogBuilder.dismiss()
+        if (isActive) findNavController().popBackStack()
+      }
+    } else {
+      // the user has passed maximum allowed timeouts
+      viewLifecycleOwner.lifecycleScope.launch {
+        viewModel.expireAllTasks()
+        Toast.makeText(
+          requireContext(),
+          getString(R.string.max_timeout_reached_msg, Constants.MAX_ALLOWED_TIMEOUTS),
+          Toast.LENGTH_SHORT
+        ).show()
+        requireContext().dataStore.edit { it[PreferenceKeys.INACTIVITY_TIMEOUT] = System.currentTimeMillis() }
+        // navigate back to dashboard
+        findNavController().popBackStack()
+      }
     }
   }
 
@@ -161,6 +235,16 @@ abstract class BaseMTRendererFragment(@LayoutRes contentLayoutId: Int) :
       builder.create()
     }
     alertDialog!!.show()
+  }
+
+  override fun onPause() {
+    super.onPause()
+    viewModel.log("BaseMTRendererFragment::onPause()")
+  }
+
+  override fun onResume() {
+    super.onResume()
+    viewModel.log("BaseMTRendererFragment::onResume()")
   }
 
 }

@@ -53,4 +53,14 @@ class MainActivity : AppCompatActivity() {
     }
 
   }
+
+    private var userInteractionCallback: () -> Unit = {}
+    fun setUserInteractionCallback(callback: () -> Unit) {
+        userInteractionCallback = callback
+    }
+
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        userInteractionCallback()
+    }
 }

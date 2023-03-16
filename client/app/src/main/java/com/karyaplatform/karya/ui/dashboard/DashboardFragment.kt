@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -23,12 +24,13 @@ import com.karyaplatform.karya.ui.base.SessionFragment
 import com.karyaplatform.karya.utils.extensions.*
 import com.karyaplatform.karya.BuildConfig
 import com.karyaplatform.karya.utils.PreferenceKeys
-import com.karyaplatform.karya.utils.extensions.*
+import com.karyaplatform.karya.utils.Constants.ALLOW_AFTER_TIMEOUT_DURATION_MILLIS
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.app_toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 private const val UNIQUE_SYNC_WORK_NAME = "syncWork"
@@ -123,6 +125,9 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
           binding.revokeWFCAuthorizationBtn.gone()
         } else {
           binding.wfcEnterCodeLL.gone()
+          if (viewModel.workerTags != null) {
+            if (viewModel.workerTags!!.contains("_wfhc_")) return@observe
+          }
           binding.revokeWFCAuthorizationBtn.visible()
         }
       }
@@ -135,6 +140,9 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
           binding.revokeWFCAuthorizationBtn.gone()
         } else {
           binding.wfcEnterCodeLL.gone()
+          if (viewModel.workerTags != null) {
+            if (viewModel.workerTags!!.contains("_wfhc_")) return@observe
+          }
           binding.revokeWFCAuthorizationBtn.visible()
         }
       }
@@ -385,7 +393,22 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
     }
   }
 
-  fun onDashboardItemClick(task: TaskInfo) {
+  private fun onDashboardItemClick(task: TaskInfo) {
+
+    val timeoutHappenedAt = runBlocking { requireContext().dataStore.data.first()[PreferenceKeys.INACTIVITY_TIMEOUT] }
+    // Timeout is not null and duration within 10 minutes, then don't navigate to task
+    val currentTime = System.currentTimeMillis()
+    if (timeoutHappenedAt != null && currentTime - timeoutHappenedAt < ALLOW_AFTER_TIMEOUT_DURATION_MILLIS) {
+      val diffMillis = (currentTime - timeoutHappenedAt)
+      val remainingTime = ALLOW_AFTER_TIMEOUT_DURATION_MILLIS - diffMillis // 10 minutes - difference
+      Toast.makeText(
+        requireContext(),
+        getString(R.string.timeout_retry_msg, remainingTime/1000),
+        Toast.LENGTH_SHORT
+      ).show()
+      return
+    }
+
     if (!task.isGradeCard && (task.taskStatus.assignedMicrotasks + task.taskStatus.skippedMicrotasks) > 0) {
       val taskId = task.taskID
       val status = task.taskStatus

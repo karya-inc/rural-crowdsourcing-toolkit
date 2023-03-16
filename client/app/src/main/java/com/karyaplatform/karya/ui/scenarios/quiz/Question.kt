@@ -1,14 +1,22 @@
 package com.karyaplatform.karya.ui.scenarios.quiz
 
-enum class QuestionType {
+enum class Type {
   text,
   mcq,
   invalid
 }
 
+enum class OptionType {
+  text,
+  image,
+  invalid
+}
+
 data class Question(
-  val type: QuestionType,
+  val type: Type,
+  val optionType: OptionType = OptionType.invalid,
   val question: String = "",
+  val questionImage: String? = null,
   val key: String = "",
   val long: Boolean? = false,
   val options: ArrayList<String>? = arrayListOf(),
