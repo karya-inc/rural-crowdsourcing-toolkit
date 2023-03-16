@@ -6,14 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
+import androidx.annotation.ColorInt
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.karyaplatform.karya.R
+import com.karyaplatform.karya.utils.extensions.invisible
+import com.karyaplatform.karya.utils.extensions.visible
 
-class OptionImageAdapter(private val dataSet: List<String>, private val onImageOptionCheckboxClickListener: OnImageOptionCheckboxClickListener) :
+class OptionImageAdapter(private val dataSet: List<String>, @ColorInt activeColor: Int, @ColorInt inactiveColor: Int, private val onImageOptionCheckboxClickListener: OnImageOptionCheckboxClickListener) :
   RecyclerView.Adapter<OptionImageAdapter.ViewHolder>() {
 
   var optionSelected = -1
+  val activeColor = activeColor
+  val inactiveColor = inactiveColor
 
   /**
    * Provide a reference to the type of views that you are using
@@ -41,8 +46,13 @@ class OptionImageAdapter(private val dataSet: List<String>, private val onImageO
     // contents of the view with that element
     val image = BitmapFactory.decodeFile(dataSet[position])
     viewHolder.optionIv.setImageBitmap(image)
+    viewHolder.optionCheckbox.isChecked = optionSelected == position
 
-    viewHolder.optionCheckbox.isSelected = optionSelected == position
+    if (optionSelected == position) {
+      viewHolder.optionCard.setCardBackgroundColor(activeColor)
+    } else {
+      viewHolder.optionCard.setCardBackgroundColor(inactiveColor)
+    }
 
     viewHolder.optionCard.setOnClickListener {
       optionSelected = position

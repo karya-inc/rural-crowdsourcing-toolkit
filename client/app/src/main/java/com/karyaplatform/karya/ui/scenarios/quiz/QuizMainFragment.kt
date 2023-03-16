@@ -112,12 +112,15 @@ class QuizMainFragment : BaseMTRendererFragment(R.layout.microtask_quiz) {
                 viewModel.inputFileImages.value[optionImageName]!!
               }
 
-
-              val adapter = OptionImageAdapter(optionImagesPath, object: OnImageOptionCheckboxClickListener {
-                override fun onClick(imageName: String) {
-                  viewModel.updateMCQResponse(imageName)
-                }
-              })
+              val adapter = OptionImageAdapter(
+                optionImagesPath,
+                resources.getColor(R.color.c_very_light_pink),
+                resources.getColor(R.color.c_white),
+                object : OnImageOptionCheckboxClickListener {
+                  override fun onClick(imageName: String) {
+                    viewModel.updateMCQResponse(imageName)
+                  }
+                })
               imageResponseRv.layoutManager = LinearLayoutManager(requireContext())
               imageResponseRv.adapter = adapter
             }
