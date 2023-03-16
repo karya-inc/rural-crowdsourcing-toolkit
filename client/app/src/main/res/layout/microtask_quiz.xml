@@ -61,7 +61,8 @@
             app:justifyContent="space_between"
             app:layout_constraintBottom_toTopOf="@id/textResponseEt"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:toggle_selectAnimation="none">
         </nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup>
 
         <EditText
