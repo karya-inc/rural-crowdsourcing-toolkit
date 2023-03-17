@@ -121,7 +121,7 @@ constructor(
     val message = WFC_CODE_SEED + today + "\n"
     val md5Encoder = MessageDigest.getInstance("MD5")
     md5Encoder.update(message.toByteArray(), 0, message.length)
-    val hash = BigInteger(1, md5Encoder.digest()).toString(16).substring(0,6)
+    val hash = BigInteger(1, md5Encoder.digest()).toString(16).substring(0,code.length)
     if (code == hash) {
       // TODO: hour offset is hard coded
       val centerAuthExpirationTime = Date().time + expireAfter * 60 * 60 * 1000

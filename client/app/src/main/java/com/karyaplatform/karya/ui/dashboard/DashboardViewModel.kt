@@ -60,7 +60,7 @@ constructor(
         if (worker.params != null && !worker.params.isJsonNull) {
           val tags = worker.params.asJsonObject.getAsJsonArray("tags")
           workerTags = tags.map { it.asString }
-          if (workerTags!!.contains("_wfc_")) {
+          if (workerTags!!.contains("_wfc_") || workerTags!!.contains("_wfhc_")) {
             _workFromCenterUser.value = true
             checkWorkFromCenterUserAuth()
           }
@@ -74,11 +74,12 @@ constructor(
   fun authorizeWorkFromCenterUser(code: String) {
     viewModelScope.launch {
       // Check if the user is work from home-center
-      val worker = authManager.getLoggedInWorker()
       var expireTime = 2
       if (workerTags != null && workerTags!!.contains("_wfhc_")) {
+        // wfhc users should have a 8 length code
+        if (code.length != 8) return@launch
           // Set 8 hours of expiry time for work from home-center users
-          expireTime = 8
+        expireTime = 8
       }
       val isAuthenticated = authManager.authorizeWorkFromCenterUser(code, expireTime)
       if (isAuthenticated) {
