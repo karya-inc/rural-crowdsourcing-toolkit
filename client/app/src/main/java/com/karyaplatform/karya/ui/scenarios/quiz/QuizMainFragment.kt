@@ -1,7 +1,9 @@
 package com.karyaplatform.karya.ui.scenarios.quiz
 
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -55,7 +57,13 @@ class QuizMainFragment : BaseMTRendererFragment(R.layout.microtask_quiz) {
   private fun setupObservers() {
     // Question has changed. Update the UI accordingly.
     viewModel.question.observe(viewLifecycleOwner.lifecycle, viewLifecycleScope) { question ->
-      questionTv.text = question.question
+      val questionHtml =
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        Html.fromHtml(question.question, Html.FROM_HTML_MODE_COMPACT)
+      } else {
+        Html.fromHtml(question.question)
+      }
+      questionTv.text = questionHtml
       if (!question.questionImage.isNullOrEmpty()) {
         val questionImagePath = viewModel.inputFileImages.value[question.questionImage]
         val questionImage = BitmapFactory.decodeFile(questionImagePath)
