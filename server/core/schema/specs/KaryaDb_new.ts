@@ -10,6 +10,7 @@ import deepcopy from 'deepcopy';
 export const karyaTableNames = [
   'server_user',
   'box',
+  'box_new',
   'worker',
   'karya_file',
   'task',
@@ -58,14 +59,13 @@ const karyaObjects = ['MicrotaskInput', 'MicrotaskOutput'] as const;
 export type KaryaObject = typeof karyaObjects[number];
 
 // Karya Database Specification
-const karyaDb: DatabaseSpec<KaryaTableName, KaryaString, KaryaObject> = {
+const karyaDbNew: DatabaseSpec<KaryaTableName, KaryaString, KaryaObject> = {
   version: '2.0.0',
   tables: {
     server_user: {
       columns: [
         ['access_code', ['string', 32], 'unique', 'not nullable', 'not mutable'],
         ['registered', ['boolean', false], 'not unique', 'not nullable', 'mutable'],
-        ['reg_mechanism', ['string', 32, 'RegistrationMechanism'], 'not unique', 'nullable', 'mutable'],
         ['phone_number', ['string', 16], 'not unique', 'nullable', 'mutable'],
         ['otp', ['string', 8], 'not unique', 'nullable', 'mutable'],
         ['otp_generated_at', ['stringarray'], 'not unique', 'nullable', 'mutable'],
@@ -96,6 +96,13 @@ const karyaDb: DatabaseSpec<KaryaTableName, KaryaString, KaryaObject> = {
         ['last_received_from_server_at', ['timestamp', 'eon'], 'not unique', 'not nullable', 'mutable'],
         ['last_sent_to_server_at', ['timestamp', 'eon'], 'not unique', 'not nullable', 'mutable'],
       ],
+    },
+
+    box_new: {
+      columns: [
+        ['access_code', ['string', 32], 'unique', 'not nullable', 'not mutable'],
+        ['registered', ['boolean', false], 'not unique', 'not nullable', 'mutable'],
+        ],
     },
 
     worker: {
@@ -333,7 +340,7 @@ const computeIdFunction = `CREATE OR REPLACE FUNCTION compute_id()
   RETURN NEW;
   END;
   $$ language 'plpgsql'`;
-karyaDb.functions = [['compute_id', computeIdFunction]];
+karyaDbNew.functions = [['compute_id', computeIdFunction]];
 
 // Compute ID triggers
 function computeIDTrigger(tableName: KaryaTableName) {
@@ -351,6 +358,7 @@ const commonFields: TableColumnSpec<KaryaTableName, KaryaString, KaryaObject>[] 
 const serverTables: KaryaTableName[] = [
   'server_user',
   'box',
+  'box_new',
   'task',
   'microtask_group',
   'microtask',
@@ -394,8 +402,8 @@ const serverSideBoxIdFields: TableColumnSpec<KaryaTableName, KaryaString, KaryaO
 ];
 
 // Seperate server-side and box side database spec
-const karyaServerDb_new = deepcopy(karyaDb);
-const karyaBoxDb_new = deepcopy(karyaDb);
+const karyaServerDb_new = deepcopy(karyaDbNew);
+const karyaBoxDb_new = deepcopy(karyaDbNew);
 
 serverTables.forEach((table) => {
   const columns = karyaServerDb_new.tables[table].columns;
@@ -416,7 +424,7 @@ const karyaFileIdFields: TableColumnSpec<KaryaTableName, KaryaString, KaryaObjec
   ['local_id', ['bigserial'], 'not unique', 'not nullable', 'not mutable'],
 ];
 
-const kf_columns = karyaDb.tables['karya_file'].columns;
+const kf_columns = karyaDbNew.tables['karya_file'].columns;
 karyaServerDb_new.tables['karya_file'].columns = karyaFileIdFields.concat(kf_columns).concat(commonFields);
 karyaServerDb_new.tables['karya_file'].triggers = [computeIDTrigger('karya_file')];
 karyaBoxDb_new.tables['karya_file'].columns = karyaFileIdFields.concat(kf_columns).concat(commonFields);

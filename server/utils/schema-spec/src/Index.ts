@@ -6,10 +6,10 @@
 export * from './SchemaInterface';
 
 import { knexDbSpec, typescriptDbInterface } from './generators/DatabaseGenerators';
-import { knexMigrationSpec } from './generators/MigrationGenerators';
+import { knexMigrationSpec, knexTableMigrationSpec } from './generators/MigrationGenerators';
 import prettier, { Options as PrettierOptions } from 'prettier';
 import fs from 'fs';
-import { DatabaseSpec } from './SchemaInterface';
+import { DatabaseSpec, TableSpec } from './SchemaInterface';
 
 // Read the formatter config
 const prettierconfig: PrettierOptions = {
@@ -64,3 +64,18 @@ export function writeMigrationFile<T extends string, S extends string, O extends
   const data = knexMigrationSpec(queryContent, knexClientPath);
   fs.writeFileSync(fileName, format(data));
 }
+
+/**
+ * Write the database migration tables functions into a given file
+ * @param dbSpec Database specification
+ * @param fileName Path to the destination file
+ */
+export function writeTableMigrationFile<T extends string, S extends string, O extends string>(
+  fileName: string,
+  queryContent: {[key:string]: TableSpec<T, S, O>},
+  knexClientPath: string
+) {
+  const data = knexTableMigrationSpec(queryContent, knexClientPath);
+  fs.writeFileSync(fileName, format(data));
+}
+
