@@ -83,7 +83,7 @@ abstract class BaseMTRendererFragment(@LayoutRes contentLayoutId: Int) :
     val worker = authManagerBase.getLoggedInWorker()
     val tags = worker.params!!.asJsonObject.getAsJsonArray("tags")
     val workerTags = tags.map { it.asString }
-    if (!workerTags.contains("_handle_inactivity_")) return
+    if (!workerTags.contains("_handle_activity_")) return
     if (inactivityCount <= Constants.MAX_ALLOWED_TIMEOUTS) {
       var dialogTimeoutJob: Job? = null
       val dialogBuilder = AlertDialog.Builder(requireContext())

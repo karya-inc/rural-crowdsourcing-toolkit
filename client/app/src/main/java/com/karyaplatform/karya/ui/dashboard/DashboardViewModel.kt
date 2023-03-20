@@ -43,7 +43,8 @@ constructor(
   private val _workerAccessCode: MutableStateFlow<String> = MutableStateFlow("")
   val workerAccessCode = _workerAccessCode.asStateFlow()
 
-  var workerTags: List<String>? = null
+  private val _workerTags: MutableStateFlow<List<String>?> = MutableStateFlow(arrayListOf())
+  val workerTags = _workerTags.asStateFlow()
 
   // Work from center user
   private val _workFromCenterUser: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -59,8 +60,9 @@ constructor(
       try {
         if (worker.params != null && !worker.params.isJsonNull) {
           val tags = worker.params.asJsonObject.getAsJsonArray("tags")
-          workerTags = tags.map { it.asString }
-          if (workerTags!!.contains("_wfc_") || workerTags!!.contains("_wfhc_")) {
+          _workerTags.value = tags.map { it.asString }
+          val wTagsValue = _workerTags.value
+          if (wTagsValue!!.contains("_wfc_") || wTagsValue!!.contains("_wfhc") || wTagsValue!!.contains("_wfhc_")) {
             _workFromCenterUser.value = true
             checkWorkFromCenterUserAuth()
           }
@@ -75,9 +77,10 @@ constructor(
     viewModelScope.launch {
       // Check if the user is work from home-center
       var expireTime = 2
-      if (workerTags != null && workerTags!!.contains("_wfhc_")) {
-        // wfhc users should have a 8 length code
-        if (code.length != 8) return@launch
+      val wTagsValue = _workerTags.value
+      if (workerTags != null && (wTagsValue!!.contains("_wfhc_") || wTagsValue!!.contains("_wfhc"))) {
+        // wfhc E2 users should have a 8 length code
+        if (code.length != 8 && wTagsValue.contains("E2")) return@launch
           // Set 8 hours of expiry time for work from home-center users
         expireTime = 8
       }

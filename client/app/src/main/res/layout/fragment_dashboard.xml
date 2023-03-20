@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/_10sdp"
                 android:layout_weight="1"
-                android:hint="Enter Center Code"
+                android:hint="Enter Code"
                 android:paddingVertical="@dimen/_8sdp"
                 android:textSize="@dimen/_14ssp" />
 

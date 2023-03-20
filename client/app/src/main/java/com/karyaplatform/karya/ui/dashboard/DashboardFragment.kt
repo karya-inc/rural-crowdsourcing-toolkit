@@ -125,8 +125,9 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
           binding.revokeWFCAuthorizationBtn.gone()
         } else {
           binding.wfcEnterCodeLL.gone()
-          if (viewModel.workerTags != null) {
-            if (viewModel.workerTags!!.contains("_wfhc_")) return@observe
+          val wTagsValue = viewModel.workerTags.value
+          if (wTagsValue != null) {
+            if (wTagsValue.contains("_wfhc_") || wTagsValue.contains("_wfhc")) return@observe
           }
           binding.revokeWFCAuthorizationBtn.visible()
         }
@@ -140,11 +141,19 @@ class DashboardFragment : SessionFragment(R.layout.fragment_dashboard) {
           binding.revokeWFCAuthorizationBtn.gone()
         } else {
           binding.wfcEnterCodeLL.gone()
-          if (viewModel.workerTags != null) {
-            if (viewModel.workerTags!!.contains("_wfhc_")) return@observe
+          val wTagsValue = viewModel.workerTags.value
+          if (wTagsValue != null) {
+            if (wTagsValue.contains("_wfhc_") || wTagsValue.contains("_wfhc")) return@observe
           }
           binding.revokeWFCAuthorizationBtn.visible()
         }
+      }
+    }
+
+    viewModel.workerTags.observe(viewLifecycleOwner.lifecycle, lifecycleScope) { wTags ->
+      val treatments = arrayListOf("E1", "E2", "E3", "E4", "E5")
+      treatments.forEach {
+        if (wTags!!.contains(it)) binding.centerCode.hint = "Center Code for $it"
       }
     }
 
