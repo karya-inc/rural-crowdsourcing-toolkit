@@ -49,9 +49,11 @@ constructor(
 
   // Text response
   private val _textResponse: MutableStateFlow<String> = MutableStateFlow("")
+  val textResponse = _textResponse.asStateFlow()
 
   // MCQ response
   private val _mcqResponse: MutableStateFlow<String> = MutableStateFlow("")
+  val mcqResponse = _mcqResponse.asStateFlow()
 
   /**
    * Setup quiz microtask

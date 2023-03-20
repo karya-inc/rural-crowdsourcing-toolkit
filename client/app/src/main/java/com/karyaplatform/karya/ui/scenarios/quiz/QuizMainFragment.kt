@@ -8,6 +8,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -140,6 +141,10 @@ class QuizMainFragment : BaseMTRendererFragment(R.layout.microtask_quiz) {
 
   private fun setupListeners() {
     nextBtn.setOnClickListener {
+      // Dont allow user to submit if a response is not provided
+      if (viewModel.textResponse.value.isNullOrEmpty() && viewModel.mcqResponse.value.isNullOrEmpty()) {
+        return@setOnClickListener
+      }
       viewModel.submitResponse()
       textResponseEt.setText("")
     }
