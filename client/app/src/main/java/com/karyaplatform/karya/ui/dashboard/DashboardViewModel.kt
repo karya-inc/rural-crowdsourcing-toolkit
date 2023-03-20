@@ -81,7 +81,10 @@ constructor(
       if (workerTags != null && (wTagsValue!!.contains("_wfhc_") || wTagsValue!!.contains("_wfhc"))) {
         // wfhc E2 users should have a 8 length code
         if (code.length != 8 && wTagsValue.contains("E2")) return@launch
-          // Set 8 hours of expiry time for work from home-center users
+        // wfhc E4 users should have a 6 length code
+        if (code.length != 6 && wTagsValue.contains("E4")) return@launch
+
+        // Set 8 hours of expiry time for work from home-center users
         expireTime = 8
       }
       val isAuthenticated = authManager.authorizeWorkFromCenterUser(code, expireTime)
