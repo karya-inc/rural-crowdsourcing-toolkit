@@ -53,7 +53,7 @@ export function writeTableFunctionsFile<T extends string, S extends string, O ex
 
 /**
  * Write the database migration tables functions into a given file
- * @param dbSpec Database specification
+ * @param queryContent queries to be run for migration
  * @param fileName Path to the destination file
  */
 export function writeMigrationFile<T extends string, S extends string, O extends string>(
@@ -67,15 +67,17 @@ export function writeMigrationFile<T extends string, S extends string, O extends
 
 /**
  * Write the database migration tables functions into a given file
- * @param dbSpec Database specification
+ * @param intent intent of migration
  * @param fileName Path to the destination file
+ * @param queryContent queries to be run for migration
  */
 export function writeTableMigrationFile<T extends string, S extends string, O extends string>(
   fileName: string,
+  intent: string,
   queryContent: {[key:string]: TableSpec<T, S, O>},
   knexClientPath: string
 ) {
-  const data = knexTableMigrationSpec(queryContent, knexClientPath);
+  const data = knexTableMigrationSpec(intent, queryContent, knexClientPath);
   fs.writeFileSync(fileName, format(data));
 }
 

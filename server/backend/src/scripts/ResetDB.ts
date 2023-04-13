@@ -9,7 +9,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { Promise as BBPromise } from 'bluebird';
-import { knex, setupDbConnection, ServerDbFunctions, mainLogger as logger, BasicModel } from '@karya/common';
+import { knex, setupDbConnection, ServerDbFunctions, mainLogger as logger, BasicModel, DataMigrationFunctionsAddTable, DataMigrationFunctionsDropTable } from '@karya/common';
 import { DataMigrationFunctions } from '@karya/common';
 import { bootstrapAuth } from './AuthBootstrap';
 import { createAllMatViews } from '../models/MatViewModel';
@@ -29,6 +29,8 @@ async function recreateAllTables() {
 async function migrateDB() {
   await DataMigrationFunctions.createAllMigrationsOfDropColumns();
   await DataMigrationFunctions.createAllMigrationsOfAddColumns();
+  await DataMigrationFunctionsAddTable.createAllMigrationsOfAddTable();
+  await DataMigrationFunctionsDropTable.createAllMigrationsOfDropTable();
   logger.info(`All Column Migrations Done`);
 }
 

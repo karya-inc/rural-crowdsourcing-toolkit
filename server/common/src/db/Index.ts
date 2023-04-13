@@ -9,6 +9,8 @@ export * as ServerDbFunctions from './auto/ServerTableFunctions';
 export * as BoxDbFunctions from './auto/BoxTableFunctions';
 export * as DataMigrationFunctions from './auto/DataMigrationFunctions';
 export * as DataMigrationFunctionsAddTable from './auto/DataMigrationFunctionsAddTable';
+export * as DataMigrationFunctionsDropTable from './auto/DataMigrationFunctionsDropTable';
+
 // Export basic models
 export * as BasicModel from './models/BasicModel';
 export * as MicrotaskModel from './models/MicrotaskModel';
