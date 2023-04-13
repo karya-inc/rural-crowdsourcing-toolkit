@@ -129,6 +129,22 @@ export function knexTableSpecAddTable<T extends string, S extends string, O exte
 return extraTables;
 }
 
+export function knexTableSpecDropTable<T extends string, S extends string, O extends string, T1 extends string, S1 extends string, O1 extends string>(
+  old_spec: DatabaseSpec<T, S, O>,
+  new_spec: DatabaseSpec<T1, S1, O1>
+): {[key:string]: TableSpec<T, S, O>} {
+  const old_server_tables = old_spec.tables;
+  const new_server_tables = new_spec.tables;
+  const extraTables : {[key:string]: TableSpec<T, S, O>} = {};
+  Object.keys(old_server_tables).map((name:string) => {
+      if(!(name in new_server_tables)){
+        extraTables[name] = old_server_tables[name as T];
+      }
+}
+)
+return extraTables;
+}
+
 /**
  * Generate the typescript name for a table. Converts given name to pascal case.
  * @param name Name of the table
@@ -140,11 +156,14 @@ export function typescriptTableName(name: string): string {
 
 const migrationFileName = `${process.cwd()}/../common/src/db/auto/DataMigrationFunctions.ts`;
 const migrationFileNameAddTable = `${process.cwd()}/../common/src/db/auto/DataMigrationFunctionsAddTable.ts`;
+const migrationFileNameDropTable = `${process.cwd()}/../common/src/db/auto/DataMigrationFunctionsDropTable.ts`;
 const migrationQueriesAddColumn = knexTableSpecAddColumn(karyaServerDb, karyaServerDb_new);
 const migrationQueriesDropColumn = knexTableSpecDropColumn(karyaServerDb, karyaServerDb_new);
-const migrationQueriesAddTableColumn = knexTableSpecAddTable(karyaServerDb, karyaServerDb_new);
-writeMigrationFile(migrationFileName, migrationQueriesAddColumn.concat(migrationQueriesDropColumn), '../Client');
-writeTableMigrationFile(migrationFileNameAddTable, migrationQueriesAddTableColumn, '../Client');
+const migrationQueriesAddTable = knexTableSpecAddTable(karyaServerDb, karyaServerDb_new);
+const migrationQueriesDropTable = knexTableSpecDropTable(karyaServerDb, karyaServerDb_new);
 
+writeMigrationFile(migrationFileName, migrationQueriesAddColumn.concat(migrationQueriesDropColumn), '../Client');
+writeTableMigrationFile(migrationFileNameAddTable, "addTable", migrationQueriesAddTable, '../Client');
+writeTableMigrationFile(migrationFileNameDropTable, "dropTable", migrationQueriesDropTable, '../Client');
 
 

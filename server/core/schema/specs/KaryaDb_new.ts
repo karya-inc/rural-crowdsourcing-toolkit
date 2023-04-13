@@ -11,6 +11,7 @@ export const karyaTableNames = [
   'server_user',
   'box',
   'box_new',
+  'worker_new',
   'worker',
   'karya_file',
   'task',
@@ -99,6 +100,13 @@ const karyaDbNew: DatabaseSpec<KaryaTableName, KaryaString, KaryaObject> = {
     },
 
     box_new: {
+      columns: [
+        ['access_code', ['string', 32], 'unique', 'not nullable', 'not mutable'],
+        ['registered', ['boolean', false], 'not unique', 'not nullable', 'mutable'],
+        ],
+    },
+
+    worker_new: {
       columns: [
         ['access_code', ['string', 32], 'unique', 'not nullable', 'not mutable'],
         ['registered', ['boolean', false], 'not unique', 'not nullable', 'mutable'],
@@ -359,6 +367,7 @@ const serverTables: KaryaTableName[] = [
   'server_user',
   'box',
   'box_new',
+  'worker_new',
   'task',
   'microtask_group',
   'microtask',
