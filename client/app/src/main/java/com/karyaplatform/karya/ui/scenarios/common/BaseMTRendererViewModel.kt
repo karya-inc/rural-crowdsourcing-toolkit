@@ -421,7 +421,9 @@ abstract class BaseMTRendererViewModel(
 
       if (_inputFileDoesNotExist.value) {
         // Dialog saying input file does not exist?
-        navigateBack()
+        log("MISSING_IP")
+        expireAndSaveCurrentMicrotask()
+        moveToNextMicrotask()
         return@launch
       }
 

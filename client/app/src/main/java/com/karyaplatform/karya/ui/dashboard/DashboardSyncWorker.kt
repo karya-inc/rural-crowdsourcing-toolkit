@@ -113,7 +113,7 @@ class DashboardSyncWorker(
       downloadInputFiles()
     } catch (e: Exception) {
       FirebaseCrashlytics.getInstance().recordException(e)
-      throw Exception(applicationContext.getString(R.string.download_file_error))
+//      throw Exception(applicationContext.getString(R.string.download_file_error))
     }
     setProgressAsync(Data.Builder().putInt("progress", MAX_DOWNLOAD_PROGRESS).build())
 
@@ -277,10 +277,12 @@ class DashboardSyncWorker(
           assignment.id
         ) // TODO: IMPLEMENT .CATCH BEFORE .COLLECT AND SEND ERROR
         .collect { response ->
-          FileUtils.downloadFileToLocalPath(
-            response,
-            microtaskInputContainer.getBlobPath(assignment.microtask_id)
-          )
+          if (response.isSuccessful) {
+            FileUtils.downloadFileToLocalPath(
+              response,
+              microtaskInputContainer.getBlobPath(assignment.microtask_id)
+            )
+          }
         }
       count += 1
       val localProgress = (count * 25) / filteredAssignments.size + MAX_RECEIVE_DB_UPDATES_PROGRESS

@@ -136,11 +136,12 @@ constructor(
   }
 
   fun getInputFile(idToken: String, assignmentId: String) = flow {
+
     val response = assignmentAPI.getInputFile(idToken, assignmentId)
 
-    if (!response.isSuccessful) {
-      error("Failed to get file")
-    }
+//    if (!response.isSuccessful) {
+//      error("Failed to get file")
+//    }
 
     emit(response)
   }
