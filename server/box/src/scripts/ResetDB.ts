@@ -5,7 +5,7 @@
 
 import dotenv from 'dotenv';
 dotenv.config();
-import { DataMigrationFunctions } from '@karya/common';
+import { DataMigrationFunctions, DataMigrationFunctionsAddTable, DataMigrationFunctionsDropTable } from '@karya/common';
 import { knex, setupDbConnection, BoxDbFunctions, mainLogger as logger } from '@karya/common';
 
 /** Main Script to reset the DB */
@@ -17,6 +17,11 @@ import { knex, setupDbConnection, BoxDbFunctions, mainLogger as logger } from '@
   setupDbConnection();
   await BoxDbFunctions.dropAllTables();
   await BoxDbFunctions.createAllTables();
-  await DataMigrationFunctions.alterTableColumns();
   logger.info(`Tables recreated`);
+  await DataMigrationFunctions.createAllMigrationsOfDropColumns();
+  await DataMigrationFunctions.createAllMigrationsOfAddColumns();
+  await DataMigrationFunctionsAddTable.createAllMigrationsOfAddTable();
+  await DataMigrationFunctionsDropTable.createAllMigrationsOfDropTable();
+  logger.info(`All Migrations Done`);
+  
 })().finally(() => knex.destroy());

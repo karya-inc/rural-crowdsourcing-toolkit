@@ -31,7 +31,7 @@ async function migrateDB() {
   await DataMigrationFunctions.createAllMigrationsOfAddColumns();
   await DataMigrationFunctionsAddTable.createAllMigrationsOfAddTable();
   await DataMigrationFunctionsDropTable.createAllMigrationsOfDropTable();
-  logger.info(`All Column Migrations Done`);
+  logger.info(`All Migrations Done`);
 }
 
 /** Script sequence */

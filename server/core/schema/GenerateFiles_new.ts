@@ -17,14 +17,19 @@ writeTypescriptInterfaceFile(karyaServerDb_new, '../types/Custom', tableInterfac
 export function knexTableSpecAddColumn<T extends string, S extends string, O extends string, T1 extends string, S1 extends string, O1 extends string>(
     old_spec: DatabaseSpec<T, S, O>,
     new_spec: DatabaseSpec<T1, S1, O1>
-  ): string[] {
+  ): (string)[] {
     const old_server_tables = old_spec.tables;
     const new_server_tables = new_spec.tables;
     var affectedTables : Array<string> = [];
     const query = Object.keys(old_server_tables).map((name) => {
-      
-        const oldTableSpec = old_server_tables[name as T].columns;
-        const newTableSpec = new_server_tables[name as T1].columns;
+        const oldTable = old_server_tables[name as T];
+        const newTable = new_server_tables[name as T1];
+        // if the table doesnt exist in newTable, i.e it has been dropped and hence should be handled by dropTable function
+        if(newTable == undefined){
+          return
+        }
+        const oldTableSpec = oldTable.columns;
+        const newTableSpec = newTable.columns;
         const extraColumns: TableColumnSpec<T1,S1,O1>[] = [];
 
         for (var i = 0; i<newTableSpec.length; i++){
@@ -46,12 +51,12 @@ export function knexTableSpecAddColumn<T extends string, S extends string, O ext
         const knexColSpecs = extraColumns.map((column) => knexColumnSpec(column));
         return extraColumns?.length ? `
         export async function alterTable${tsTableName}AddColumns() {
-        return knex.schema.alterTable('${tsTableName}', async (table) => {
+        return knex.schema.alterTable('${name}', async (table) => {
           ${knexColSpecs.join('\n')}
         });
       }` : ""
     })
-    var content = query.filter(item => item.length);
+    var content = query.filter(item => item && item.length) as string[];
     var sub = `export async function createAllMigrationsOfAddColumns() {`;
     Object.keys(old_server_tables).forEach((name) => {
       const tsTableName = typescriptTableName(name);
@@ -73,8 +78,14 @@ export function knexTableSpecDropColumn<T extends string, S extends string, O ex
     var affectedTables : Array<string> = [];
     const query = Object.keys(old_server_tables).map((name) => {
       
-        const oldTableSpec = old_server_tables[name as T].columns;
-        const newTableSpec = new_server_tables[name as T1].columns;
+      const oldTable = old_server_tables[name as T];
+      const newTable = new_server_tables[name as T1];
+      // if the table doesnt exist in newTable, i.e it has been dropped and hence should be handled by dropTable function
+      if(newTable == undefined){
+        return
+      }
+      const oldTableSpec = oldTable.columns;
+      const newTableSpec = newTable.columns;
         const extraColumns: TableColumnSpec<T,S,O>[] = [];
 
         for (var i = 0; i<oldTableSpec.length; i++){
@@ -96,12 +107,12 @@ export function knexTableSpecDropColumn<T extends string, S extends string, O ex
         const knexColSpecs = extraColumns.map((column) => `table.dropColumn('${column[0]}')`);
         return extraColumns?.length ? `
         export async function alterTable${tsTableName}DropColumns() {
-        await knex.schema.alterTable('${tsTableName}', async (table) => {
+        await knex.schema.alterTable('${name}', async (table) => {
           ${knexColSpecs.join('\n')}
         });
       }` : ""
     })
-    var content = query.filter(item => item.length);
+    var content = query.filter(item => item && item.length) as string [];
     var sub = `export async function createAllMigrationsOfDropColumns() {`;
     Object.keys(old_server_tables).forEach((name) => {
       const tsTableName = typescriptTableName(name);
