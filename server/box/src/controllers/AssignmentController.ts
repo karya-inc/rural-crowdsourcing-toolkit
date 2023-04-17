@@ -19,6 +19,7 @@ export const get: KaryaMiddleware = async (ctx) => {
   const assignment_type = ctx.request.query.type;
   const from = ctx.request.query.from;
   const limit_param = ctx.request.query.limit;
+  const include_mt = ctx.request.query.includemt;
 
   // Check assignment type
   if (assignment_type != 'new' && assignment_type != 'verified') {
@@ -51,7 +52,13 @@ export const get: KaryaMiddleware = async (ctx) => {
     );
     const taskIds = new Set(assignments.map((mta) => mta.task_id));
     const tasks = await BasicModel.getRecords('task', {}, [['id', [...taskIds]]]);
-    HttpResponse.OK(ctx, { tasks, assignments });
+    if (!include_mt) {
+      HttpResponse.OK(ctx, { tasks, assignments });
+    } else {
+      const mtIds = assignments.map((mta) => mta.microtask_id);
+      const microtasks = await BasicModel.getRecords('microtask', {}, [['id', mtIds]]);
+      HttpResponse.OK(ctx, { tasks, microtasks, assignments });
+    }
   } else {
     // TODO: Adjust max credits
     await assignMicrotasksForWorker(worker, 10000);
