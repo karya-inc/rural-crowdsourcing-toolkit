@@ -215,8 +215,8 @@ export const getWorkerBalance: KaryaMiddleware = async (ctx, next) => {
   // TODO @enhancement: Validate the input
   const workerId = ctx.params.id;
   const workerBalance = await WorkerModel.getBalance(workerId);
-  const totalSpent = await WorkerModel.getTotalSpent(workerId);
-  return HttpResponse.OK(ctx, { worker_balance: workerBalance, total_spent: totalSpent });
+  // const totalSpent = await WorkerModel.getTotalSpent(workerId);
+  return HttpResponse.OK(ctx, { worker_balance: workerBalance, total_spent: 0.0 });
 };
 
 /**
@@ -226,6 +226,6 @@ export const getWorkerEarningStatus: KaryaMiddleware = async (ctx, next) => {
   const worker_id = ctx.state.entity.id;
   const total_earned = await WorkerModel.getTotalEarned(worker_id);
   const week_earned = await WorkerModel.getWeekEarned(worker_id);
-  const total_paid = await WorkerModel.getTotalSpent(worker_id);
-  return HttpResponse.OK(ctx, { total_earned, week_earned, total_paid });
+  // const total_paid = await WorkerModel.getTotalSpent(worker_id);
+  return HttpResponse.OK(ctx, { total_earned, week_earned, total_paid: 0.0 });
 };
