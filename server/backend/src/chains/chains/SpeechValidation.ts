@@ -29,7 +29,8 @@ export const speechValidationChain: BackendChainInterface<'SPEECH_DATA', 'SPEECH
       const chainedMicrotask: MicrotaskType<'SPEECH_VERIFICATION'> = {
         task_id: toTask.id,
         input: {
-          data: microtask.input.data,
+          // @ts-ignore
+          data: { ...microtask.input.data, recorder_id: assignment.worker_id },
           files: { recording },
         },
         input_file_id: assignment.output_file_id,
